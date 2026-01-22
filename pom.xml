@@ -4,10 +4,10 @@
   <artifactId>linkml-java</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  
+
   <name>LinkML-Java</name>
   <description>LinkML runtime library for Java</description>
-  <url>https://github.com/gouttegd/linml-java</url>
+  <url>https://github.com/gouttegd/linkml-java</url>
 
   <licenses>
     <license>
@@ -47,7 +47,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.13.0-M3</version>
+      <version>5.14.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -61,7 +61,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.6.1</version>
+        <version>3.6.2</version>
         <executions>
           <execution>
             <goals>
@@ -80,7 +80,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.14.0</version>
+        <version>3.14.1</version>
         <configuration>
           <release>8</release>
         </configuration>
@@ -88,7 +88,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.5.3</version>
+        <version>3.5.4</version>
       </plugin>
     </plugins>
   </build>
