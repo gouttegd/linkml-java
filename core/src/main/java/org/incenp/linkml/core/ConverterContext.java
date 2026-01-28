@@ -1,0 +1,224 @@
+/*
+ * LinkML-Java - LinkML library for Java
+ * Copyright © 2026 Damien Goutte-Gattat
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.incenp.linkml.core;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.incenp.linkml.model.ClassDefinition;
+import org.incenp.linkml.model.Element;
+import org.incenp.linkml.model.EnumDefinition;
+import org.incenp.linkml.model.SchemaDefinition;
+import org.incenp.linkml.model.SlotDefinition;
+import org.incenp.linkml.model.TypeDefinition;
+
+/**
+ * Global context for converting LinkML objects (as parsed from a JSON/YAML
+ * document) into their corresponding Java objects.
+ * <p>
+ * An object of this class serves mostly two purposes.
+ * <p>
+ * First, it holds a list of all the known LinkML classes, along with their
+ * respective converter objects. So whenever a converting encounters a slot
+ * expecting a value of type <em>Foo</em> (where <em>Foo</em> is a LinkML
+ * class), it can obtain from the context the converter it needs to convert the
+ * value of the slot into an instance of the <em>Foo</em> class.
+ * <p>
+ * Second, it provides a solution to the problem of dereferencing entities that
+ * may not have been parsed/converted yet. For example, when parsing a class
+ * definition, we are likely to encounter a reference to a slot definition, but
+ * we may not have parsed that slot definition yet. We cannot solve that simply
+ * by ensuring that we always parse slot definitions first, because slot
+ * definitions may in turn contain references to a class definition (typically
+ * within the <code>range</code> slot). This context object will take care of
+ * resolving those references, either immediately if possible (if the referenced
+ * object has already been seen before), or in a post-parsing finalization step
+ * (when we are sure that all objects contained in the document have been seen,
+ * so all references should be resolvable).
+ */
+public class ConverterContext {
+
+    private Map<Class<?>, ObjectConverter> converters = new HashMap<>();
+    private ObjectCache objectCache = new ObjectCache();
+    private List<DelayedAssignment> delayedAssignments = new ArrayList<>();
+
+    /**
+     * Registers a converter for objects of the given class.
+     * 
+     * @param type The class for which to register a converter. A default converter
+     *             will be automatically created.
+     */
+    public void addConverter(Class<?> type) {
+        converters.put(type, new ObjectConverter(type));
+    }
+
+    /**
+     * Registers a custom converter for objects of a given class.
+     * 
+     * @param type      The class for which to register a converter.
+     * @param converter The converter to use for objects of that class.
+     */
+    public void addConverter(Class<?> type, ObjectConverter converter) {
+        converters.put(type, converter);
+    }
+
+    /**
+     * Checks whether the given type is a “complex” type.
+     * <p>
+     * A “complex type”, in this context, is a class for which we have a dedicated
+     * converter object.
+     * 
+     * @param type The type to query.
+     * @return <code>true</code> if the type is a complex type, <code>false</code>
+     *         otherwise.
+     */
+    public boolean isComplexType(Class<?> type) {
+        return converters.containsKey(type);
+    }
+
+    /**
+     * Checks whether the given type has an identifier slot.
+     * <p>
+     * A type with an identifier slot represents objects that are expected to be
+     * unique within the context of the entire document. Those are the objects that
+     * we might need to dereference.
+     * 
+     * @param type The type to query.
+     * @return <code>true</code> if the type has an identifier slot,
+     *         <code>false</code> otherwise (including the case where the object is
+     *         not of a type known to this context).
+     */
+    public boolean hasIdentifier(Class<?> type) {
+        ObjectConverter converter = converters.get(type);
+        return converter != null ? converter.hasIdentifier() : false;
+    }
+
+    /**
+     * Gets the converter for objects of the given type.
+     * 
+     * @param type The type to query.
+     * @return The registered converter for the type, or <code>null</code> if no
+     *         converter has been registered for that type.
+     */
+    public ObjectConverter getConverter(Class<?> type) {
+        return converters.get(type);
+    }
+
+    /**
+     * Dereferences a global object, optionally creating it if does not already
+     * exist.
+     * 
+     * @param <T>    The type of object to dereference.
+     * @param type   The type of object to dereference.
+     * @param name   The name to resolve into a dereferenced object.
+     * @param create If <code>true</code>, a new object of the given type and with
+     *               the given name will be created and added to the global context
+     *               if an object with that name did not already exist.
+     * @return The dereferenced object, or <code>null</code> if the object did not
+     *         already exist and <code>create</code> is <code>false</code>.
+     * @throws LinkMLRuntimeException If we cannot create the object as needed.
+     */
+    public <T> T getObject(Class<T> type, String name, boolean create) throws LinkMLRuntimeException {
+        return objectCache.getObject(type, name, create);
+    }
+
+    /**
+     * Dereferences a global object and assigns it to a slot on another object.
+     * <p>
+     * If the desired object does not exist in the context, the assignment will take
+     * place when the {@link #finalizeAssignments()} method is called.
+     * 
+     * @param slot   The slot to which to assign the dereferenced object.
+     * @param name   The name to resolve into a dereferenced object.
+     * @param target The object to which to assign the dereferenced object.
+     * @return The dereferenced object, or <code>null</code> if the object does not
+     *         exist in the context at the time this method is called.
+     * @throws LinkMLRuntimeException If the retrieved object cannot be assigned to
+     *                                the slot.
+     */
+    public Object getObject(Slot slot, String name, Object target) throws LinkMLRuntimeException {
+        Object value = objectCache.getObject(slot.getInnerType(), name, false);
+        if ( value == null ) {
+            delayedAssignments.add(new DelayedAssignment(name, target, slot));
+        } else {
+            slot.setValue(target, value);
+        }
+        return value;
+    }
+
+    /**
+     * Performs all delayed assignments.
+     * <p>
+     * A delayed assignment is an assignment requested through the
+     * {@link #getObject(Slot, String, Object)} method, which could not be performed
+     * at the time that method was called because the requested object was not known
+     * to the context yet.
+     * 
+     * @throws LinkMLRuntimeException If an assignment cannot be performed.
+     */
+    public void finalizeAssignments() throws LinkMLRuntimeException {
+        for ( DelayedAssignment da : delayedAssignments ) {
+            Object value = getObject(da.slot.getInnerType(), da.name, false);
+            if ( value == null ) {
+                // FIXME: Not sure yet what to do here. Should a non-resolvable reference be a
+                // fatal error (and trigger a LinkMLRuntimeException)? For now we silently
+                // ignore.
+                continue;
+            }
+
+            da.slot.setValue(da.target, value);
+        }
+    }
+
+    /**
+     * Gets a context suitable for converting LinkML schema objects.
+     */
+    public static ConverterContext getLinkMLContext() {
+        ConverterContext ctx = new ConverterContext();
+        ctx.addConverter(SchemaDefinition.class);
+        ctx.addConverter(TypeDefinition.class);
+        ctx.addConverter(EnumDefinition.class);
+        ctx.addConverter(SlotDefinition.class);
+        ctx.addConverter(ClassDefinition.class);
+        ctx.addConverter(Element.class);
+
+        return ctx;
+    }
+
+    /*
+     * Represents the assignment of a global object to a slot, that cannot be
+     * performed immediately because the requested global object is not known yet.
+     * 
+     * This is a private class for now because it is not expected to be needed
+     * anywhere outside of this context. That may change in the future.
+     */
+    private class DelayedAssignment {
+        String name; // The name of the global object to dereference and assign.
+        Object target; // The object to which to assign the dereferenced value.
+        Slot slot; // The slot (within the target object) to which to assign the value.
+
+        DelayedAssignment(String name, Object target, Slot slot) {
+            this.name = name;
+            this.target = target;
+            this.slot = slot;
+        }
+    }
+}
