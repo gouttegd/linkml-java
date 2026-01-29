@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.incenp.linkml.model.ClassDefinition;
+import org.incenp.linkml.model.Prefix;
 import org.incenp.linkml.model.SlotDefinition;
 import org.incenp.linkml.model.TypeDefinition;
 import org.junit.jupiter.api.Assertions;
@@ -89,5 +90,23 @@ public class SchemaDocumentTest {
         } catch ( IOException | InvalidSchemaException e ) {
             Assertions.fail("Unexpected exception", e);
         }
+    }
+
+    @Test
+    void testReadingPrefixesBlock() {
+        File schemaFile = new File("src/test/resources/schemas/organisms-1.yaml");
+        SchemaDocument schemaDoc = null;
+        try {
+            schemaDoc = new SchemaDocument(schemaFile);
+        } catch ( IOException | InvalidSchemaException e ) {
+            Assertions.fail("Unexpected exception", e);
+        }
+
+        Assertions.assertNotNull(schemaDoc.getRootSchema().getPrefixes());
+        Assertions.assertEquals(1, schemaDoc.getRootSchema().getPrefixes().size());
+
+        Prefix pfx = schemaDoc.getRootSchema().getPrefixes().get(0);
+        Assertions.assertEquals("linkml", pfx.getPrefixName());
+        Assertions.assertEquals("https://w3id.org/linkml/", pfx.getIriPrefix());
     }
 }

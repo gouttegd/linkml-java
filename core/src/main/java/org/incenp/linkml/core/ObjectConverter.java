@@ -95,7 +95,8 @@ public class ObjectConverter {
                 // - complex multi-valued slots expecting references
                 if ( ctx.isComplexType(type) ) {
                     if ( ctx.hasIdentifier(type) ) {
-                        if ( slot.getInliningMode() == InliningMode.DICT ) {
+                        InliningMode inlining = slot.getInliningMode();
+                        if ( inlining == InliningMode.DICT ) {
                             ArrayList<Object> value = new ArrayList<>();
 
                             Map<String, Object> rawValue = toMap(entry.getValue());
@@ -107,6 +108,23 @@ public class ObjectConverter {
                                 value.add(item);
                             }
 
+                            slot.setValue(dest, value);
+                        } else if ( inlining == InliningMode.SIMPLE_DICT ) {
+                            Slot primarySlot = Slot.getPrimaryValueSlot(type);
+                            if ( primarySlot == null ) {
+                                throw new LinkMLRuntimeException(
+                                        String.format("Type of slot '%s' is not compatible with simple dict inlining",
+                                                slot.getLinkMLName()));
+                            }
+                            ArrayList<Object> value = new ArrayList<>();
+
+                            Map<String, Object> rawValue = toMap(entry.getValue());
+                            for ( Map.Entry<String, Object> rawItem : rawValue.entrySet() ) {
+                                Object item = ctx.getObject(type, rawItem.getKey(), true);
+                                // FIXME: Handle type checking/conversion
+                                primarySlot.setValue(item, rawItem.getValue());
+                                value.add(item);
+                            }
                             slot.setValue(dest, value);
                         }
                     }
@@ -135,9 +153,20 @@ public class ObjectConverter {
                 // - non-identifiable object
                 // - identifiable object inlined
                 if ( ctx.hasIdentifier(type) ) {
-                    if ( slot.getInliningMode() == null ) {
-                        // Reference mode
+                    switch ( slot.getInliningMode() ) {
+                    case NO_INLINING:
                         ctx.getObject(slot, (String) entry.getValue(), dest);
+                        break;
+                    case DICT:
+                        break;
+                    case LIST:
+                        // Does not make sense for a single-valued slot?
+                        break;
+                    case SIMPLE_DICT:
+                        break;
+                    default:
+                        // Should never happen
+                        break;
                     }
                 }
             }

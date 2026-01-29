@@ -26,6 +26,7 @@ import java.util.Map;
 import org.incenp.linkml.model.ClassDefinition;
 import org.incenp.linkml.model.Element;
 import org.incenp.linkml.model.EnumDefinition;
+import org.incenp.linkml.model.Prefix;
 import org.incenp.linkml.model.SchemaDefinition;
 import org.incenp.linkml.model.SlotDefinition;
 import org.incenp.linkml.model.TypeDefinition;
@@ -199,6 +200,7 @@ public class ConverterContext {
         ctx.addConverter(SlotDefinition.class);
         ctx.addConverter(ClassDefinition.class);
         ctx.addConverter(Element.class);
+        ctx.addConverter(Prefix.class);
 
         return ctx;
     }

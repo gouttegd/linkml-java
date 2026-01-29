@@ -54,6 +54,7 @@ public class SchemaDefinition extends Element {
     private String license;
 
     @LinkURI("http://www.w3.org/ns/shacl#declare")
+    @Inlining(InliningMode.SIMPLE_DICT)
     private List<Prefix> prefixes;
 
     @JsonProperty("default_prefix")
