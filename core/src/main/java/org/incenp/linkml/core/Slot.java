@@ -27,8 +27,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.incenp.linkml.model.InliningMode;
+import org.incenp.linkml.model.RequirementLevel;
 import org.incenp.linkml.model.annotations.Identifier;
 import org.incenp.linkml.model.annotations.Inlining;
+import org.incenp.linkml.model.annotations.Requirement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -138,6 +140,19 @@ public class Slot {
     }
 
     /**
+     * Indicates whether the slot is required, recommended, or optional.
+     * 
+     * @return A {@link RequirementLevel} value for the slot.
+     */
+    public RequirementLevel getRequirementLevel() {
+        if ( isIdentifier() ) {
+            return RequirementLevel.MANDATORY;
+        }
+        Requirement reqAnnotation = field.getAnnotation(Requirement.class);
+        return reqAnnotation != null ? reqAnnotation.value() : RequirementLevel.OPTIONAL;
+    }
+
+    /**
      * Assigns a value to the slot for the given object.
      * 
      * @param target The LinkML object holding the slot.
@@ -213,6 +228,51 @@ public class Slot {
         } while ( current != null );
 
         return null;
+    }
+
+    /**
+     * Finds the primary slot for the given type.
+     * <p>
+     * The “primary” slot of a LinkML class is the slot to which assign the value of
+     * a dict entry when using the “SimpleDict” inlining mode. As per the rules set
+     * forth in LinkML’s documentation, the primary slot is either:
+     * <ul>
+     * <li>the one non-identifier (or more generally, non-<em>key</em>, but we do
+     * not support key slots for the time being) slot, if the class has only one
+     * such slot beyond the identifier slot;
+     * <li>the one <em>mandatory</em> non-identifier slot, if the class has several
+     * non-identifier slots but only one marked as mandatory.
+     * </ul>
+     * If the class has more than one non-identifier slot without any single one of
+     * them being mandatory, or more than one mandatory non-identifier slot, then
+     * the class has <em>no</em> primary slot (and is not eligible for inlining in
+     * SimpleDict mode).
+     * 
+     * @param type The type for which to retrieve the primary slot.
+     * @return The primary slot for the type, or <code>null</code> if the type has
+     *         no primary slot.
+     * 
+     * @see <a href=
+     *      "https://linkml.io/linkml/schemas/inlining.html#inlining-as-simple-dictionaries">LinkML
+     *      documentation about inlining as simple dictionaries</a>
+     */
+    public static Slot getPrimaryValueSlot(Class<?> type) {
+        Slot mandatorySlot = null;
+        Slot nonIdentifierSlot = null;
+        int nMandatorySlots = 0;
+        int nNonIdentifierSlots = 0;
+        for ( Slot slot : Slot.getSlots(type) ) {
+            if ( slot.isIdentifier() ) {
+                continue;
+            }
+            if ( slot.getRequirementLevel() == RequirementLevel.MANDATORY ) {
+                mandatorySlot = slot;
+                nMandatorySlots += 1;
+            }
+            nonIdentifierSlot = slot;
+            nNonIdentifierSlots += 1;
+        }
+        return nNonIdentifierSlots == 1 ? nonIdentifierSlot : nMandatorySlots == 1 ? mandatorySlot : null;
     }
 
     /**

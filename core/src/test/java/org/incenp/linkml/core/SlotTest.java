@@ -22,6 +22,7 @@ import java.util.HashMap;
 
 import org.incenp.linkml.model.InliningMode;
 import org.incenp.linkml.model.PermissibleValue;
+import org.incenp.linkml.model.Prefix;
 import org.incenp.linkml.model.SchemaDefinition;
 import org.incenp.linkml.model.SlotDefinition;
 import org.incenp.linkml.model.TypeDefinition;
@@ -92,6 +93,15 @@ public class SlotTest {
 
         identifierSlot = Slot.getIdentifierSlot(PermissibleValue.class);
         Assertions.assertNull(identifierSlot);
+    }
+
+    @Test
+    void testGetPrimaryValueSlot() {
+        Slot primarySlot = Slot.getPrimaryValueSlot(Prefix.class);
+        Assertions.assertEquals("prefix_reference", primarySlot.getLinkMLName());
+
+        primarySlot = Slot.getPrimaryValueSlot(TypeDefinition.class);
+        Assertions.assertNull(primarySlot);
     }
 
     @Test
