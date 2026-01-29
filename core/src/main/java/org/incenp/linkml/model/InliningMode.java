@@ -26,6 +26,11 @@ import org.incenp.linkml.model.annotations.Identifier;
  */
 public enum InliningMode {
     /**
+     * Instances are not inlined.
+     */
+    NO_INLINING,
+
+    /**
      * Instances are inlined as a list.
      */
     LIST,

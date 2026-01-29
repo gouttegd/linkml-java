@@ -69,7 +69,7 @@ public class SlotTest {
     @Test
     void testGetInliningMode() throws LinkMLRuntimeException {
         Slot noInliningSlot = Slot.getSlot(SchemaDefinition.class, "defaultRange");
-        Assertions.assertNull(noInliningSlot.getInliningMode());
+        Assertions.assertEquals(InliningMode.NO_INLINING, noInliningSlot.getInliningMode());
 
         Slot inlinedAsDictSlot = Slot.getSlot(SchemaDefinition.class, "slotDefinitions");
         Assertions.assertEquals(InliningMode.DICT, inlinedAsDictSlot.getInliningMode());

@@ -68,9 +68,7 @@ public class Slot {
         }
 
         Inlining inliningAnnotation = field.getAnnotation(Inlining.class);
-        if ( inliningAnnotation != null ) {
-            inliningMode = inliningAnnotation.value();
-        }
+        inliningMode = inliningAnnotation != null ? inliningAnnotation.value() : InliningMode.NO_INLINING;
     }
 
     /**
