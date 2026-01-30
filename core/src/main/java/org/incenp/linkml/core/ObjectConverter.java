@@ -18,10 +18,9 @@
 
 package org.incenp.linkml.core;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.incenp.linkml.model.InliningMode;
@@ -89,7 +88,6 @@ public class ObjectConverter {
             Class<?> type = slot.getInnerType();
             if ( slot.isMultivalued() ) {
                 // FIXME: Non-covered cases:
-                // - non-complex multi-valued slots
                 // - complex multi-valued slots expecting non-identifiable values
                 // - complex multi-valued slots expecting identifiable values inlined as list
                 // - complex multi-valued slots expecting references
@@ -120,33 +118,37 @@ public class ObjectConverter {
 
                             Map<String, Object> rawValue = toMap(entry.getValue());
                             for ( Map.Entry<String, Object> rawItem : rawValue.entrySet() ) {
+                                // FIXME: For now we assume that the primary slot of a class inlined as a
+                                // SimpleDict cannot be multi-valued and cannot be of a non-scalar type. Whether
+                                // this is correct or not is unclear: the LinkML validator accepts a
+                                // multi-valued primary slot and a non-scalar-typed primary slot, but the LinkML
+                                // converter rejects both cases (https://github.com/linkml/linkml/issues/3112).
                                 Object item = ctx.getObject(type, rawItem.getKey(), true);
-                                // FIXME: Handle type checking/conversion
-                                primarySlot.setValue(item, rawItem.getValue());
+                                primarySlot.setValue(item,
+                                        convertScalar(primarySlot.getInnerType(), rawItem.getValue(), ctx));
                                 value.add(item);
                             }
                             slot.setValue(dest, value);
                         }
                     }
-                }
-            } else if ( type == String.class ) {
-                // FIXME: Check that the value matches what we expect
-                // (likewise for all similar cases below).
-                slot.setValue(dest, entry.getValue());
-            } else if ( type == URI.class ) {
-                try {
-                    URI value = new URI((String) entry.getValue());
-                    slot.setValue(dest, value);
-                } catch ( URISyntaxException e ) {
-                    // FIXME: Decide how to report type-checking errors
-                }
-            } else if ( type == Boolean.TYPE ) {
-                Object rawValue = entry.getValue();
-                if ( Boolean.class.isInstance(rawValue) ) {
-                    slot.setValue(dest, rawValue);
                 } else {
-                    Boolean value = ((String) rawValue).equalsIgnoreCase("true");
+                    // Scalar multi-valued slot
+                    if ( !(entry.getValue() instanceof List) ) {
+                        throw new LinkMLRuntimeException("Invalid value type, list expected");
+                    }
+                    @SuppressWarnings("unchecked")
+                    List<Object> rawValue = List.class.cast(entry.getValue());
+                    IScalarConverter conv = ctx.getScalarConverter(type);
+                    if ( conv == null ) {
+                        throw new LinkMLRuntimeException(String.format("Unsupported scalar type: %s", type.getName()));
+                    }
+                    ArrayList<Object> value = new ArrayList<>();
+
+                    for ( Object rawItem : rawValue ) {
+                        value.add(conv.convert(rawItem));
+                    }
                     slot.setValue(dest, value);
+
                 }
             } else if ( ctx.isComplexType(type) ) {
                 // FIXME: Non-covered cases:
@@ -169,9 +171,18 @@ public class ObjectConverter {
                         break;
                     }
                 }
+            } else {
+                slot.setValue(dest, convertScalar(type, entry.getValue(), ctx));
             }
-            // FIXME: Handle Other scalar types.
         }
+    }
+
+    protected Object convertScalar(Class<?> type, Object value, ConverterContext ctx) throws LinkMLRuntimeException {
+        IScalarConverter conv = ctx.getScalarConverter(type);
+        if ( conv == null ) {
+            throw new LinkMLRuntimeException(String.format("Unsupported scalar type: %s", type.getName()));
+        }
+        return conv.convert(value);
     }
 
     /**

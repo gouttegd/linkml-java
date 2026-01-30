@@ -109,4 +109,19 @@ public class SchemaDocumentTest {
         Assertions.assertEquals("linkml", pfx.getPrefixName());
         Assertions.assertEquals("https://w3id.org/linkml/", pfx.getIriPrefix());
     }
+
+    @Test
+    void testReadingImportsBlock() {
+        File schemaFile = new File("src/test/resources/schemas/organisms-1.yaml");
+        SchemaDocument schemaDoc = null;
+        try {
+            schemaDoc = new SchemaDocument(schemaFile);
+        } catch ( IOException | InvalidSchemaException e ) {
+            Assertions.fail("Unexpected exception", e);
+        }
+
+        Assertions.assertNotNull(schemaDoc.getRootSchema().getImports());
+        Assertions.assertEquals(1, schemaDoc.getRootSchema().getImports().size());
+        Assertions.assertEquals("linkml:types", schemaDoc.getRootSchema().getImports().get(0));
+    }
 }

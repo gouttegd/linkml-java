@@ -3,6 +3,8 @@ name: organisms
 default_range: string
 prefixes:
   linkml: https://w3id.org/linkml/
+imports:
+  - linkml:types
 
 types:
   string:

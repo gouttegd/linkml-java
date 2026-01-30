@@ -58,6 +58,7 @@ import org.incenp.linkml.model.TypeDefinition;
 public class ConverterContext {
 
     private Map<Class<?>, ObjectConverter> converters = new HashMap<>();
+    private List<IScalarConverter> scalarConverters = new ArrayList<>();
     private ObjectCache objectCache = new ObjectCache();
     private List<DelayedAssignment> delayedAssignments = new ArrayList<>();
 
@@ -79,6 +80,15 @@ public class ConverterContext {
      */
     public void addConverter(Class<?> type, ObjectConverter converter) {
         converters.put(type, converter);
+    }
+
+    /**
+     * Registers a converter for scalar values.
+     * 
+     * @param converter The converter to register.
+     */
+    public void addScalarConverter(IScalarConverter converter) {
+        scalarConverters.add(converter);
     }
 
     /**
@@ -121,6 +131,22 @@ public class ConverterContext {
      */
     public ObjectConverter getConverter(Class<?> type) {
         return converters.get(type);
+    }
+
+    /**
+     * Gets the converter for scalar objects of the given type.
+     * 
+     * @param type The type to query.
+     * @return The registered converter for the type, or <code>null</code> if no
+     *         converter has been registered for that type.
+     */
+    public IScalarConverter getScalarConverter(Class<?> type) {
+        for ( IScalarConverter converter : scalarConverters ) {
+            if ( converter.canHandle(type) ) {
+                return converter;
+            }
+        }
+        return null;
     }
 
     /**
@@ -201,6 +227,9 @@ public class ConverterContext {
         ctx.addConverter(ClassDefinition.class);
         ctx.addConverter(Element.class);
         ctx.addConverter(Prefix.class);
+        ctx.addScalarConverter(new StringConverter());
+        ctx.addScalarConverter(new URIConverter());
+        ctx.addScalarConverter(new BooleanConverter());
 
         return ctx;
     }
