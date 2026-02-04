@@ -192,10 +192,33 @@ public class ConverterContext {
     }
 
     /**
+     * Dereferences several global objects and assigns them to a list.
+     * <p>
+     * If any of the referenced objects does not exist in the context, it will be
+     * assigned to the target list when the {@link #finalizeAssignments()} method is
+     * called.
+     * 
+     * @param type   The type of the objects to dereference.
+     * @param names  The names to resolve into dereferenced objects.
+     * @param target The list to which the dereferenced objects should be assigned.
+     */
+    public void getObjects(Class<?> type, List<String> names, List<Object> target) {
+        for ( String name : names ) {
+            Object value = objectCache.getObject(type, name);
+            if ( value == null ) {
+                delayedAssignments.add(new DelayedAssignment(name, target, type));
+            } else {
+                target.add(value);
+            }
+        }
+    }
+
+    /**
      * Performs all delayed assignments.
      * <p>
      * A delayed assignment is an assignment requested through the
-     * {@link #getObject(Slot, String, Object)} method, which could not be performed
+     * {@link #getObject(Slot, String, Object)} or
+     * {@link #getObjects(Slot, List, Object)} methods, which could not be performed
      * at the time that method was called because the requested object was not known
      * to the context yet.
      * 
@@ -203,15 +226,15 @@ public class ConverterContext {
      */
     public void finalizeAssignments() throws LinkMLRuntimeException {
         for ( DelayedAssignment da : delayedAssignments ) {
-            Object value = getObject(da.slot.getInnerType(), da.name, false);
+            Object value = getObject(da.type, da.name, false);
             if ( value == null ) {
                 // FIXME: Not sure yet what to do here. Should a non-resolvable reference be a
                 // fatal error (and trigger a LinkMLRuntimeException)? For now we silently
                 // ignore.
+                // For what it's worth, the LinkML validator silently ignores this case.
                 continue;
             }
-
-            da.slot.setValue(da.target, value);
+            da.setValue(value);
         }
     }
 
@@ -242,14 +265,32 @@ public class ConverterContext {
      * anywhere outside of this context. That may change in the future.
      */
     private class DelayedAssignment {
+        Class<?> type; // The type of object to assign.
         String name; // The name of the global object to dereference and assign.
-        Object target; // The object to which to assign the dereferenced value.
-        Slot slot; // The slot (within the target object) to which to assign the value.
+        Object targetObject; // The object to which to assign the dereferenced value.
+        Slot targetSlot; // The slot (within the target object) to which to assign the value.
+        List<Object> targetList; // The list to which to assign the dereferenced value (when the target slot is a
+                                 // multi-valued slot).
 
         DelayedAssignment(String name, Object target, Slot slot) {
+            this.type = slot.getInnerType();
             this.name = name;
-            this.target = target;
-            this.slot = slot;
+            this.targetObject = target;
+            this.targetSlot = slot;
+        }
+
+        DelayedAssignment(String name, List<Object> target, Class<?> type) {
+            this.type = type;
+            this.name = name;
+            this.targetList = target;
+        }
+
+        void setValue(Object value) throws LinkMLRuntimeException {
+            if ( targetList != null ) {
+                targetList.add(value);
+            } else {
+                targetSlot.setValue(targetObject, value);
+            }
         }
     }
 }

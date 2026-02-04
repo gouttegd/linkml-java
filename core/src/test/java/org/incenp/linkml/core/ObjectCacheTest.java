@@ -41,6 +41,18 @@ public class ObjectCacheTest {
     }
 
     @Test
+    void testLookupWithoutCreate() throws LinkMLRuntimeException {
+        ObjectCache cache = new ObjectCache();
+        TypeDefinition def1 = cache.getObject(TypeDefinition.class, "string", true);
+
+        TypeDefinition def2 = cache.getObject(TypeDefinition.class, "string");
+        Assertions.assertTrue(def1 == def2);
+
+        SlotDefinition def3 = cache.getObject(SlotDefinition.class, "string");
+        Assertions.assertNull(def3);
+    }
+
+    @Test
     void testDontReturnObjectOfDifferentType() throws LinkMLRuntimeException {
         ObjectCache cache = new ObjectCache();
         cache.getObject(TypeDefinition.class, "string", true);

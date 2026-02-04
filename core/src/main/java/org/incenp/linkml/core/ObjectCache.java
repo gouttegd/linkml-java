@@ -77,6 +77,20 @@ public class ObjectCache {
     }
 
     /**
+     * Looks up for an object with the specified name.
+     * 
+     * @param <T>  The type of object to return.
+     * @param type The type of object to return.
+     * @param name The name of the object to return.
+     * @return The requested object, or <code>null</code> if the object was not in
+     *         the cache or was not of the expected type.
+     */
+    public <T> T getObject(Class<T> type, String name) {
+        Object cached = cache.get(name);
+        return cached != null && type.isInstance(cached) ? type.cast(cached) : null;
+    }
+
+    /**
      * Gets the number of objects in the cache.
      */
     public int getSize() {

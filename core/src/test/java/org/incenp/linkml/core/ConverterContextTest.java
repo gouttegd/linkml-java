@@ -18,6 +18,9 @@
 
 package org.incenp.linkml.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.incenp.linkml.model.SlotDefinition;
 import org.incenp.linkml.model.TypeDefinition;
 import org.junit.jupiter.api.Assertions;
@@ -74,5 +77,28 @@ public class ConverterContextTest {
         ctx.finalizeAssignments();
 
         Assertions.assertTrue(td == sd.getRange());
+    }
+
+    @Test
+    void testMultiValuedDelayedAssignment() throws LinkMLRuntimeException {
+        ConverterContext ctx = new ConverterContext();
+        SlotDefinition def1 = ctx.getObject(SlotDefinition.class, "foo", true);
+
+        List<Object> list = new ArrayList<>();
+        List<String> names = new ArrayList<String>();
+        names.add("foo");
+        names.add("bar");
+        ctx.getObjects(SlotDefinition.class, names, list);
+
+        // Only "foo" should have been assigned, since "bar" is currently unknown
+        Assertions.assertEquals(1, list.size());
+        Assertions.assertTrue(list.get(0) == def1);
+
+        SlotDefinition def2 = ctx.getObject(SlotDefinition.class, "bar", true);
+        ctx.finalizeAssignments();
+
+        // Now we should get both "foo" and "bar"
+        Assertions.assertEquals(2, list.size());
+        Assertions.assertTrue(list.get(1) == def2);
     }
 }
