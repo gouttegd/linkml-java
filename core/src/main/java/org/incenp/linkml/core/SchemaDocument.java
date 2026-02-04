@@ -75,7 +75,7 @@ public class SchemaDocument {
 
         SchemaDefinition def = new SchemaDefinition();
         try {
-            schemaDefConverter.convert(rawDef, def, ctx);
+            schemaDefConverter.convertTo(rawDef, def, ctx);
             ctx.finalizeAssignments();
         } catch ( LinkMLRuntimeException e ) {
             throw new InvalidSchemaException("Cannot parse schema from YAML document", e);

@@ -87,6 +87,10 @@ public class SchemaDocumentTest {
             Assertions.assertFalse(hasParentSlot.isMultivalued());
             Assertions.assertFalse(hasParentSlot.isInlined());
             Assertions.assertFalse(hasParentSlot.isInlinedAsList());
+
+            Assertions.assertEquals(2, organismClass.getSlots().size());
+            Assertions.assertTrue(strType == organismClass.getSlots().get(0).getRange());
+
         } catch ( IOException | InvalidSchemaException e ) {
             Assertions.fail("Unexpected exception", e);
         }

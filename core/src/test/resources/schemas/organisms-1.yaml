@@ -10,6 +10,12 @@ types:
   string:
     base: str
 
+slot_definitions:
+  foo:
+    range: string
+  bar:
+    range: string
+
 classes:
   OrganismCollection:
     attributes:
@@ -21,6 +27,9 @@ classes:
         inlined_as_list: true
 
   Organism:
+    slots:
+      - foo
+      - bar
     attributes:
       id:
         identifier: true
