@@ -33,6 +33,11 @@ import org.incenp.linkml.model.InliningMode;
  */
 public class ObjectConverter {
 
+    private final static String MAP_EXPECTED = "Invalid value type, map expected";
+    private final static String LIST_EXPECTED = "Invalid value type, list expected";
+    private final static String STRING_EXPECTED = "Invalid value type, string expected";
+    private final static String SCALAR_EXPECTED = "Invalid value type, scalar expected";
+
     private Map<String, Slot> slots = new HashMap<>();
     private boolean hasIdentifier;
 
@@ -189,22 +194,77 @@ public class ObjectConverter {
      * Checks that a raw object is a String-keyed map, and casts it as such.
      * 
      * @param value The raw object to cast.
-     * @return The input object, cast into a String-keyed map; or <code>null</code>
-     *         if the input object is not a map, or is a map with at least one key
-     *         that is not a string.
+     * @return The input object, cast into a String-keyed map.
+     * @throws LinkMLRuntimeException If the raw object is not a String-keyed map.
      */
     @SuppressWarnings("unchecked")
-    protected Map<String, Object> toMap(Object value) {
-        if ( Map.class.isInstance(value) ) {
-            Map<Object, Object> map = Map.class.cast(value);
-            for ( Object key : map.keySet() ) {
-                if ( !String.class.isInstance(key) ) {
-                    return null;
-                }
-            }
-
-            return (Map<String, Object>) Map.class.cast(value);
+    protected Map<String, Object> toMap(Object value) throws LinkMLRuntimeException {
+        if ( !(value instanceof Map) ) {
+            throw new LinkMLRuntimeException(MAP_EXPECTED);
         }
-        return null;
+        Map<Object, Object> map = (Map<Object, Object>) value;
+        for ( Object key : map.keySet() ) {
+            if ( !(key instanceof String) ) {
+                throw new LinkMLRuntimeException(STRING_EXPECTED);
+            }
+        }
+        return (Map<String, Object>) value;
+    }
+
+    /**
+     * Checks that a raw object is a list, and casts it as such.
+     * 
+     * @param value The raw object to cast.
+     * @return The input object, cast into a list.
+     * @throws LinkMLRuntimeException If the raw object is not in fact a list.
+     */
+    @SuppressWarnings("unchecked")
+    protected List<Object> toList(Object value) throws LinkMLRuntimeException {
+        if ( !(value instanceof List) ) {
+            throw new LinkMLRuntimeException(LIST_EXPECTED);
+        }
+        return (List<Object>) value;
+    }
+
+    /**
+     * Checks that a raw object is a list of scalars, and converts it to a list of
+     * strings.
+     * 
+     * @param value The raw object to check and convert.
+     * @return A list of strings. Note that this is a <em>new</em> list, not the
+     *         original object.
+     * @throws LinkMLRuntimeException If the raw object is not a list of scalar
+     *                                values.
+     */
+    @SuppressWarnings("unchecked")
+    protected List<String> toStringList(Object value) throws LinkMLRuntimeException {
+        if ( !(value instanceof List) ) {
+            throw new LinkMLRuntimeException(LIST_EXPECTED);
+        }
+        ArrayList<String> list = new ArrayList<>();
+        for ( Object rawItem : (List<Object>) value ) {
+            if ( rawItem instanceof List || rawItem instanceof Map ) {
+                throw new LinkMLRuntimeException(SCALAR_EXPECTED);
+            }
+            list.add(rawItem.toString());
+        }
+        return list;
+    }
+
+    /**
+     * Checks that a raw object is a scalar value, and converts it to a string.
+     * <p>
+     * For the purpose of the converter, a <em>scalar</em> value is anything that is
+     * neither a list nor a map.
+     * 
+     * @param value The raw object to check and convert.
+     * @return The string value of the raw object.
+     * @throws LinkMLRuntimeException If the raw object is not a scalar value.
+     */
+    protected String toString(Object value) throws LinkMLRuntimeException {
+        if ( value instanceof List || value instanceof Map ) {
+            throw new LinkMLRuntimeException(SCALAR_EXPECTED);
+        }
+        return value.toString();
     }
 }
