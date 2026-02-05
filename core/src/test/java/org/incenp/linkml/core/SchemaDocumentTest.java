@@ -128,4 +128,17 @@ public class SchemaDocumentTest {
         Assertions.assertEquals(1, schemaDoc.getRootSchema().getImports().size());
         Assertions.assertEquals("linkml:types", schemaDoc.getRootSchema().getImports().get(0));
     }
+
+    @Test
+    void testReadingTypes() {
+        File schemaFile = new File("src/main/resources/types.yaml");
+        SchemaDocument doc = null;
+        try {
+            doc = new SchemaDocument(schemaFile);
+        } catch ( IOException | InvalidSchemaException e ) {
+            Assertions.fail("Unexpected exception", e);
+        }
+
+        Assertions.assertEquals(19, doc.getRootSchema().getTypes().size());
+    }
 }
