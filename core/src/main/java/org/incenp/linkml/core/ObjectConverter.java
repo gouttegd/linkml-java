@@ -24,14 +24,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.incenp.linkml.model.InliningMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A class to convert “raw objects” (as obtained from a JSON/YAML parser) into
  * instances of LinkML objects.
- * 
- * FIXME: Absolutely not complete yet, lots of cases still not covered.
  */
 public class ObjectConverter {
+
+    private static final Logger logger = LoggerFactory.getLogger(ObjectConverter.class);
 
     private final static String MAP_EXPECTED = "Invalid value type, map expected";
     private final static String LIST_EXPECTED = "Invalid value type, list expected";
@@ -94,8 +96,9 @@ public class ObjectConverter {
         for ( Map.Entry<String, Object> entry : rawMap.entrySet() ) {
             Slot slot = slots.get(entry.getKey());
             if ( slot == null ) {
-                // Ignore unknown key.
                 // FIXME: Allow storing into a dedicated dict for unknown keys.
+                logger.debug("Ignoring unknown or unsupported slot '{}'", entry.getKey());
+                continue;
             }
             convertSlot(entry.getValue(), slot, dest, ctx);
         }
