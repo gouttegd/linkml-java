@@ -1,0 +1,18 @@
+id: https://example.org/organism
+name: organism
+default_range: string
+prefixes:
+  linkml: https://w3id.org/linkml/
+imports:
+  - linkml:types
+
+classes:
+  Organism:
+    attributes:
+      id:
+        identifier: true
+      name:
+      rank:
+        range: integer
+      has_parent:
+        range: Organism

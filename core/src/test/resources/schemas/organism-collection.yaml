@@ -1,0 +1,15 @@
+id: https://example.org/organism-collection
+name: organism-collection
+default_range: string
+imports:
+  - organism
+
+classes:
+  OrganismCollection:
+    attributes:
+      name:
+      organisms:
+        range: Organism
+        multivalued: true
+        inlined: true
+        inlined_as_list: true

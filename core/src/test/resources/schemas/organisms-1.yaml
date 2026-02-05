@@ -6,10 +6,6 @@ prefixes:
 imports:
   - linkml:types
 
-types:
-  string:
-    base: str
-
 slot_definitions:
   foo:
     range: string

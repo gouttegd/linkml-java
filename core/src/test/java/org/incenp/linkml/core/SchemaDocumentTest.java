@@ -24,7 +24,6 @@ import java.io.IOException;
 import org.incenp.linkml.model.ClassDefinition;
 import org.incenp.linkml.model.Prefix;
 import org.incenp.linkml.model.SlotDefinition;
-import org.incenp.linkml.model.TypeDefinition;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -42,10 +41,8 @@ public class SchemaDocumentTest {
 
             Assertions.assertEquals(2, doc.getRootSchema().getClasses().size());
 
-            Assertions.assertEquals(1, doc.getRootSchema().getTypes().size());
-            TypeDefinition strType = doc.getRootSchema().getTypes().get(0);
-            Assertions.assertEquals("string", strType.getName());
-            Assertions.assertEquals("str", strType.getBase());
+            // This indirectly tests that the linkml:types schema has been imported
+            Assertions.assertEquals("A character string", doc.getRootSchema().getDefaultRange().getDescription());
 
             ClassDefinition organismClass = null;
             ClassDefinition organismCollectionClass = null;
@@ -89,7 +86,6 @@ public class SchemaDocumentTest {
             Assertions.assertFalse(hasParentSlot.isInlinedAsList());
 
             Assertions.assertEquals(2, organismClass.getSlots().size());
-            Assertions.assertTrue(strType == organismClass.getSlots().get(0).getRange());
 
         } catch ( IOException | InvalidSchemaException e ) {
             Assertions.fail("Unexpected exception", e);
@@ -140,5 +136,19 @@ public class SchemaDocumentTest {
         }
 
         Assertions.assertEquals(19, doc.getRootSchema().getTypes().size());
+    }
+
+    @Test
+    void testChainingImports() {
+        File schemaFile = new File("src/test/resources/schemas/organism-collection.yaml");
+        SchemaDocument doc = null;
+        try {
+            doc = new SchemaDocument(schemaFile);
+        } catch ( IOException | InvalidSchemaException e ) {
+            Assertions.fail("Unexpected exception", e);
+        }
+
+        Assertions.assertEquals(2, doc.getImports().size());
+        Assertions.assertEquals("A character string", doc.getRootSchema().getDefaultRange().getDescription());
     }
 }
