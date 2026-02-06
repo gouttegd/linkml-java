@@ -52,4 +52,16 @@ public class FileSchemaSource implements ISchemaSource {
         return stream;
     }
 
+    @Override
+    public int hashCode() {
+        return file.getAbsolutePath().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if ( object instanceof FileSchemaSource ) {
+            return ((FileSchemaSource) object).file.getAbsolutePath().equals(file.getAbsolutePath());
+        }
+        return false;
+    }
 }

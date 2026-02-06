@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.incenp.linkml.model.Prefix;
 import org.incenp.linkml.model.SchemaDefinition;
@@ -46,6 +48,7 @@ public class SchemaDocument {
 
     private SchemaDefinition rootSchema;
     private List<SchemaDefinition> importedSchemas = new ArrayList<>();
+    private Set<ISchemaSource> importedSources = new HashSet<>();
 
     /**
      * Creates a new instance from the specified file.
@@ -114,13 +117,14 @@ public class SchemaDocument {
             throw new InvalidSchemaException(INVALID_LINKML, e);
         }
 
+        importedSources.add(source);
         if ( schema.getImports() != null ) {
             for ( String importName : schema.getImports() ) {
-                // FIXME: We should avoid reading the same schema twice (if the same schema is
-                // mentioned several time in the import chain).
                 ISchemaSource importSource = resolveImport(importName, schema, source.getBase());
-                SchemaDefinition importedSchema = parseSchema(importSource, mapper, ctx);
-                importedSchemas.add(importedSchema);
+                if ( !importedSources.contains(importSource) ) {
+                    SchemaDefinition importedSchema = parseSchema(importSource, mapper, ctx);
+                    importedSchemas.add(importedSchema);
+                }
             }
         }
 

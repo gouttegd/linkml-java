@@ -151,4 +151,17 @@ public class SchemaDocumentTest {
         Assertions.assertEquals(2, doc.getImports().size());
         Assertions.assertEquals("A character string", doc.getRootSchema().getDefaultRange().getDescription());
     }
+
+    @Test
+    void testNoInfiniteImportLoop() {
+        File schemaFile = new File("src/test/resources/schemas/loop-a.yaml");
+        SchemaDocument doc = null;
+        try {
+            doc = new SchemaDocument(schemaFile);
+        } catch ( IOException | InvalidSchemaException e ) {
+            Assertions.fail("Unexpected exception", e);
+        }
+
+        Assertions.assertEquals(2, doc.getImports().size());
+    }
 }

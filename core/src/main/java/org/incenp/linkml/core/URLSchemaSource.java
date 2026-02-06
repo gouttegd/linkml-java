@@ -48,4 +48,16 @@ public class URLSchemaSource implements ISchemaSource {
         return stream;
     }
 
+    @Override
+    public int hashCode() {
+        return url.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if ( object instanceof URLSchemaSource ) {
+            return ((URLSchemaSource) object).url.equals(url);
+        }
+        return false;
+    }
 }

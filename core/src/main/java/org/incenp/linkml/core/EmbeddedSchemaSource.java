@@ -46,4 +46,16 @@ public class EmbeddedSchemaSource implements ISchemaSource {
         return stream;
     }
 
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if ( object instanceof EmbeddedSchemaSource ) {
+            return ((EmbeddedSchemaSource) object).name.equals(name);
+        }
+        return false;
+    }
 }

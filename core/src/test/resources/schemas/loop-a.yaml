@@ -1,0 +1,19 @@
+id: https://example.org/loop-a
+name: loop-a
+default_range: string
+prefixes:
+  linkml: https://w3id.org/linkml/
+imports:
+  - linkml:types
+  - loop-b
+
+classes:
+  Organism:
+    attributes:
+      id:
+        identifier: true
+      name:
+      rank:
+        range: integer
+      has_parent:
+        range: Organism
