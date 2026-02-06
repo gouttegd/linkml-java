@@ -164,4 +164,33 @@ public class SchemaDocumentTest {
 
         Assertions.assertEquals(2, doc.getImports().size());
     }
+
+    @Test
+    void testAttributesNotSharedAccrossClasses() {
+        File schemaFile = new File("src/test/resources/schemas/organisms-1.yaml");
+        SchemaDocument schemaDoc = null;
+        try {
+            schemaDoc = new SchemaDocument(schemaFile);
+        } catch ( IOException | InvalidSchemaException e ) {
+            Assertions.fail("Unexpected exception", e);
+        }
+
+        SlotDefinition organismCollectionNameSlot = null;
+        SlotDefinition organismNameSlot = null;
+        for ( ClassDefinition cd : schemaDoc.getRootSchema().getClasses() ) {
+            for ( SlotDefinition sd : cd.getAttributes() ) {
+                if ( sd.getName().equals("name") ) {
+                    if ( cd.getName().equals("OrganismCollection") ) {
+                        organismCollectionNameSlot = sd;
+                    } else if ( cd.getName().equals("Organism") ) {
+                        organismNameSlot = sd;
+                    }
+                }
+            }
+        }
+
+        Assertions.assertNotNull(organismCollectionNameSlot);
+        Assertions.assertNotNull(organismNameSlot);
+        Assertions.assertTrue(organismCollectionNameSlot != organismNameSlot);
+    }
 }

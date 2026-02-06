@@ -286,7 +286,7 @@ public class ConverterContext {
         ctx.addConverter(TypeDefinition.class);
         ctx.addConverter(EnumDefinition.class);
         ctx.addConverter(SlotDefinition.class);
-        ctx.addConverter(ClassDefinition.class);
+        ctx.addConverter(ClassDefinition.class, new ClassDefinitionConverter());
         ctx.addConverter(Element.class);
         ctx.addConverter(Prefix.class);
         ctx.addScalarConverter(new StringConverter());
