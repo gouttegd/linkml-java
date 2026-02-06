@@ -90,9 +90,8 @@ public class SchemaDocument {
             // All schemas have been read, so we can resolve all references
             ctx.finalizeAssignments();
         } catch ( LinkMLRuntimeException e ) {
-            // We consider a missing reference within a schema as a fatal error. This is
-            // stricter than what LinkML-Py does, but I believe this is the correct thing to
-            // do -- a schema with missing references should not be trusted for anything.
+            // This could happen for example if a reference is resolved into an object of
+            // the wrong type for the slot to which it was supposed to be assigned.
             throw new InvalidSchemaException(INVALID_LINKML, e);
         }
 
