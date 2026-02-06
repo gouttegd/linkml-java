@@ -282,7 +282,7 @@ public class ConverterContext {
      */
     public static ConverterContext getLinkMLContext() {
         ConverterContext ctx = new ConverterContext();
-        ctx.addConverter(SchemaDefinition.class);
+        ctx.addConverter(SchemaDefinition.class, new SchemaDefinitionConverter());
         ctx.addConverter(TypeDefinition.class);
         ctx.addConverter(EnumDefinition.class);
         ctx.addConverter(SlotDefinition.class);

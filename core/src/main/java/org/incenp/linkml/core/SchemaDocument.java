@@ -115,10 +115,6 @@ public class SchemaDocument {
             throw new InvalidSchemaException(INVALID_LINKML, e);
         }
 
-        if ( schema.getPrefixes() != null ) {
-            ctx.addPrefixes(schema.getPrefixes());
-        }
-
         importedSources.add(source);
         if ( schema.getImports() != null ) {
             for ( String importName : schema.getImports() ) {

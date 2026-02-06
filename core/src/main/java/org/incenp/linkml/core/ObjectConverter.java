@@ -64,6 +64,21 @@ public class ObjectConverter {
     }
 
     /**
+     * Gets the specified slot.
+     * <p>
+     * This is mostly intended for the benefit of derived classes, so that they do
+     * not have to call {@link Slot#getSlot(Class, String)} themselves (which would
+     * be a duplication of the job done in the constructor of this class).
+     * 
+     * @param name The name of the slot.
+     * @return The corresponding slot, or <code>null</code> if the class for which
+     *         this object is a converter does not have any slot with that name.
+     */
+    protected Slot getSlot(String name) {
+        return slots.get(name);
+    }
+
+    /**
      * Indicates whether this converter converts raw objects into “identifiable
      * objects”.
      * <p>
