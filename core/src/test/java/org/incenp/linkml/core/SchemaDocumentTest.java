@@ -44,24 +44,11 @@ public class SchemaDocumentTest {
             // This indirectly tests that the linkml:types schema has been imported
             Assertions.assertEquals("A character string", doc.getRootSchema().getDefaultRange().getDescription());
 
-            ClassDefinition organismClass = null;
-            ClassDefinition organismCollectionClass = null;
-
-            for ( ClassDefinition cd : doc.getRootSchema().getClasses() ) {
-                if ( cd.getName().equals("OrganismCollection") ) {
-                    organismCollectionClass = cd;
-                } else if ( cd.getName().equals("Organism") ) {
-                    organismClass = cd;
-                }
-            }
+            ClassDefinition organismClass = doc.getClassDefinition("Organism");
+            ClassDefinition organismCollectionClass = doc.getClassDefinition("OrganismCollection");
 
             Assertions.assertEquals(2, organismCollectionClass.getAttributes().size());
-            SlotDefinition organismsSlotDefinition = null;
-            for ( SlotDefinition sd : organismCollectionClass.getAttributes() ) {
-                if ( sd.getName().equals("organisms") ) {
-                    organismsSlotDefinition = sd;
-                }
-            }
+            SlotDefinition organismsSlotDefinition = doc.getAttribute(organismCollectionClass.getName(), "organisms");
             Assertions.assertEquals("organisms", organismsSlotDefinition.getName());
             Assertions.assertTrue(organismsSlotDefinition.isMultivalued());
             Assertions.assertTrue(organismsSlotDefinition.isInlined());
@@ -70,15 +57,8 @@ public class SchemaDocumentTest {
             Assertions.assertEquals(organismClass, organismsSlotDefinition.getRange());
 
             Assertions.assertEquals(3, organismClass.getAttributes().size());
-            SlotDefinition idSlot = null;
-            SlotDefinition hasParentSlot = null;
-            for ( SlotDefinition sd : organismClass.getAttributes() ) {
-                if ( sd.getName().equals("id") ) {
-                    idSlot = sd;
-                } else if ( sd.getName().equals("has_parent") ) {
-                    hasParentSlot = sd;
-                }
-            }
+            SlotDefinition idSlot = doc.getAttribute(organismClass.getName(), "id");
+            SlotDefinition hasParentSlot = doc.getAttribute(organismClass.getName(), "has_parent");
             Assertions.assertTrue(idSlot.isIdentifier());
             Assertions.assertEquals(organismClass, hasParentSlot.getRange());
             Assertions.assertFalse(hasParentSlot.isMultivalued());
@@ -175,19 +155,8 @@ public class SchemaDocumentTest {
             Assertions.fail("Unexpected exception", e);
         }
 
-        SlotDefinition organismCollectionNameSlot = null;
-        SlotDefinition organismNameSlot = null;
-        for ( ClassDefinition cd : schemaDoc.getRootSchema().getClasses() ) {
-            for ( SlotDefinition sd : cd.getAttributes() ) {
-                if ( sd.getName().equals("name") ) {
-                    if ( cd.getName().equals("OrganismCollection") ) {
-                        organismCollectionNameSlot = sd;
-                    } else if ( cd.getName().equals("Organism") ) {
-                        organismNameSlot = sd;
-                    }
-                }
-            }
-        }
+        SlotDefinition organismCollectionNameSlot = schemaDoc.getAttribute("OrganismCollection", "name");
+        SlotDefinition organismNameSlot = schemaDoc.getAttribute("Organism", "name");
 
         Assertions.assertNotNull(organismCollectionNameSlot);
         Assertions.assertNotNull(organismNameSlot);
