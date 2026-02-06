@@ -19,6 +19,7 @@
 package org.incenp.linkml.core;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,7 @@ public class ConverterContext {
     private List<IScalarConverter> scalarConverters = new ArrayList<>();
     private ObjectCache objectCache = new ObjectCache();
     private List<DelayedAssignment> delayedAssignments = new ArrayList<>();
+    private Map<String, String> prefixMap = new HashMap<>();
 
     /**
      * Registers a converter for objects of the given class.
@@ -147,6 +149,43 @@ public class ConverterContext {
             }
         }
         return null;
+    }
+
+    /**
+     * Registers a list of prefix declarations.
+     * <p>
+     * Prefixes declared here will become resolvable by the {@link #resolve(String)}
+     * method.
+     * 
+     * @param prefixes The prefix declarations to add.
+     */
+    public void addPrefixes(Collection<Prefix> prefixes) {
+        for ( Prefix prefix : prefixes ) {
+            prefixMap.put(prefix.getPrefixName(), prefix.getIriPrefix());
+        }
+    }
+
+    /**
+     * Resolves a shortened identifier (“CURIE”) into a full-length IRI.
+     * 
+     * @param name The shortened identifier to resolve.
+     * @return The resolved IRI, or the original String if (1) it was not a
+     *         shortened identifier to begin with or (2) the prefix is unknown.
+     */
+    public String resolve(String name) {
+        if ( !name.contains(":") ) {
+            // Not a CURIE, return as is
+            return name;
+        }
+
+        String[] items = name.split(":", 2);
+        String prefix = prefixMap.get(items[0]);
+        if ( prefix != null ) {
+            return prefix + items[1];
+        }
+
+        // Non-resolvable prefix name, return as is
+        return name;
     }
 
     /**

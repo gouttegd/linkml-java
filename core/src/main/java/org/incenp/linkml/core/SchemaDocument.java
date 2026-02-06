@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.incenp.linkml.model.Prefix;
 import org.incenp.linkml.model.SchemaDefinition;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
@@ -116,10 +115,14 @@ public class SchemaDocument {
             throw new InvalidSchemaException(INVALID_LINKML, e);
         }
 
+        if ( schema.getPrefixes() != null ) {
+            ctx.addPrefixes(schema.getPrefixes());
+        }
+
         importedSources.add(source);
         if ( schema.getImports() != null ) {
             for ( String importName : schema.getImports() ) {
-                ISchemaSource importSource = resolveImport(importName, schema, source.getBase());
+                ISchemaSource importSource = resolveImport(importName, schema, source.getBase(), ctx);
                 if ( !importedSources.contains(importSource) ) {
                     SchemaDefinition importedSchema = parseSchema(importSource, mapper, ctx);
                     importedSchemas.add(importedSchema);
@@ -130,40 +133,33 @@ public class SchemaDocument {
         return schema;
     }
 
-    private ISchemaSource resolveImport(String name, SchemaDefinition schema, String base)
+    private ISchemaSource resolveImport(String name, SchemaDefinition schema, String base, ConverterContext ctx)
             throws InvalidSchemaException {
-        if ( !name.contains(":") ) {
+        String extName = name + ".yaml";
+        if ( !extName.contains(":") ) {
             // Local file, relative to the directory containing the importing schema
             if ( base != null ) {
-                return new FileSchemaSource(base + File.separator + name + ".yaml");
+                return new FileSchemaSource(base + File.separator + extName);
             } else {
-                return new FileSchemaSource(name + ".yaml");
+                return new FileSchemaSource(extName);
             }
         }
 
-        // If not a local file, then it should be a CURIE
-        String[] items = name.split(":", 2);
-        if ( schema.getPrefixes() != null ) {
-            for ( Prefix pfx : schema.getPrefixes() ) {
-                if ( pfx.getPrefixName().equals(items[0]) ) {
-                    String url = pfx.getIriPrefix() + items[1] + ".yaml";
-                    if ( url.equals(TYPES_SCHEMA) ) {
-                        // Redirect the standard linkml:types schema to the embedded version. That
-                        // schema is expected to be imported in virtually all LinkML schemas, so we
-                        // don't want to have to always fetch it from a remote server.
-                        // FIXME: We should probably provide a way to override this behaviour.
-                        return new EmbeddedSchemaSource("types.yaml");
-                    }
-                    try {
-                        return new URLSchemaSource(url);
-                    } catch ( MalformedURLException e ) {
-                        throw new InvalidSchemaException(String.format(UNRESOLVABLE_IMPORT, name), e);
-                    }
-                }
-            }
+        String resolved = ctx.resolve(extName);
+        if ( resolved == extName ) {
+            throw new InvalidSchemaException(String.format(UNRESOLVABLE_IMPORT, name));
         }
-
-        // Failure to resolve the CURIE into a URL is a fatal error
-        throw new InvalidSchemaException(String.format(UNRESOLVABLE_IMPORT, name));
+        if ( resolved.equals(TYPES_SCHEMA) ) {
+            // Redirect the standard linkml:types schema to the embedded version. That
+            // schema is expected to be imported in virtually all LinkML schemas, so we
+            // don't want to have to always fetch it from a remote server.
+            // FIXME: We should probably provide a way to override this behaviour.
+            return new EmbeddedSchemaSource("types.yaml");
+        }
+        try {
+            return new URLSchemaSource(resolved);
+        } catch ( MalformedURLException e ) {
+            throw new InvalidSchemaException(String.format(UNRESOLVABLE_IMPORT, name), e);
+        }
     }
 }
