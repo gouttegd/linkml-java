@@ -162,4 +162,30 @@ public class SchemaDocumentTest {
         Assertions.assertNotNull(organismNameSlot);
         Assertions.assertTrue(organismCollectionNameSlot != organismNameSlot);
     }
+
+    @Test
+    void testFailOnMissingReferences() {
+        File schemaFile = new File("src/test/resources/schemas/missing-ref.yaml");
+        try {
+            new SchemaDocument(schemaFile);
+            Assertions.fail("Exception not thrown for a missing reference");
+        } catch ( IOException e ) {
+            Assertions.fail("Unexpected exception");
+        } catch ( InvalidSchemaException e ) {
+            Assertions.assertEquals("Cannot dereference 'inexisting_type': no such object", e.getCause().getMessage());
+        }
+    }
+
+    @Test
+    void testFailOnInvalidReferences() {
+        File schemaFile = new File("src/test/resources/schemas/invalid-ref.yaml");
+        try {
+            new SchemaDocument(schemaFile);
+            Assertions.fail("Exception not thrown for an invalid reference");
+        } catch ( IOException e ) {
+            Assertions.fail("Unexpected exception");
+        } catch ( InvalidSchemaException e ) {
+            Assertions.assertEquals("Cannot dereference 'Organism': invalid type", e.getCause().getMessage());
+        }
+    }
 }

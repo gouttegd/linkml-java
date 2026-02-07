@@ -217,10 +217,8 @@ public class SchemaDocument {
 
         try {
             // All schemas have been read, so we can resolve all references
-            ctx.finalizeAssignments();
+            ctx.finalizeAssignments(true);
         } catch ( LinkMLRuntimeException e ) {
-            // This could happen for example if a reference is resolved into an object of
-            // the wrong type for the slot to which it was supposed to be assigned.
             throw new InvalidSchemaException(INVALID_LINKML, e);
         }
 

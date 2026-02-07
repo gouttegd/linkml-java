@@ -264,16 +264,35 @@ public class ConverterContext {
      * @throws LinkMLRuntimeException If an assignment cannot be performed.
      */
     public void finalizeAssignments() throws LinkMLRuntimeException {
+        finalizeAssignments(false);
+    }
+
+    /**
+     * Performs all delayed assignments, optionally failing if an assignment refers
+     * to a missing object.
+     * 
+     * @param failOnMissing If <code>true</code> and a delayed assignment refers to
+     *                      an object that is either unknown in the global context,
+     *                      or of a different type than expected, this will be
+     *                      treated as a fatal error.
+     * @throws LinkMLRuntimeException If an assignment cannot be performed
+     *                                (including for an invalid reference, if
+     *                                <code>failOnMissing</code> is
+     *                                <code>true</code>.
+     */
+    public void finalizeAssignments(boolean failOnMissing) throws LinkMLRuntimeException {
         for ( DelayedAssignment da : delayedAssignments ) {
             Object value = getObject(da.type, da.name, false);
-            if ( value == null ) {
-                // FIXME: Not sure yet what to do here. Should a non-resolvable reference be a
-                // fatal error (and trigger a LinkMLRuntimeException)? For now we silently
-                // ignore.
-                // For what it's worth, the LinkML validator silently ignores this case.
-                continue;
+            if ( value != null ) {
+                da.setValue(value);
+            } else if ( failOnMissing ) {
+                // Check if there is another object with that name
+                if ( getObject(Object.class, da.name, false) != null ) {
+                    throw new LinkMLRuntimeException(String.format("Cannot dereference '%s': invalid type", da.name));
+                } else {
+                    throw new LinkMLRuntimeException(String.format("Cannot dereference '%s': no such object", da.name));
+                }
             }
-            da.setValue(value);
         }
     }
 

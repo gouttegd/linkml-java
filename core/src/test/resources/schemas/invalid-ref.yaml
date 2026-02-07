@@ -1,0 +1,30 @@
+id: https://example.org/organisms
+name: organisms
+default_range: string
+prefixes:
+  linkml: https://w3id.org/linkml/
+imports:
+  - linkml:types
+
+slot_definitions:
+  name:
+
+classes:
+  OrganismCollection:
+    slots:
+      - Organism
+    attributes:
+      organisms:
+        range: Organism
+        multivalued: true
+        inlined: true
+        inlined_as_list: true
+
+  Organism:
+    slots:
+      - name
+    attributes:
+      id:
+        identifier: true
+      has_parent:
+        range: Organism
