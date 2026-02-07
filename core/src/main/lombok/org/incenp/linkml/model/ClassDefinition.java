@@ -49,4 +49,12 @@ public class ClassDefinition extends Definition {
 
     @Inlining(InliningMode.DICT)
     private List<SlotDefinition> attributes;
+
+    @Override
+    public void setParent(Definition parent) {
+        if ( !(parent instanceof ClassDefinition) ) {
+            throw new IllegalArgumentException("Invalid type, ClassDefinition expected");
+        }
+        super.setParent(parent);
+    }
 }

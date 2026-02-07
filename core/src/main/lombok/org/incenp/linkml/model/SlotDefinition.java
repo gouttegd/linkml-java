@@ -55,4 +55,12 @@ public class SlotDefinition extends Definition {
 
     @JsonProperty("inlined_as_list")
     private boolean inlinedAsList;
+
+    @Override
+    public void setParent(Definition parent) {
+        if ( !(parent instanceof SlotDefinition) ) {
+            throw new IllegalArgumentException("Invalid type, SlotDefinition expected");
+        }
+        super.setParent(parent);
+    }
 }
