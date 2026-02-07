@@ -65,14 +65,22 @@ public class ClassDefinitionConverter extends ObjectConverter {
 
     @Override
     public void convertTo(Map<String, Object> rawMap, Object dest, ConverterContext ctx) throws LinkMLRuntimeException {
+        ClassDefinition def = (ClassDefinition) dest;
         Object attributes = rawMap.remove("attributes");
         if ( attributes != null ) {
-            ((ClassDefinition) dest).setAttributes(convertLocalSlotDefinitions(toMap(attributes), ctx));
+            def.setAttributes(convertLocalSlotDefinitions(toMap(attributes), ctx));
         }
 
         Object slotUsages = rawMap.remove("slot_usage");
         if ( slotUsages != null ) {
-            ((ClassDefinition) dest).setSlotUsage(convertLocalSlotDefinitions(toMap(slotUsages), ctx));
+            def.setSlotUsage(convertLocalSlotDefinitions(toMap(slotUsages), ctx));
+
+            // Additionally inject on each slot usage a reference pointing to the global
+            // slot that is being refined, for convenience.
+            Slot globalSlot = Slot.getSlot(SlotDefinition.class, "globalSlot");
+            for ( SlotDefinition sd : def.getSlotUsage() ) {
+                ctx.getObject(globalSlot, sd.getName(), sd);
+            }
         }
 
         super.convertTo(rawMap, dest, ctx);

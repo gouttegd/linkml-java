@@ -73,6 +73,23 @@ public class SchemaDocumentTest {
     }
 
     @Test
+    void testReadingSimpleSchema2() {
+        File schemaFile = new File("src/test/resources/schemas/organisms.yaml");
+        SchemaDocument doc = null;
+        try {
+            doc = new SchemaDocument(schemaFile);
+        } catch ( IOException | InvalidSchemaException e ) {
+            Assertions.fail("Unexpected exception", e);
+        }
+
+        SlotDefinition idSlot = doc.getSlot("id");
+        Assertions.assertNotNull(idSlot);
+        SlotDefinition idSlotUsage = doc.getSlotUsage("Organism", "id");
+        Assertions.assertNotNull(idSlotUsage);
+        Assertions.assertEquals(idSlot, idSlotUsage.getGlobalSlot());
+    }
+
+    @Test
     void testReadingPrefixesBlock() {
         File schemaFile = new File("src/test/resources/schemas/organisms-1.yaml");
         SchemaDocument schemaDoc = null;
