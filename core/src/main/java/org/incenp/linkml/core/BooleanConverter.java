@@ -24,16 +24,16 @@ package org.incenp.linkml.core;
 public class BooleanConverter extends ScalarConverterBase {
 
     @Override
-    public boolean canHandle(Class<?> type) {
-        return type == Boolean.TYPE;
+    public Class<?> getType() {
+        return Boolean.TYPE;
     }
 
     @Override
-    protected Object convertImpl(Object value) throws LinkMLRuntimeException {
-        if ( value instanceof Boolean ) {
-            return value;
+    protected Object convertImpl(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
+        if ( raw instanceof Boolean ) {
+            return raw;
         } else {
-            String stringValue = value.toString();
+            String stringValue = raw.toString();
             if ( stringValue.equalsIgnoreCase("true") ) {
                 return true;
             } else if ( stringValue.equalsIgnoreCase("false") ) {

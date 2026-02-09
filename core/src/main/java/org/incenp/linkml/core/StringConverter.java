@@ -24,12 +24,12 @@ package org.incenp.linkml.core;
 public class StringConverter extends ScalarConverterBase {
 
     @Override
-    public boolean canHandle(Class<?> type) {
-        return type == String.class;
+    public Class<?> getType() {
+        return String.class;
     }
 
     @Override
-    protected Object convertImpl(Object value) throws LinkMLRuntimeException {
-        return value instanceof String ? value : value.toString();
+    protected Object convertImpl(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
+        return raw instanceof String ? raw : raw.toString();
     }
 }

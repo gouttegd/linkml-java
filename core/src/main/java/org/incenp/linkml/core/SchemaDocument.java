@@ -228,7 +228,7 @@ public class SchemaDocument {
     // Parses a schema and its imports
     private SchemaDefinition parseSchema(ISchemaSource source, ObjectMapper mapper, ConverterContext ctx)
             throws IOException, InvalidSchemaException {
-        SchemaDefinition schema = new SchemaDefinition();
+        SchemaDefinition schema = null;
         Object raw;
         try {
             raw = mapper.readValue(source.getStream(), Map.class);
@@ -238,7 +238,7 @@ public class SchemaDocument {
         }
 
         try {
-            ctx.getConverter(SchemaDefinition.class).convertTo(raw, schema, ctx);
+            schema = (SchemaDefinition) ctx.getConverter(SchemaDefinition.class).convert(raw, ctx);
         } catch ( LinkMLRuntimeException e ) {
             throw new InvalidSchemaException(INVALID_LINKML, e);
         }

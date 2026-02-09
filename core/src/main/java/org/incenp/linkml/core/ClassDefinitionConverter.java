@@ -89,6 +89,7 @@ public class ClassDefinitionConverter extends ObjectConverter {
     private List<SlotDefinition> convertLocalSlotDefinitions(Map<String, Object> rawMap, ConverterContext ctx)
             throws LinkMLRuntimeException {
         List<SlotDefinition> value = new ArrayList<>();
+        ObjectConverter converter = (ObjectConverter) ctx.getConverter(SlotDefinition.class);
         for ( Map.Entry<String, Object> rawItem : rawMap.entrySet() ) {
             // We need a purely local object, notwithstanding the unicity constraint on
             // SlotDefinition; so we do not look up in the global context, and we do not
@@ -96,7 +97,7 @@ public class ClassDefinitionConverter extends ObjectConverter {
             SlotDefinition def = new SlotDefinition();
             def.setName(rawItem.getKey());
             if ( rawItem.getValue() != null ) {
-                ctx.getConverter(SlotDefinition.class).convertTo(toMap(rawItem.getValue()), def, ctx);
+                converter.convertTo(toMap(rawItem.getValue()), def, ctx);
             }
             value.add(def);
         }

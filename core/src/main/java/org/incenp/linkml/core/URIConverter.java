@@ -27,16 +27,16 @@ import java.net.URISyntaxException;
 public class URIConverter extends ScalarConverterBase {
 
     @Override
-    public boolean canHandle(Class<?> type) {
-        return type == URI.class;
+    public Class<?> getType() {
+        return URI.class;
     }
 
     @Override
-    protected Object convertImpl(Object value) throws LinkMLRuntimeException {
+    protected Object convertImpl(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
         try {
-            return new URI(value.toString());
+            return new URI(raw.toString());
         } catch ( URISyntaxException e ) {
-            throw new LinkMLRuntimeException(String.format("Invalid value, URI expected: %s", value));
+            throw new LinkMLRuntimeException(String.format("Invalid value, URI expected: %s", raw));
         }
     }
 

@@ -20,6 +20,7 @@ package org.incenp.linkml.core;
 
 import java.util.Map;
 
+import org.incenp.linkml.model.Prefix;
 import org.incenp.linkml.model.SchemaDefinition;
 
 /**
@@ -52,7 +53,7 @@ public class SchemaDefinitionConverter extends ObjectConverter {
         Object prefixes = rawMap.remove(PREFIXES_KEY);
         if ( prefixes != null ) {
             Slot slot = getSlot(PREFIXES_KEY);
-            convertSlot(prefixes, slot, dest, ctx);
+            ctx.getConverter(Prefix.class).convertForSlot(prefixes, dest, slot, ctx);
             ctx.addPrefixes(((SchemaDefinition) dest).getPrefixes());
         }
 

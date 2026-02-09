@@ -27,27 +27,29 @@ import org.junit.jupiter.api.Test;
 
 public class ScalarConverterBaseTest {
 
+    private ConverterContext ctx = new ConverterContext();
+
     @Test
     void testNonScalarObjects() {
         StringConverter c = new StringConverter();
 
         Object o = null;
         try {
-            c.convert(o);
+            c.convert(o, ctx);
             Assertions.fail("Exception not thrown for a null value");
         } catch ( LinkMLRuntimeException e ) {
         }
 
         o = new ArrayList<String>();
         try {
-            c.convert(o);
+            c.convert(o, ctx);
             Assertions.fail("Exception not thrown for a list value");
         } catch ( LinkMLRuntimeException e ) {
         }
 
         o = new HashMap<String, Object>();
         try {
-            c.convert(o);
+            c.convert(o, ctx);
             Assertions.fail("Exception not thrown for a dictionary value");
         } catch ( LinkMLRuntimeException e ) {
         }
@@ -56,18 +58,18 @@ public class ScalarConverterBaseTest {
     @Test
     void testStringConversion() throws LinkMLRuntimeException {
         StringConverter c = new StringConverter();
-        Assertions.assertEquals("string value", c.convert("string value"));
-        Assertions.assertEquals("123", c.convert(123));
+        Assertions.assertEquals("string value", c.convert("string value", ctx));
+        Assertions.assertEquals("123", c.convert(123, ctx));
     }
 
     @Test
     void testBooleanConversion() throws LinkMLRuntimeException {
         BooleanConverter c = new BooleanConverter();
-        Assertions.assertEquals(true, c.convert(true));
-        Assertions.assertEquals(true, c.convert("true"));
-        Assertions.assertEquals(false, c.convert("False"));
+        Assertions.assertEquals(true, c.convert(true, ctx));
+        Assertions.assertEquals(true, c.convert("true", ctx));
+        Assertions.assertEquals(false, c.convert("False", ctx));
         try {
-            c.convert("not a boolean");
+            c.convert("not a boolean", ctx);
             Assertions.fail("Exception not thrown for an invalid boolean value");
         } catch ( LinkMLRuntimeException e ) {
         }
@@ -76,12 +78,12 @@ public class ScalarConverterBaseTest {
     @Test
     void testURIConversion() throws LinkMLRuntimeException {
         URIConverter c = new URIConverter();
-        Object uri = c.convert("local_file.txt");
+        Object uri = c.convert("local_file.txt", ctx);
         Assertions.assertTrue(uri instanceof URI);
         Assertions.assertEquals("local_file.txt", ((URI) uri).getPath());
 
         try {
-            c.convert("not a uri");
+            c.convert("not a uri", ctx);
             Assertions.fail("Exception not thrown for an invalid URI value");
         } catch ( LinkMLRuntimeException e ) {
         }

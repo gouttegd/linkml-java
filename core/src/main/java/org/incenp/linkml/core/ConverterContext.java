@@ -24,11 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.incenp.linkml.model.ClassDefinition;
 import org.incenp.linkml.model.Element;
 import org.incenp.linkml.model.EnumDefinition;
 import org.incenp.linkml.model.Prefix;
-import org.incenp.linkml.model.SchemaDefinition;
 import org.incenp.linkml.model.SlotDefinition;
 import org.incenp.linkml.model.TypeDefinition;
 
@@ -58,8 +56,7 @@ import org.incenp.linkml.model.TypeDefinition;
  */
 public class ConverterContext {
 
-    private Map<Class<?>, ObjectConverter> converters = new HashMap<>();
-    private List<IScalarConverter> scalarConverters = new ArrayList<>();
+    private Map<Class<?>, IConverter> converters = new HashMap<>();
     private ObjectCache objectCache = new ObjectCache();
     private List<DelayedAssignment> delayedAssignments = new ArrayList<>();
     private Map<String, String> prefixMap = new HashMap<>();
@@ -75,53 +72,12 @@ public class ConverterContext {
     }
 
     /**
-     * Registers a custom converter for objects of a given class.
-     * 
-     * @param type      The class for which to register a converter.
-     * @param converter The converter to use for objects of that class.
-     */
-    public void addConverter(Class<?> type, ObjectConverter converter) {
-        converters.put(type, converter);
-    }
-
-    /**
-     * Registers a converter for scalar values.
+     * Registers a pre-built converter.
      * 
      * @param converter The converter to register.
      */
-    public void addScalarConverter(IScalarConverter converter) {
-        scalarConverters.add(converter);
-    }
-
-    /**
-     * Checks whether the given type is a “complex” type.
-     * <p>
-     * A “complex type”, in this context, is a class for which we have a dedicated
-     * converter object.
-     * 
-     * @param type The type to query.
-     * @return <code>true</code> if the type is a complex type, <code>false</code>
-     *         otherwise.
-     */
-    public boolean isComplexType(Class<?> type) {
-        return converters.containsKey(type);
-    }
-
-    /**
-     * Checks whether the given type has an identifier slot.
-     * <p>
-     * A type with an identifier slot represents objects that are expected to be
-     * unique within the context of the entire document. Those are the objects that
-     * we might need to dereference.
-     * 
-     * @param type The type to query.
-     * @return <code>true</code> if the type has an identifier slot,
-     *         <code>false</code> otherwise (including the case where the object is
-     *         not of a type known to this context).
-     */
-    public boolean hasIdentifier(Class<?> type) {
-        ObjectConverter converter = converters.get(type);
-        return converter != null ? converter.hasIdentifier() : false;
+    public void addConverter(IConverter converter) {
+        converters.put(converter.getType(), converter);
     }
 
     /**
@@ -131,24 +87,8 @@ public class ConverterContext {
      * @return The registered converter for the type, or <code>null</code> if no
      *         converter has been registered for that type.
      */
-    public ObjectConverter getConverter(Class<?> type) {
+    public IConverter getConverter(Class<?> type) {
         return converters.get(type);
-    }
-
-    /**
-     * Gets the converter for scalar objects of the given type.
-     * 
-     * @param type The type to query.
-     * @return The registered converter for the type, or <code>null</code> if no
-     *         converter has been registered for that type.
-     */
-    public IScalarConverter getScalarConverter(Class<?> type) {
-        for ( IScalarConverter converter : scalarConverters ) {
-            if ( converter.canHandle(type) ) {
-                return converter;
-            }
-        }
-        return null;
     }
 
     /**
@@ -301,16 +241,17 @@ public class ConverterContext {
      */
     public static ConverterContext getLinkMLContext() {
         ConverterContext ctx = new ConverterContext();
-        ctx.addConverter(SchemaDefinition.class, new SchemaDefinitionConverter());
+        ctx.addConverter(new SchemaDefinitionConverter());
         ctx.addConverter(TypeDefinition.class);
         ctx.addConverter(EnumDefinition.class);
         ctx.addConverter(SlotDefinition.class);
-        ctx.addConverter(ClassDefinition.class, new ClassDefinitionConverter());
+        ctx.addConverter(new ClassDefinitionConverter());
         ctx.addConverter(Element.class);
         ctx.addConverter(Prefix.class);
-        ctx.addScalarConverter(new StringConverter());
-        ctx.addScalarConverter(new URIConverter());
-        ctx.addScalarConverter(new BooleanConverter());
+
+        ctx.addConverter(new StringConverter());
+        ctx.addConverter(new URIConverter());
+        ctx.addConverter(new BooleanConverter());
 
         return ctx;
     }

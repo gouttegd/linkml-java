@@ -28,10 +28,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A class to convert “raw objects” (as obtained from a JSON/YAML parser) into
- * instances of LinkML objects.
+ * A generic converter to convert “raw objects” (as obtained from a JSON/YAML
+ * parser) into instances of LinkML classes.
  */
-public class ObjectConverter {
+public class ObjectConverter implements IConverter {
 
     private static final Logger logger = LoggerFactory.getLogger(ObjectConverter.class);
 
@@ -42,7 +42,6 @@ public class ObjectConverter {
     private final static String CREATE_ERROR = "Cannot create object of type '%s'";
     private final static String NO_IDENTIFIER = "Missing identifier for type '%s'";
     private final static String NO_SIMPLE_DICT = "Type '%s' is not compatible with simple dict inlining";
-    private final static String UNSUPPORTED_SCALAR = "Unsupported scalar type '%s'";
 
     private Class<?> targetType;
     private Map<String, Slot> slots = new HashMap<>();
@@ -61,6 +60,11 @@ public class ObjectConverter {
                 identifierSlot = slot;
             }
         }
+    }
+
+    @Override
+    public Class<?> getType() {
+        return targetType;
     }
 
     /**
@@ -90,13 +94,6 @@ public class ObjectConverter {
     }
 
     /**
-     * Gets the type of object handled by this converter.
-     */
-    public Class<?> getTargetType() {
-        return targetType;
-    }
-
-    /**
      * Converts a raw map into an instance of a LinkML object, where the object
      * already exists.
      * 
@@ -115,7 +112,7 @@ public class ObjectConverter {
                 logger.debug("Ignoring unknown or unsupported slot '{}'", entry.getKey());
                 continue;
             }
-            convertSlot(entry.getValue(), slot, dest, ctx);
+            ctx.getConverter(slot.getInnerType()).convertForSlot(entry.getValue(), dest, slot, ctx);
         }
     }
 
@@ -128,21 +125,52 @@ public class ObjectConverter {
      * that the value is actually a map. If the raw object is <code>null</code>,
      * this method is a no-op.
      * 
-     * @param rawObject The raw object to convert.
-     * @param dest      The instance of the LinkML object whose slots should be
-     *                  filled with values from the raw object.
-     * @param ctx       The global converter context.
-     * @throws LinkMLRuntimeException If either (1) <code>rawObject</code> is not a
-     *                                map, or (2) a slot of the <code>dest</code>
-     *                                object cannot be assigned.
+     * @param raw  The raw object to convert.
+     * @param dest The instance of the LinkML object whose slots should be filled
+     *             with values from the raw object.
+     * @param ctx  The global converter context.
+     * @throws LinkMLRuntimeException If either (1) <code>raw</code> is not a map,
+     *                                or (2) a slot of the <code>dest</code> object
+     *                                cannot be assigned.
      */
-    public void convertTo(Object rawObject, Object dest, ConverterContext ctx)
+    public void convertTo(Object raw, Object dest, ConverterContext ctx)
             throws LinkMLRuntimeException {
-        if ( rawObject == null ) {
+        if ( raw == null ) {
             return;
         }
 
-        convertTo(toMap(rawObject), dest, ctx);
+        convertTo(toMap(raw), dest, ctx);
+    }
+
+    @Override
+    public Object convert(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
+        return convert(toMap(raw), ctx);
+    }
+
+    /**
+     * Converts a raw map into a new instance of a LinkML object.
+     * <p>
+     * If the object to create is an “identifiable” object, then the identifier is
+     * expected to be found within the provided raw map.
+     * 
+     * @param raw The raw map to convert.
+     * @param ctx The global converter context.
+     * @return The newly created object.
+     * @throws LinkMLRuntimeException If (1) the object cannot be created, (2) one
+     *                                of its slots cannot be assigned, or (3) the
+     *                                object requires an identifier that was not
+     *                                found within the raw map.
+     */
+    public Object convert(Map<String, Object> raw, ConverterContext ctx) throws LinkMLRuntimeException {
+        String id = null;
+        if ( hasIdentifier() ) {
+            Object identifier = raw.get(identifierSlot.getLinkMLName());
+            if ( identifier == null ) {
+                throw new LinkMLRuntimeException(String.format(NO_IDENTIFIER, targetType.getName()));
+            }
+            id = identifier.toString();
+        }
+        return convert(raw, id, ctx);
     }
 
     /**
@@ -174,134 +202,87 @@ public class ObjectConverter {
     }
 
     /**
-     * Converts a raw map into a new instance of a LinkML object.
-     * <p>
-     * If the object to create is an “identifiable” object, then the identifier is
-     * expected to be found within the provided raw map.
-     * 
-     * @param raw The raw map to convert.
-     * @param ctx The global converter context.
-     * @return The newly created object.
-     * @throws LinkMLRuntimeException If (1) the object cannot be created, (2) one
-     *                                of its slots cannot be assigned, or (3) the
-     *                                object requires an identifier that was not
-     *                                found within the raw map.
-     */
-    public Object convert(Map<String, Object> raw, ConverterContext ctx) throws LinkMLRuntimeException {
-        String id = null;
-        if ( hasIdentifier() ) {
-            Object identifier = raw.get(identifierSlot.getLinkMLName());
-            if ( identifier == null ) {
-                throw new LinkMLRuntimeException(String.format(NO_IDENTIFIER, targetType.getName()));
-            }
-            id = identifier.toString();
-        }
-        return convert(raw, id, ctx);
-    }
-
-    /**
      * Converts the value of a single slot and assigns it to the target object.
      * <p>
-     * This is the core of the converter. Its complexity stems from the fact that is
-     * has to deal with (1) single- and multi-valued slots, (2) scalar- and
-     * complex-typed slots, and (for complex slots) the various types of “inlining”.
+     * This is the core of the converter. Its complexity stems mostly from the fact
+     * that is has to deal with the various types of “inlining”.
      * 
-     * @param rawValue     The raw value of the slot.
-     * @param targetSlot   The slot to which the value should be assigned.
-     * @param targetObject The object whose slots should be assigned.
-     * @param ctx          The global converter context.
+     * @param raw  The raw value of the slot.
+     * @param slot The slot to which the value should be assigned.
+     * @param dest The object whose slots should be assigned.
+     * @param ctx  The global converter context.
      * @throws LinkMLRuntimeException If (1) the raw value does not match the
      *                                expected type for the slot, or (2) the
      *                                converted value cannot be assigned.
      */
-    protected void convertSlot(Object rawValue, Slot targetSlot, Object targetObject, ConverterContext ctx)
+    @Override
+    public void convertForSlot(Object raw, Object dest, Slot slot, ConverterContext ctx)
             throws LinkMLRuntimeException {
-        Class<?> slotType = targetSlot.getInnerType();
-        if ( ctx.isComplexType(slotType) ) {
-            // Complex object
-            ObjectConverter conv = ctx.getConverter(slotType);
-            if ( targetSlot.isMultivalued() ) {
-                List<Object> value = new ArrayList<>();
-                if ( ctx.hasIdentifier(slotType) ) {
-                    switch ( targetSlot.getInliningMode() ) {
-                    case NO_INLINING:
-                        ctx.getObjects(slotType, toStringList(rawValue), value);
-                        break;
+        if ( slot.isMultivalued() ) {
+            List<Object> value = new ArrayList<>();
+            if ( hasIdentifier() ) {
+                switch ( slot.getInliningMode() ) {
+                case NO_INLINING:
+                    ctx.getObjects(targetType, toStringList(raw), value);
+                    break;
 
-                    case LIST:
-                        for ( Object rawItem : toList(rawValue) ) {
-                            value.add(conv.convert(toMap(rawItem), ctx));
-                        }
-                        break;
-
-                    case DICT:
-                        for ( Map.Entry<String, Object> rawItem : toMap(rawValue).entrySet() ) {
-                            Object item = null;
-                            if ( rawItem.getValue() == null ) {
-                                item = ctx.getObject(slotType, rawItem.getKey(), true);
-                            } else {
-                                item = conv.convert(toMap(rawItem.getValue()), rawItem.getKey(), ctx);
-                            }
-                            value.add(item);
-                        }
-                        break;
-
-                    case SIMPLE_DICT:
-                        Slot primarySlot = Slot.getPrimaryValueSlot(slotType);
-                        if ( primarySlot == null ) {
-                            throw new LinkMLRuntimeException(String.format(NO_SIMPLE_DICT, slotType.getName()));
-
-                        }
-                        IScalarConverter primaryConv = ctx.getScalarConverter(primarySlot.getInnerType());
-                        if ( primaryConv == null || primarySlot.isMultivalued() ) {
-                            // FIXME: For now we assume that the primary slot of a class inlined as
-                            // SimpleDict cannot be multi-valued and cannot be of a non-scalar type. Whether
-                            // this is correct or not is unclear: the LinkML validator accepts a
-                            // multi-valued primary slot and a non-scalar-typed primary slot, but the LinkML
-                            // converter rejects both (https://github.com/linkml/linkml/issues/3112).
-                            throw new LinkMLRuntimeException(String.format(NO_SIMPLE_DICT, slotType.getName()));
-                        }
-
-                        for ( Map.Entry<String, Object> rawItem : toMap(rawValue).entrySet() ) {
-                            Object item = ctx.getObject(slotType, rawItem.getKey(), true);
-                            primarySlot.setValue(item, primaryConv.convert(rawItem.getValue()));
-                            value.add(item);
-                        }
-                        break;
+                case LIST:
+                    for ( Object rawItem : toList(raw) ) {
+                        value.add(convert(rawItem, ctx));
                     }
-                } else {
-                    // Multi-valued non-identifiable object (necessarily inlined as list)
-                    for ( Object rawItem : toList(rawValue) ) {
-                        value.add(conv.convert(toMap(rawItem), ctx));
+                    break;
+
+                case DICT:
+                    for ( Map.Entry<String, Object> rawItem : toMap(raw).entrySet() ) {
+                        Object item = null;
+                        if ( rawItem.getValue() == null ) {
+                            item = ctx.getObject(targetType, rawItem.getKey(), true);
+                        } else {
+                            item = convert(toMap(rawItem.getValue()), rawItem.getKey(), ctx);
+                        }
+                        value.add(item);
                     }
+                    break;
+
+                case SIMPLE_DICT:
+                    Slot primarySlot = Slot.getPrimaryValueSlot(targetType);
+                    if ( primarySlot == null ) {
+                        throw new LinkMLRuntimeException(String.format(NO_SIMPLE_DICT, targetType.getName()));
+
+                    }
+                    IConverter primaryConv = ctx.getConverter(primarySlot.getInnerType());
+                    if ( primaryConv == null || primarySlot.isMultivalued() ) {
+                        // FIXME: For now we assume that the primary slot of a class inlined as
+                        // SimpleDict cannot be multi-valued and cannot be of a non-scalar type. Whether
+                        // this is correct or not is unclear: the LinkML validator accepts a
+                        // multi-valued primary slot and a non-scalar-typed primary slot, but the LinkML
+                        // converter rejects both (https://github.com/linkml/linkml/issues/3112).
+                        throw new LinkMLRuntimeException(String.format(NO_SIMPLE_DICT, targetType.getName()));
+                    }
+
+                    for ( Map.Entry<String, Object> rawItem : toMap(raw).entrySet() ) {
+                        Object item = ctx.getObject(targetType, rawItem.getKey(), true);
+                        primarySlot.setValue(item, primaryConv.convert(rawItem.getValue(), ctx));
+                        value.add(item);
+                    }
+                    break;
                 }
 
-                targetSlot.setValue(targetObject, value);
             } else {
-                // Single-valued complex object
-                if ( ctx.hasIdentifier(slotType) && targetSlot.getInliningMode() == InliningMode.NO_INLINING ) {
-                    ctx.getObject(targetSlot, toString(rawValue), targetObject);
-                } else {
-                    // Non-identifiable object or inlined identifiable object; in both case, can
-                    // only be expected to be represented as a map.
-                    targetSlot.setValue(targetObject, convert(toMap(rawValue), ctx));
+                // Multi-valued non-identifiable object (necessary inlined as a list)
+                for ( Object rawItem : toList(raw) ) {
+                    value.add(convert(rawItem, ctx));
                 }
             }
+            slot.setValue(dest, value);
         } else {
-            // Scalar
-            IScalarConverter conv = ctx.getScalarConverter(slotType);
-            if ( conv == null ) {
-                throw new LinkMLRuntimeException(String.format(UNSUPPORTED_SCALAR, slotType.getName()));
-            }
-
-            if ( targetSlot.isMultivalued() ) {
-                ArrayList<Object> value = new ArrayList<>();
-                for ( Object rawItem : toList(rawValue) ) {
-                    value.add(conv.convert(rawItem));
-                }
-                targetSlot.setValue(targetObject, value);
+            // Single-valued object
+            if ( hasIdentifier() && slot.getInliningMode() == InliningMode.NO_INLINING ) {
+                ctx.getObject(slot, toString(raw), dest);
             } else {
-                targetSlot.setValue(targetObject, conv.convert(rawValue));
+                // Non-identifiable object or inlined identifiable object; in both cases, can
+                // only be expected to be represented as a map
+                slot.setValue(dest, convert(toMap(raw), ctx));
             }
         }
     }

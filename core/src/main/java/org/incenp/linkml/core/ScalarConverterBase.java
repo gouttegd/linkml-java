@@ -18,6 +18,7 @@
 
 package org.incenp.linkml.core;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,27 +28,54 @@ import java.util.Map;
  * The role of this class is to have in a single place all the basic tests on
  * the raw value that most converters will need to perform.
  */
-public abstract class ScalarConverterBase implements IScalarConverter {
+public abstract class ScalarConverterBase implements IConverter {
 
     @Override
-    public Object convert(Object value) throws LinkMLRuntimeException {
-        if ( value == null ) {
+    public Object convert(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
+        if ( raw == null ) {
             throw new LinkMLRuntimeException("Invalid null value, scalar type expected");
-        } else if ( value instanceof List || value instanceof Map ) {
+        } else if ( raw instanceof List || raw instanceof Map ) {
             throw new LinkMLRuntimeException("Invalid complex value, scalar type expected");
         }
-        return convertImpl(value);
+        return convertImpl(raw, ctx);
+    }
+
+    @Override
+    public void convertForSlot(Object raw, Object dest, Slot slot, ConverterContext ctx) throws LinkMLRuntimeException {
+        if ( slot.isMultivalued() ) {
+            ArrayList<Object> list = new ArrayList<>();
+            for ( Object item : toList(raw) ) {
+                list.add(convert(item, ctx));
+            }
+            slot.setValue(dest, list);
+        } else {
+            slot.setValue(dest, convert(raw, ctx));
+        }
     }
 
     /**
      * Performs the actual type conversion.
      * 
-     * @param value The raw object to convert. This is guaranteed to be a
-     *              non-<code>null</code>, non-list, non-dictionary object.
+     * @param raw The raw object to convert. This is guaranteed to be a
+     *            non-<code>null</code>, non-list, non-dictionary object.
      * @return The converted value.
      * @throws LinkMLRuntimeException If the converter cannot convert the given
      *                                value.
      */
-    protected abstract Object convertImpl(Object value) throws LinkMLRuntimeException;
+    protected abstract Object convertImpl(Object raw, ConverterContext ctx) throws LinkMLRuntimeException;
 
+    /**
+     * Checks that a raw object is a list, and casts it as such.
+     * 
+     * @param raw The raw object to cast.
+     * @return The input object, cast into a list.
+     * @throws LinkMLRuntimeException If the raw object is not in fact a list.
+     */
+    @SuppressWarnings("unchecked")
+    protected List<Object> toList(Object raw) throws LinkMLRuntimeException {
+        if ( !(raw instanceof List) ) {
+            throw new LinkMLRuntimeException("Invalid value type, list expected");
+        }
+        return (List<Object>) raw;
+    }
 }

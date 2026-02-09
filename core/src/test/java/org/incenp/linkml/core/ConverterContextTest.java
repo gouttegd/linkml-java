@@ -29,14 +29,6 @@ import org.junit.jupiter.api.Test;
 public class ConverterContextTest {
 
     @Test
-    void testLinkMLContext() {
-        ConverterContext linkmlContext = ConverterContext.getLinkMLContext();
-
-        Assertions.assertTrue(linkmlContext.isComplexType(SlotDefinition.class));
-        Assertions.assertTrue(linkmlContext.hasIdentifier(SlotDefinition.class));
-    }
-
-    @Test
     void testGetObject() throws LinkMLRuntimeException {
         ConverterContext ctx = new ConverterContext();
         SlotDefinition sd = ctx.getObject(SlotDefinition.class, "Foo", false);
