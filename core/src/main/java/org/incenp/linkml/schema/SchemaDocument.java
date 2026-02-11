@@ -29,10 +29,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.incenp.linkml.core.BooleanConverter;
 import org.incenp.linkml.core.ConverterContext;
 import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.StringConverter;
+import org.incenp.linkml.core.URIConverter;
 import org.incenp.linkml.schema.model.ClassDefinition;
+import org.incenp.linkml.schema.model.Element;
 import org.incenp.linkml.schema.model.EnumDefinition;
+import org.incenp.linkml.schema.model.Prefix;
 import org.incenp.linkml.schema.model.SchemaDefinition;
 import org.incenp.linkml.schema.model.SlotDefinition;
 import org.incenp.linkml.schema.model.TypeDefinition;
@@ -212,7 +217,7 @@ public class SchemaDocument {
     private SchemaDefinition parseSchema(File file)
             throws IOException, InvalidSchemaException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        ConverterContext ctx = ConverterContext.getLinkMLContext();
+        ConverterContext ctx = getLinkMLContext();
 
         // Parse the top-level schema and all its imports recursively
         SchemaDefinition schema = parseSchema(new FileSchemaSource(file), mapper, ctx);
@@ -324,5 +329,20 @@ public class SchemaDocument {
         } catch ( MalformedURLException e ) {
             throw new InvalidSchemaException(String.format(UNRESOLVABLE_IMPORT, name), e);
         }
+    }
+
+    private ConverterContext getLinkMLContext() {
+        ConverterContext ctx = new ConverterContext();
+        ctx.addConverter(new SchemaDefinitionConverter());
+        ctx.addConverter(TypeDefinition.class);
+        ctx.addConverter(EnumDefinition.class);
+        ctx.addConverter(SlotDefinition.class);
+        ctx.addConverter(new ClassDefinitionConverter());
+        ctx.addConverter(Element.class);
+        ctx.addConverter(Prefix.class);
+        ctx.addConverter(new StringConverter());
+        ctx.addConverter(new URIConverter());
+        ctx.addConverter(new BooleanConverter());
+        return ctx;
     }
 }

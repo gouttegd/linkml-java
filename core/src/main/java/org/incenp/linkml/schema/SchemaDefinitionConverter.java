@@ -58,7 +58,9 @@ public class SchemaDefinitionConverter extends ObjectConverter {
         if ( prefixes != null ) {
             Slot slot = getSlot(PREFIXES_KEY);
             ctx.getConverter(Prefix.class).convertForSlot(prefixes, dest, slot, ctx);
-            ctx.addPrefixes(((SchemaDefinition) dest).getPrefixes());
+            for ( Prefix prefix : ((SchemaDefinition) dest).getPrefixes() ) {
+                ctx.addPrefix(prefix.getPrefixName(), prefix.getIriPrefix());
+            }
         }
 
         super.convertTo(rawMap, dest, ctx);

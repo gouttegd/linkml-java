@@ -19,18 +19,9 @@
 package org.incenp.linkml.core;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.incenp.linkml.schema.ClassDefinitionConverter;
-import org.incenp.linkml.schema.SchemaDefinitionConverter;
-import org.incenp.linkml.schema.model.Element;
-import org.incenp.linkml.schema.model.EnumDefinition;
-import org.incenp.linkml.schema.model.Prefix;
-import org.incenp.linkml.schema.model.SlotDefinition;
-import org.incenp.linkml.schema.model.TypeDefinition;
 
 /**
  * Global context for converting LinkML objects (as parsed from a JSON/YAML
@@ -94,17 +85,16 @@ public class ConverterContext {
     }
 
     /**
-     * Registers a list of prefix declarations.
+     * Registers a prefix.
      * <p>
-     * Prefixes declared here will become resolvable by the {@link #resolve(String)}
-     * method.
+     * Any prefix declared here will become resolvable by the
+     * {@link #resolve(String)} method.
      * 
-     * @param prefixes The prefix declarations to add.
+     * @param name   The prefix name.
+     * @param prefix The corresponding IRI prefix.
      */
-    public void addPrefixes(Collection<Prefix> prefixes) {
-        for ( Prefix prefix : prefixes ) {
-            prefixMap.put(prefix.getPrefixName(), prefix.getIriPrefix());
-        }
+    public void addPrefix(String name, String prefix) {
+        prefixMap.put(name, prefix);
     }
 
     /**
@@ -236,26 +226,6 @@ public class ConverterContext {
                 }
             }
         }
-    }
-
-    /**
-     * Gets a context suitable for converting LinkML schema objects.
-     */
-    public static ConverterContext getLinkMLContext() {
-        ConverterContext ctx = new ConverterContext();
-        ctx.addConverter(new SchemaDefinitionConverter());
-        ctx.addConverter(TypeDefinition.class);
-        ctx.addConverter(EnumDefinition.class);
-        ctx.addConverter(SlotDefinition.class);
-        ctx.addConverter(new ClassDefinitionConverter());
-        ctx.addConverter(Element.class);
-        ctx.addConverter(Prefix.class);
-
-        ctx.addConverter(new StringConverter());
-        ctx.addConverter(new URIConverter());
-        ctx.addConverter(new BooleanConverter());
-
-        return ctx;
     }
 
     /*
