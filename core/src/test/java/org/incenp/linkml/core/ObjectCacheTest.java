@@ -18,8 +18,8 @@
 
 package org.incenp.linkml.core;
 
-import org.incenp.linkml.model.SlotDefinition;
-import org.incenp.linkml.model.TypeDefinition;
+import org.incenp.linkml.schema.model.SlotDefinition;
+import org.incenp.linkml.schema.model.TypeDefinition;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

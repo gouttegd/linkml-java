@@ -16,23 +16,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.model.annotations;
-
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+package org.incenp.linkml.core;
 
 /**
- * An annotation to indicate that a field is intended to contain a unique
- * identifier for an instance of the class it belongs to.
- * 
- * Of note, in LinkML an identifier field is necessarily a
- * {@link RequirementLevel#MANDATORY} field.
+ * The level of requirement that applies to a given field within a class.
  */
-@Retention(RUNTIME)
-@Target(FIELD)
-public @interface Identifier {
+public enum RequirementLevel {
+    /**
+     * Indicates an optional field.
+     */
+    OPTIONAL,
 
+    /**
+     * Indicates an optional, but recommended, field. A LinkML validator may emit a
+     * warning if the field is not set in a given instance.
+     */
+    RECOMMENDED,
+
+    /**
+     * Indicates a required field.
+     */
+    MANDATORY
 }

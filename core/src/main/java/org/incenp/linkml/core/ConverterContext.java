@@ -24,11 +24,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.incenp.linkml.model.Element;
-import org.incenp.linkml.model.EnumDefinition;
-import org.incenp.linkml.model.Prefix;
-import org.incenp.linkml.model.SlotDefinition;
-import org.incenp.linkml.model.TypeDefinition;
+import org.incenp.linkml.schema.ClassDefinitionConverter;
+import org.incenp.linkml.schema.SchemaDefinitionConverter;
+import org.incenp.linkml.schema.model.Element;
+import org.incenp.linkml.schema.model.EnumDefinition;
+import org.incenp.linkml.schema.model.Prefix;
+import org.incenp.linkml.schema.model.SlotDefinition;
+import org.incenp.linkml.schema.model.TypeDefinition;
 
 /**
  * Global context for converting LinkML objects (as parsed from a JSON/YAML

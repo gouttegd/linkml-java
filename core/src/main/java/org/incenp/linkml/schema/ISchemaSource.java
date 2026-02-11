@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.schema;
 
 import java.io.IOException;
 import java.io.InputStream;

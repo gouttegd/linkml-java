@@ -16,29 +16,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.model;
+package org.incenp.linkml.core.annotations;
 
-import java.util.List;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
- * Represents the definition an element whose instances must be drawn from a
- * specified set of permissible values.
+ * An annotation to indicate the URI associated with a class or a field within a
+ * class.
+ * 
+ * When this annotation is absent, the URI for a class or a field is constructed
+ * by appending the name of the class or field to the defining schema’s default
+ * prefix.
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@SuperBuilder(toBuilder = true)
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class EnumDefinition extends Definition {
-    @JsonProperty("permissible_values")
-    private List<PermissibleValue> permissibleValues;
+@Retention(RUNTIME)
+@Target({ TYPE, FIELD })
+public @interface LinkURI {
+    String value();
 }

@@ -26,11 +26,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.incenp.linkml.model.InliningMode;
-import org.incenp.linkml.model.RequirementLevel;
-import org.incenp.linkml.model.annotations.Identifier;
-import org.incenp.linkml.model.annotations.Inlining;
-import org.incenp.linkml.model.annotations.Requirement;
+import org.incenp.linkml.core.annotations.Identifier;
+import org.incenp.linkml.core.annotations.Inlining;
+import org.incenp.linkml.core.annotations.Requirement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

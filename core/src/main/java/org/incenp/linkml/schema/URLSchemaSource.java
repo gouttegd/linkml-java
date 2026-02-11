@@ -16,51 +16,47 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.schema;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
- * Represents a schema location pointing to a local file.
+ * Represents a schema location pointing to a remote resource.
  */
-public class FileSchemaSource implements ISchemaSource {
+public class URLSchemaSource implements ISchemaSource {
 
-    private File file;
+    private URL url;
     private InputStream stream;
 
-    public FileSchemaSource(File file) {
-        this.file = file;
-    }
-
-    public FileSchemaSource(String filename) {
-        this.file = new File(filename);
+    public URLSchemaSource(String url) throws MalformedURLException {
+        this.url = new URL(url);
     }
 
     @Override
     public String getBase() {
-        return file.getParent();
+        return null;
     }
 
     @Override
     public InputStream getStream() throws IOException {
-        if ( stream == null ) {
-            stream = new FileInputStream(file);
+        if (stream == null) {
+            stream = url.openStream();
         }
         return stream;
     }
 
     @Override
     public int hashCode() {
-        return file.getAbsolutePath().hashCode();
+        return url.hashCode();
     }
 
     @Override
     public boolean equals(Object object) {
-        if ( object instanceof FileSchemaSource ) {
-            return ((FileSchemaSource) object).file.getAbsolutePath().equals(file.getAbsolutePath());
+        if ( object instanceof URLSchemaSource ) {
+            return ((URLSchemaSource) object).url.equals(url);
         }
         return false;
     }

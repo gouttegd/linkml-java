@@ -16,34 +16,30 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.model;
+package org.incenp.linkml.schema.model;
 
-import org.incenp.linkml.model.annotations.Identifier;
-import org.incenp.linkml.model.annotations.LinkURI;
-import org.incenp.linkml.model.annotations.Requirement;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 /**
- * A named element in the LinkML model.
+ * Represents the definition of a scalar type.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder(toBuilder = true)
 @Data
-public abstract class Element {
-    @Identifier
-    @LinkURI("http://www.w3.org/2000/01/rdf-schema#label")
-    private String name;
+@EqualsAndHashCode(callSuper = true)
+public class TypeDefinition extends Element {
+    @JsonProperty("typeof")
+    private TypeDefinition typeOf;
 
-    @Requirement(RequirementLevel.RECOMMENDED)
-    @LinkURI("http://www.w3.org/2004/02/skos/core#definition")
-    private String description;
+    private String base;
 
-    @LinkURI("http://purl.org/dc/terms/title")
-    private String title;
+    private String repr;
 }

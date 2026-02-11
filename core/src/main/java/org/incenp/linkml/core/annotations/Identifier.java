@@ -16,31 +16,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.model;
+package org.incenp.linkml.core.annotations;
 
-import org.incenp.linkml.model.annotations.LinkURI;
-import org.incenp.linkml.model.annotations.Requirement;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
- * Represents a permissible value within a LinkML enumeration.
+ * An annotation to indicate that a field is intended to contain a unique
+ * identifier for an instance of the class it belongs to.
+ * 
+ * Of note, in LinkML an identifier field is necessarily a
+ * {@link RequirementLevel#MANDATORY} field.
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@SuperBuilder(toBuilder = true)
-@Data
-public class PermissibleValue {
-    @Requirement(RequirementLevel.MANDATORY)
-    private String text;
+@Retention(RUNTIME)
+@Target(FIELD)
+public @interface Identifier {
 
-    @Requirement(RequirementLevel.RECOMMENDED)
-    @LinkURI("http://www.w3.org/2004/02/skos/core#definition")
-    private String description;
-
-    private String meaning;
 }

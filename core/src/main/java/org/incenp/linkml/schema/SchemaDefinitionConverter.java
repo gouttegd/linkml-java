@@ -16,12 +16,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.schema;
 
 import java.util.Map;
 
-import org.incenp.linkml.model.Prefix;
-import org.incenp.linkml.model.SchemaDefinition;
+import org.incenp.linkml.core.ConverterContext;
+import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.ObjectConverter;
+import org.incenp.linkml.core.Slot;
+import org.incenp.linkml.schema.model.Prefix;
+import org.incenp.linkml.schema.model.SchemaDefinition;
 
 /**
  * A converter object specifically intended to convert {@link SchemaDefinition}

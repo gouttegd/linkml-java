@@ -1,4 +1,4 @@
-/*
+/* 
  * LinkML-Java - LinkML library for Java
  * Copyright © 2026 Damien Goutte-Gattat
  * 
@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.model;
+package org.incenp.linkml.schema.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -28,17 +28,41 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Abstract base class for the “core” metaclasses.
+ * Represents the definition of a “slot”. A slot in LinkML parlance is the
+ * equivalent of a “field” in Java.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder(toBuilder = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
-public abstract class Definition extends Element {
-    @JsonProperty("is_a")
-    private Definition parent;
+public class SlotDefinition extends Definition {
+    @JsonProperty("identifier")
+    private boolean isIdentifier;
 
-    @JsonProperty("abstract")
-    private boolean isAbstract;
+    @JsonProperty("designates_type")
+    private boolean isTypeDesignator;
+
+    private Element range;
+
+    private boolean required;
+
+    private boolean recommended;
+
+    private boolean multivalued;
+
+    private boolean inlined;
+
+    @JsonProperty("inlined_as_list")
+    private boolean inlinedAsList;
+
+    private SlotDefinition globalSlot;
+
+    @Override
+    public void setParent(Definition parent) {
+        if ( !(parent instanceof SlotDefinition) ) {
+            throw new IllegalArgumentException("Invalid type, SlotDefinition expected");
+        }
+        super.setParent(parent);
+    }
 }

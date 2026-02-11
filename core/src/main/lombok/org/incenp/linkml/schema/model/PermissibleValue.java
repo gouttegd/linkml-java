@@ -1,4 +1,4 @@
-/* 
+/*
  * LinkML-Java - LinkML library for Java
  * Copyright © 2026 Damien Goutte-Gattat
  * 
@@ -16,45 +16,32 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.model;
+package org.incenp.linkml.schema.model;
 
-import java.util.List;
-
-import org.incenp.linkml.model.annotations.Inlining;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.incenp.linkml.core.RequirementLevel;
+import org.incenp.linkml.core.annotations.LinkURI;
+import org.incenp.linkml.core.annotations.Requirement;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Represents the definition of a class. A LinkML class should be directly
- * equivalent to a Java class (or a record).
+ * Represents a permissible value within a LinkML enumeration.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder(toBuilder = true)
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class ClassDefinition extends Definition {
-    private List<SlotDefinition> slots;
+public class PermissibleValue {
+    @Requirement(RequirementLevel.MANDATORY)
+    private String text;
 
-    @JsonProperty("slot_usage")
-    @Inlining(InliningMode.DICT)
-    private List<SlotDefinition> slotUsage;
+    @Requirement(RequirementLevel.RECOMMENDED)
+    @LinkURI("http://www.w3.org/2004/02/skos/core#definition")
+    private String description;
 
-    @Inlining(InliningMode.DICT)
-    private List<SlotDefinition> attributes;
-
-    @Override
-    public void setParent(Definition parent) {
-        if ( !(parent instanceof ClassDefinition) ) {
-            throw new IllegalArgumentException("Invalid type, ClassDefinition expected");
-        }
-        super.setParent(parent);
-    }
+    private String meaning;
 }

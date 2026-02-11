@@ -16,25 +16,35 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.model;
+package org.incenp.linkml.core;
+
+import org.incenp.linkml.core.annotations.Identifier;
 
 /**
- * The level of requirement that applies to a given field within a class.
+ * Represents the various modes of “inlining” instances of a class, in
+ * serialisations that do support inlining (e.g. JSON, YAML).
  */
-public enum RequirementLevel {
+public enum InliningMode {
     /**
-     * Indicates an optional field.
+     * Instances are not inlined.
      */
-    OPTIONAL,
+    NO_INLINING,
 
     /**
-     * Indicates an optional, but recommended, field. A LinkML validator may emit a
-     * warning if the field is not set in a given instance.
+     * Instances are inlined as a list.
      */
-    RECOMMENDED,
+    LIST,
 
     /**
-     * Indicates a required field.
+     * Instances are inlined as a dictionary. This is only possible if their class
+     * defines an {@link Identifier} field.
      */
-    MANDATORY
+    DICT,
+
+    /**
+     * Instances are inlined as a “simple” dictionary. This is only possible if (1)
+     * their class defines an {@link Identifier} field and (2) their class has only
+     * one other field beyond the identifier field.
+     */
+    SIMPLE_DICT
 }

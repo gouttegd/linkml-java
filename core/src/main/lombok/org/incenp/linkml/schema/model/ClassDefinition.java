@@ -16,7 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.model;
+package org.incenp.linkml.schema.model;
+
+import java.util.List;
+
+import org.incenp.linkml.core.InliningMode;
+import org.incenp.linkml.core.annotations.Inlining;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -28,40 +33,28 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Represents the definition of a “slot”. A slot in LinkML parlance is the
- * equivalent of a “field” in Java.
+ * Represents the definition of a class. A LinkML class should be directly
+ * equivalent to a Java class (or a record).
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder(toBuilder = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SlotDefinition extends Definition {
-    @JsonProperty("identifier")
-    private boolean isIdentifier;
+public class ClassDefinition extends Definition {
+    private List<SlotDefinition> slots;
 
-    @JsonProperty("designates_type")
-    private boolean isTypeDesignator;
+    @JsonProperty("slot_usage")
+    @Inlining(InliningMode.DICT)
+    private List<SlotDefinition> slotUsage;
 
-    private Element range;
-
-    private boolean required;
-
-    private boolean recommended;
-
-    private boolean multivalued;
-
-    private boolean inlined;
-
-    @JsonProperty("inlined_as_list")
-    private boolean inlinedAsList;
-
-    private SlotDefinition globalSlot;
+    @Inlining(InliningMode.DICT)
+    private List<SlotDefinition> attributes;
 
     @Override
     public void setParent(Definition parent) {
-        if ( !(parent instanceof SlotDefinition) ) {
-            throw new IllegalArgumentException("Invalid type, SlotDefinition expected");
+        if ( !(parent instanceof ClassDefinition) ) {
+            throw new IllegalArgumentException("Invalid type, ClassDefinition expected");
         }
         super.setParent(parent);
     }

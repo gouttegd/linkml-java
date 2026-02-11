@@ -16,14 +16,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.schema;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.incenp.linkml.model.ClassDefinition;
-import org.incenp.linkml.model.SlotDefinition;
+import org.incenp.linkml.core.ConverterContext;
+import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.ObjectConverter;
+import org.incenp.linkml.core.Slot;
+import org.incenp.linkml.schema.model.ClassDefinition;
+import org.incenp.linkml.schema.model.SlotDefinition;
 
 /**
  * A converter object specifically intended to convert {@link ClassDefinition}

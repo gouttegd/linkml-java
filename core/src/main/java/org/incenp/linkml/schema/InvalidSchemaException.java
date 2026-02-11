@@ -16,25 +16,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.model.annotations;
-
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import org.incenp.linkml.model.RequirementLevel;
+package org.incenp.linkml.schema;
 
 /**
- * An annotation to indicate whether a given field is optional, recommended, or
- * mandatory.
- * 
- * Any field not annotated with an explicit requirement level is assumed to be
- * {@link RequirementLevel#OPTIONAL}.
+ * This exception is thrown when processing a LinkML schema that does not
+ * conform to the LinkML specification.
  */
-@Retention(RUNTIME)
-@Target(FIELD)
-public @interface Requirement {
-    RequirementLevel value();
+public class InvalidSchemaException extends Exception {
+
+    private static final long serialVersionUID = -9079693184858658675L;
+
+    public InvalidSchemaException(String msg) {
+        super(msg);
+    }
+
+    public InvalidSchemaException(String msg, Throwable inner) {
+        super(msg, inner);
+    }
 }

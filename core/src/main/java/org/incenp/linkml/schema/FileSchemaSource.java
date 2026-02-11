@@ -16,45 +16,51 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.schema;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Represents a schema location pointing to an embedded Java resource.
+ * Represents a schema location pointing to a local file.
  */
-public class EmbeddedSchemaSource implements ISchemaSource {
+public class FileSchemaSource implements ISchemaSource {
 
-    private String name;
+    private File file;
     private InputStream stream;
 
-    public EmbeddedSchemaSource(String name) {
-        this.name = name;
+    public FileSchemaSource(File file) {
+        this.file = file;
+    }
+
+    public FileSchemaSource(String filename) {
+        this.file = new File(filename);
     }
 
     @Override
     public String getBase() {
-        return null;
+        return file.getParent();
     }
 
     @Override
     public InputStream getStream() throws IOException {
         if ( stream == null ) {
-            stream = EmbeddedSchemaSource.class.getClassLoader().getResourceAsStream(name);
+            stream = new FileInputStream(file);
         }
         return stream;
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return file.getAbsolutePath().hashCode();
     }
 
     @Override
     public boolean equals(Object object) {
-        if ( object instanceof EmbeddedSchemaSource ) {
-            return ((EmbeddedSchemaSource) object).name.equals(name);
+        if ( object instanceof FileSchemaSource ) {
+            return ((FileSchemaSource) object).file.getAbsolutePath().equals(file.getAbsolutePath());
         }
         return false;
     }

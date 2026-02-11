@@ -16,23 +16,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.schema;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
- * Represents a schema location pointing to a remote resource.
+ * Represents a schema location pointing to an embedded Java resource.
  */
-public class URLSchemaSource implements ISchemaSource {
+public class EmbeddedSchemaSource implements ISchemaSource {
 
-    private URL url;
+    private String name;
     private InputStream stream;
 
-    public URLSchemaSource(String url) throws MalformedURLException {
-        this.url = new URL(url);
+    public EmbeddedSchemaSource(String name) {
+        this.name = name;
     }
 
     @Override
@@ -42,21 +40,21 @@ public class URLSchemaSource implements ISchemaSource {
 
     @Override
     public InputStream getStream() throws IOException {
-        if (stream == null) {
-            stream = url.openStream();
+        if ( stream == null ) {
+            stream = EmbeddedSchemaSource.class.getClassLoader().getResourceAsStream(name);
         }
         return stream;
     }
 
     @Override
     public int hashCode() {
-        return url.hashCode();
+        return name.hashCode();
     }
 
     @Override
     public boolean equals(Object object) {
-        if ( object instanceof URLSchemaSource ) {
-            return ((URLSchemaSource) object).url.equals(url);
+        if ( object instanceof EmbeddedSchemaSource ) {
+            return ((EmbeddedSchemaSource) object).name.equals(name);
         }
         return false;
     }

@@ -16,14 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.schema;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.incenp.linkml.model.ClassDefinition;
-import org.incenp.linkml.model.Prefix;
-import org.incenp.linkml.model.SlotDefinition;
+import org.incenp.linkml.schema.model.ClassDefinition;
+import org.incenp.linkml.schema.model.Prefix;
+import org.incenp.linkml.schema.model.SlotDefinition;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

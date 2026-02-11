@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.model.annotations;
+package org.incenp.linkml.core.annotations;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -24,19 +24,17 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.incenp.linkml.model.InliningMode;
+import org.incenp.linkml.core.RequirementLevel;
 
 /**
- * An annotation to indicate whether the value(s) of a field should be inlined
- * or not (in serialisations that do support inlining).
+ * An annotation to indicate whether a given field is optional, recommended, or
+ * mandatory.
  * 
- * When that annotation is not present and the type (“range”, in LinkML
- * parlance) of a field is a class that defines an {@link Identifier} slot, then
- * only the identifier is serialised (it is assumed that the full value will be
- * serialised in inline form elsewhere).
+ * Any field not annotated with an explicit requirement level is assumed to be
+ * {@link RequirementLevel#OPTIONAL}.
  */
 @Retention(RUNTIME)
 @Target(FIELD)
-public @interface Inlining {
-    InliningMode value();
+public @interface Requirement {
+    RequirementLevel value();
 }

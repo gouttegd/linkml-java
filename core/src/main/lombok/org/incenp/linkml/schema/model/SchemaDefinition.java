@@ -16,14 +16,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.model;
+package org.incenp.linkml.schema.model;
 
 import java.net.URI;
 import java.util.List;
 
-import org.incenp.linkml.model.annotations.Inlining;
-import org.incenp.linkml.model.annotations.LinkURI;
-import org.incenp.linkml.model.annotations.Requirement;
+import org.incenp.linkml.core.InliningMode;
+import org.incenp.linkml.core.RequirementLevel;
+import org.incenp.linkml.core.annotations.Inlining;
+import org.incenp.linkml.core.annotations.LinkURI;
+import org.incenp.linkml.core.annotations.Requirement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

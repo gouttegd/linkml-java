@@ -20,12 +20,11 @@ package org.incenp.linkml.core;
 
 import java.util.HashMap;
 
-import org.incenp.linkml.model.InliningMode;
-import org.incenp.linkml.model.PermissibleValue;
-import org.incenp.linkml.model.Prefix;
-import org.incenp.linkml.model.SchemaDefinition;
-import org.incenp.linkml.model.SlotDefinition;
-import org.incenp.linkml.model.TypeDefinition;
+import org.incenp.linkml.schema.model.PermissibleValue;
+import org.incenp.linkml.schema.model.Prefix;
+import org.incenp.linkml.schema.model.SchemaDefinition;
+import org.incenp.linkml.schema.model.SlotDefinition;
+import org.incenp.linkml.schema.model.TypeDefinition;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

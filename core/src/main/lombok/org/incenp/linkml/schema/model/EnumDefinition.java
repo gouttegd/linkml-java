@@ -16,21 +16,29 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.schema.model;
+
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
- * This exception is thrown when processing a LinkML schema that does not
- * conform to the LinkML specification.
+ * Represents the definition an element whose instances must be drawn from a
+ * specified set of permissible values.
  */
-public class InvalidSchemaException extends Exception {
-
-    private static final long serialVersionUID = -9079693184858658675L;
-
-    public InvalidSchemaException(String msg) {
-        super(msg);
-    }
-
-    public InvalidSchemaException(String msg, Throwable inner) {
-        super(msg, inner);
-    }
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@SuperBuilder(toBuilder = true)
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class EnumDefinition extends Definition {
+    @JsonProperty("permissible_values")
+    private List<PermissibleValue> permissibleValues;
 }
