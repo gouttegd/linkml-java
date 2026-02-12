@@ -3,3 +3,6 @@ the_bar: https://example.org/a/URI
 baz: true
 foos:
   - a string in a list
+unknown1: unknown string
+unknown2:
+  name: unknown dict

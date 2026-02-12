@@ -27,6 +27,7 @@ import org.incenp.linkml.core.sample.ContainerOfInlinedObjects;
 import org.incenp.linkml.core.sample.ContainerOfReferences;
 import org.incenp.linkml.core.sample.ContainerOfSimpleDicts;
 import org.incenp.linkml.core.sample.ContainerOfSimpleObjects;
+import org.incenp.linkml.core.sample.ExtensibleSimpleClass;
 import org.incenp.linkml.core.sample.ExtraSimpleDict;
 import org.incenp.linkml.core.sample.MultivaluedSimpleDict;
 import org.incenp.linkml.core.sample.SimpleClass;
@@ -49,6 +50,7 @@ public class ObjectConverterTest {
         ctx.addConverter(new BooleanConverter());
         ctx.addConverter(SimpleClass.class);
         ctx.addConverter(SimpleIdentifiableClass.class);
+        ctx.addConverter(ExtensibleSimpleClass.class);
         ctx.addConverter(SimpleDict.class);
         ctx.addConverter(ExtraSimpleDict.class);
         ctx.addConverter(MultivaluedSimpleDict.class);
@@ -66,6 +68,26 @@ public class ObjectConverterTest {
         Assertions.assertEquals("https://example.org/a/URI", sc.getBar().toString());
         Assertions.assertTrue(sc.isBaz());
         Assertions.assertEquals("a string in a list", sc.getFoos().get(0));
+    }
+
+    @Test
+    void testConvertingExtensibleSimpleClass() throws IOException {
+        ExtensibleSimpleClass esc = parse("simple-class.yaml", ExtensibleSimpleClass.class);
+
+        Assertions.assertEquals("a string", esc.getFoo());
+        Assertions.assertNotNull(esc.getExtensions());
+
+        Object unknown1 = esc.getExtensions().get("unknown1");
+        Assertions.assertNotNull(unknown1);
+        Assertions.assertEquals("unknown string", unknown1);
+
+        Object unknown2 = esc.getExtensions().get("unknown2");
+        Assertions.assertNotNull(unknown2);
+        Assertions.assertInstanceOf(Map.class, unknown2);
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> unknown2AsMap = Map.class.cast(unknown2);
+        Assertions.assertEquals("unknown dict", unknown2AsMap.get("name"));
     }
 
     @Test

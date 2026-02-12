@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.incenp.linkml.core.annotations.ExtensionHolder;
 import org.incenp.linkml.core.annotations.Identifier;
 import org.incenp.linkml.core.annotations.Inlining;
 import org.incenp.linkml.core.annotations.Requirement;
@@ -148,6 +149,17 @@ public class Slot {
         }
         Requirement reqAnnotation = field.getAnnotation(Requirement.class);
         return reqAnnotation != null ? reqAnnotation.value() : RequirementLevel.OPTIONAL;
+    }
+
+    /**
+     * Indicates whether this slot is intended to store “extended data” (unknown
+     * properties) for its object.
+     * 
+     * @return <code>true</code> if the slot is the holder slot for all unknown
+     *         properties.
+     */
+    public boolean isExtensionStore() {
+        return field.isAnnotationPresent(ExtensionHolder.class);
     }
 
     /**

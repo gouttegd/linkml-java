@@ -45,6 +45,7 @@ public class ObjectConverter implements IConverter {
     private Class<?> targetType;
     private Map<String, Slot> slots = new HashMap<>();
     private Slot identifierSlot;
+    private Slot extensionSlot;
 
     /**
      * Creates a new converter for objects of the specified type.
@@ -57,6 +58,8 @@ public class ObjectConverter implements IConverter {
             slots.put(slot.getLinkMLName(), slot);
             if ( slot.isIdentifier() ) {
                 identifierSlot = slot;
+            } else if ( slot.isExtensionStore() ) {
+                extensionSlot = slot;
             }
         }
     }
@@ -104,14 +107,22 @@ public class ObjectConverter implements IConverter {
      *                                cannot be assigned.
      */
     public void convertTo(Map<String, Object> rawMap, Object dest, ConverterContext ctx) throws LinkMLRuntimeException {
+        Map<String, Object> extensions = null;
         for ( Map.Entry<String, Object> entry : rawMap.entrySet() ) {
             Slot slot = slots.get(entry.getKey());
             if ( slot == null ) {
-                // FIXME: Allow storing into a dedicated dict for unknown keys.
-                logger.debug("Ignoring unknown or unsupported slot '{}'", entry.getKey());
-                continue;
+                if ( extensionSlot != null ) {
+                    if ( extensions == null ) {
+                        extensions = new HashMap<>();
+                        extensionSlot.setValue(dest, extensions);
+                    }
+                    extensions.put(entry.getKey(), entry.getValue());
+                } else {
+                    logger.debug("Ignoring unknown or unsupported slot '{}'", entry.getKey());
+                }
+            } else {
+                ctx.getConverter(slot.getInnerType()).convertForSlot(entry.getValue(), dest, slot, ctx);
             }
-            ctx.getConverter(slot.getInnerType()).convertForSlot(entry.getValue(), dest, slot, ctx);
         }
     }
 
