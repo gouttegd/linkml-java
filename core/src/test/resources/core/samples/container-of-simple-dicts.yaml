@@ -4,3 +4,6 @@ simpleDict:
 extraSimpleDict:
   key3: value3
   key4: value4
+multivaluedSimpleDict:
+  key5:
+    - value5

@@ -250,18 +250,9 @@ public class ObjectConverter implements IConverter {
 
                     }
                     IConverter primaryConv = ctx.getConverter(primarySlot.getInnerType());
-                    if ( primaryConv == null || primarySlot.isMultivalued() ) {
-                        // FIXME: For now we assume that the primary slot of a class inlined as
-                        // SimpleDict cannot be multi-valued and cannot be of a non-scalar type. Whether
-                        // this is correct or not is unclear: the LinkML validator accepts a
-                        // multi-valued primary slot and a non-scalar-typed primary slot, but the LinkML
-                        // converter rejects both (https://github.com/linkml/linkml/issues/3112).
-                        throw new LinkMLRuntimeException(String.format(NO_SIMPLE_DICT, targetType.getName()));
-                    }
-
                     for ( Map.Entry<String, Object> rawItem : toMap(raw).entrySet() ) {
                         Object item = ctx.getObject(targetType, rawItem.getKey(), true);
-                        primarySlot.setValue(item, primaryConv.convert(rawItem.getValue(), ctx));
+                        primaryConv.convertForSlot(rawItem.getValue(), item, primarySlot, ctx);
                         value.add(item);
                     }
                     break;

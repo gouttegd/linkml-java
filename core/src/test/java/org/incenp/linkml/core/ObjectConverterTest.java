@@ -29,6 +29,7 @@ import org.incenp.linkml.core.sample.ContainerOfReferences;
 import org.incenp.linkml.core.sample.ContainerOfSimpleDicts;
 import org.incenp.linkml.core.sample.ContainerOfSimpleObjects;
 import org.incenp.linkml.core.sample.ExtraSimpleDict;
+import org.incenp.linkml.core.sample.MultivaluedSimpleDict;
 import org.incenp.linkml.core.sample.SimpleClass;
 import org.incenp.linkml.core.sample.SimpleDict;
 import org.incenp.linkml.core.sample.SimpleIdentifiableClass;
@@ -51,6 +52,7 @@ public class ObjectConverterTest {
         ctx.addConverter(SimpleIdentifiableClass.class);
         ctx.addConverter(SimpleDict.class);
         ctx.addConverter(ExtraSimpleDict.class);
+        ctx.addConverter(MultivaluedSimpleDict.class);
         ctx.addConverter(ContainerOfSimpleObjects.class);
         ctx.addConverter(ContainerOfReferences.class);
         ctx.addConverter(ContainerOfInlinedObjects.class);
@@ -178,6 +180,12 @@ public class ObjectConverterTest {
         esd = extraMap.get("key4");
         Assertions.assertNotNull(esd);
         Assertions.assertEquals("value4", esd.getValue());
+
+        Assertions.assertNotNull(cos.getMultivaluedSimpleDict());
+        Assertions.assertEquals(1, cos.getMultivaluedSimpleDict().size());
+        MultivaluedSimpleDict msd = cos.getMultivaluedSimpleDict().get(0);
+        Assertions.assertEquals("key5", msd.getKey());
+        Assertions.assertEquals("value5", msd.getValues().get(0));
     }
 
     private <T> T parse(String file, Class<T> target) throws IOException {

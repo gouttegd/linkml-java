@@ -20,8 +20,7 @@ package org.incenp.linkml.core.sample;
 
 import java.util.List;
 
-import org.incenp.linkml.core.InliningMode;
-import org.incenp.linkml.core.annotations.Inlining;
+import org.incenp.linkml.core.annotations.Identifier;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -30,20 +29,16 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 /**
- * An example of a class with multi-valued slots whose values are expected to be
- * inlined as “SimpleDict”.
+ * An example of a class that is eligible for inlining as a “SimpleDict” (only
+ * one additional slot beyond the identifier slot), where the primary slot is
+ * multivalued.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder(toBuilder = true)
 @Data
-public class ContainerOfSimpleDicts {
-    @Inlining(InliningMode.SIMPLE_DICT)
-    private List<SimpleDict> simpleDict;
-
-    @Inlining(InliningMode.SIMPLE_DICT)
-    private List<ExtraSimpleDict> extraSimpleDict;
-
-    @Inlining(InliningMode.SIMPLE_DICT)
-    private List<MultivaluedSimpleDict> multivaluedSimpleDict;
+public class MultivaluedSimpleDict {
+    @Identifier
+    private String key;
+    private List<String> values;
 }
