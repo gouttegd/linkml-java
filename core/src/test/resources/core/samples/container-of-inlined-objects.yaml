@@ -1,0 +1,9 @@
+singleInlined:
+  foo: a string
+  id: sic1
+inlinedAsList:
+  - foo: another string
+    id: sic2
+inlinedAsDict:
+  sic3:
+    foo: yet another string
