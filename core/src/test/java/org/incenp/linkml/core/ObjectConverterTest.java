@@ -21,7 +21,6 @@ package org.incenp.linkml.core;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.incenp.linkml.core.sample.ContainerOfInlinedObjects;
@@ -159,33 +158,22 @@ public class ObjectConverterTest {
     void testConvertingContainerOfSimpleDicts() throws IOException {
         ContainerOfSimpleDicts cos = parse("container-of-simple-dicts.yaml", ContainerOfSimpleDicts.class);
 
-        HashMap<String, SimpleDict> simpleMap = new HashMap<>();
-        for ( SimpleDict sd : cos.getSimpleDict() ) {
-            simpleMap.put(sd.getKey(), sd);
-        }
-        SimpleDict sd = simpleMap.get("key1");
+        SimpleDict sd = cos.getSimpleDict().get(0);
         Assertions.assertNotNull(sd);
+        Assertions.assertEquals("key1", sd.getKey());
         Assertions.assertEquals("value1", sd.getValue());
-        sd = simpleMap.get("key2");
-        Assertions.assertNotNull(sd);
-        Assertions.assertEquals("value2", sd.getValue());
 
-        HashMap<String, ExtraSimpleDict> extraMap = new HashMap<>();
-        for ( ExtraSimpleDict esd : cos.getExtraSimpleDict() ) {
-            extraMap.put(esd.getKey(), esd);
-        }
-        ExtraSimpleDict esd = extraMap.get("key3");
+        ExtraSimpleDict esd = cos.getExtraSimpleDict().get(0);
         Assertions.assertNotNull(esd);
-        Assertions.assertEquals("value3", esd.getValue());
-        esd = extraMap.get("key4");
-        Assertions.assertNotNull(esd);
-        Assertions.assertEquals("value4", esd.getValue());
+        Assertions.assertEquals("key2", esd.getKey());
+        Assertions.assertEquals("value2", esd.getValue());
+        Assertions.assertNull(esd.getExtra());
 
         Assertions.assertNotNull(cos.getMultivaluedSimpleDict());
         Assertions.assertEquals(1, cos.getMultivaluedSimpleDict().size());
         MultivaluedSimpleDict msd = cos.getMultivaluedSimpleDict().get(0);
-        Assertions.assertEquals("key5", msd.getKey());
-        Assertions.assertEquals("value5", msd.getValues().get(0));
+        Assertions.assertEquals("key3", msd.getKey());
+        Assertions.assertEquals("value3", msd.getValues().get(0));
     }
 
     private <T> T parse(String file, Class<T> target) throws IOException {
