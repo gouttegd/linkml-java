@@ -1,8 +1,8 @@
 single:
   foo: a string
-  bar: https://example.org/a/URI
+  the_bar: https://example.org/a/URI
   baz: false
 multiple:
   - foo: another string
-    bar: https://example.org/another/URI
+    the_bar: https://example.org/another/URI
     baz: true

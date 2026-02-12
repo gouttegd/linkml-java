@@ -1,5 +1,5 @@
 foo: a string
-bar: https://example.org/a/URI
+the_bar: https://example.org/a/URI
 baz: true
 foos:
   - a string in a list

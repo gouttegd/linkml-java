@@ -21,8 +21,8 @@ package org.incenp.linkml.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.incenp.linkml.schema.model.SlotDefinition;
-import org.incenp.linkml.schema.model.TypeDefinition;
+import org.incenp.linkml.core.sample.ContainerOfReferences;
+import org.incenp.linkml.core.sample.SimpleIdentifiableClass;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,66 +31,66 @@ public class ConverterContextTest {
     @Test
     void testGetObject() throws LinkMLRuntimeException {
         ConverterContext ctx = new ConverterContext();
-        SlotDefinition sd = ctx.getObject(SlotDefinition.class, "Foo", false);
-        Assertions.assertNull(sd);
+        SimpleIdentifiableClass sic = ctx.getObject(SimpleIdentifiableClass.class, "Foo", false);
+        Assertions.assertNull(sic);
 
-        sd = ctx.getObject(SlotDefinition.class, "Foo", true);
-        Assertions.assertNotNull(sd);
-        Assertions.assertEquals("Foo", sd.getName());
+        sic = ctx.getObject(SimpleIdentifiableClass.class, "Foo", true);
+        Assertions.assertNotNull(sic);
+        Assertions.assertEquals("Foo", sic.getId());
 
-        SlotDefinition sd2 = ctx.getObject(SlotDefinition.class, "Foo", true);
-        Assertions.assertNotNull(sd2);
-        Assertions.assertTrue(sd == sd2);
+        SimpleIdentifiableClass sic2 = ctx.getObject(SimpleIdentifiableClass.class, "Foo", true);
+        Assertions.assertNotNull(sic2);
+        Assertions.assertTrue(sic == sic2);
     }
 
     @Test
     void testImmediateAssignment() throws LinkMLRuntimeException {
         ConverterContext ctx = new ConverterContext();
-        SlotDefinition sd = new SlotDefinition();
+        ContainerOfReferences cor = new ContainerOfReferences();
+        SimpleIdentifiableClass sic = ctx.getObject(SimpleIdentifiableClass.class, "sic1", true);
+        Slot singleSlot = Slot.getSlot(ContainerOfReferences.class, "single");
+        ctx.getObject(singleSlot, "sic1", cor);
 
-        TypeDefinition td = ctx.getObject(TypeDefinition.class, "string", true);
-        Slot rangeSlot = Slot.getSlot(SlotDefinition.class, "range");
-        ctx.getObject(rangeSlot, "string", sd);
-
-        Assertions.assertTrue(td == sd.getRange());
+        Assertions.assertTrue(sic == cor.getSingle());
     }
 
     @Test
     void testDelayedAssignment() throws LinkMLRuntimeException {
         ConverterContext ctx = new ConverterContext();
-        SlotDefinition sd = new SlotDefinition();
-        Slot rangeSlot = Slot.getSlot(SlotDefinition.class, "range");
+        ContainerOfReferences cor = new ContainerOfReferences();
+        Slot singleSlot = Slot.getSlot(ContainerOfReferences.class, "single");
 
-        ctx.getObject(rangeSlot, "string", sd);
-        Assertions.assertNull(sd.getRange());
+        ctx.getObject(singleSlot, "sic1", cor);
+        Assertions.assertNull(cor.getSingle());
 
-        TypeDefinition td = ctx.getObject(TypeDefinition.class, "string", true);
+        SimpleIdentifiableClass sic = ctx.getObject(SimpleIdentifiableClass.class, "sic1", true);
 
         ctx.finalizeAssignments();
 
-        Assertions.assertTrue(td == sd.getRange());
+        Assertions.assertTrue(sic == cor.getSingle());
     }
 
     @Test
     void testMultiValuedDelayedAssignment() throws LinkMLRuntimeException {
         ConverterContext ctx = new ConverterContext();
-        SlotDefinition def1 = ctx.getObject(SlotDefinition.class, "foo", true);
+
+        SimpleIdentifiableClass sic1 = ctx.getObject(SimpleIdentifiableClass.class, "sic1", true);
 
         List<Object> list = new ArrayList<>();
-        List<String> names = new ArrayList<String>();
-        names.add("foo");
-        names.add("bar");
-        ctx.getObjects(SlotDefinition.class, names, list);
+        List<String> names = new ArrayList<>();
+        names.add("sic1");
+        names.add("sic2");
+        ctx.getObjects(SimpleIdentifiableClass.class, names, list);
 
-        // Only "foo" should have been assigned, since "bar" is currently unknown
+        // Only "sic1" should have been assigned, since "sic2" is currently unknown
         Assertions.assertEquals(1, list.size());
-        Assertions.assertTrue(list.get(0) == def1);
+        Assertions.assertTrue(sic1 == list.get(0));
 
-        SlotDefinition def2 = ctx.getObject(SlotDefinition.class, "bar", true);
+        SimpleIdentifiableClass sic2 = ctx.getObject(SimpleIdentifiableClass.class, "sic2", true);
         ctx.finalizeAssignments();
 
-        // Now we should get both "foo" and "bar"
+        // Now we should get both "sic1" and "sic2"
         Assertions.assertEquals(2, list.size());
-        Assertions.assertTrue(list.get(1) == def2);
+        Assertions.assertTrue(sic2 == list.get(1));
     }
 }

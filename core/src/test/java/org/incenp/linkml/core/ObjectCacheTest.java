@@ -18,8 +18,8 @@
 
 package org.incenp.linkml.core;
 
-import org.incenp.linkml.schema.model.SlotDefinition;
-import org.incenp.linkml.schema.model.TypeDefinition;
+import org.incenp.linkml.core.sample.SimpleDict;
+import org.incenp.linkml.core.sample.SimpleIdentifiableClass;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,36 +28,33 @@ public class ObjectCacheTest {
     @Test
     void testCachedObjectIsNotCreatedTwice() throws LinkMLRuntimeException {
         ObjectCache cache = new ObjectCache();
-        TypeDefinition def1 = cache.getObject(TypeDefinition.class, "string", true);
+        SimpleIdentifiableClass sic1 = cache.getObject(SimpleIdentifiableClass.class, "sic1", true);
 
-        Assertions.assertEquals("string", def1.getName());
+        Assertions.assertEquals("sic1", sic1.getId());
         Assertions.assertEquals(1, cache.getSize());
-        def1.setDescription("description");
+        sic1.setFoo("a string");
 
-        TypeDefinition def2 = cache.getObject(TypeDefinition.class, "string", true);
-        Assertions.assertEquals(def1, def2);
-        Assertions.assertEquals("description", def2.getDescription());
+        SimpleIdentifiableClass sic2 = cache.getObject(SimpleIdentifiableClass.class, "sic1", true);
+        Assertions.assertTrue(sic1 == sic2);
+        Assertions.assertEquals("a string", sic2.getFoo());
         Assertions.assertEquals(1, cache.getSize());
     }
 
     @Test
     void testLookupWithoutCreate() throws LinkMLRuntimeException {
         ObjectCache cache = new ObjectCache();
-        TypeDefinition def1 = cache.getObject(TypeDefinition.class, "string", true);
+        SimpleIdentifiableClass sic1 = cache.getObject(SimpleIdentifiableClass.class, "sic1", true);
 
-        TypeDefinition def2 = cache.getObject(TypeDefinition.class, "string");
-        Assertions.assertTrue(def1 == def2);
-
-        SlotDefinition def3 = cache.getObject(SlotDefinition.class, "string");
-        Assertions.assertNull(def3);
+        SimpleIdentifiableClass sic2 = cache.getObject(SimpleIdentifiableClass.class, "sic1");
+        Assertions.assertTrue(sic1 == sic2);
     }
 
     @Test
     void testDontReturnObjectOfDifferentType() throws LinkMLRuntimeException {
         ObjectCache cache = new ObjectCache();
-        cache.getObject(TypeDefinition.class, "string", true);
+        cache.getObject(SimpleIdentifiableClass.class, "sic1", true);
 
-        SlotDefinition def2 = cache.getObject(SlotDefinition.class, "string", false);
-        Assertions.assertNull(def2);
+        SimpleDict sd = cache.getObject(SimpleDict.class, "sic1", false);
+        Assertions.assertNull(sd);
     }
 }

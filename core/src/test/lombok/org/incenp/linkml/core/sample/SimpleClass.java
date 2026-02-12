@@ -21,6 +21,8 @@ package org.incenp.linkml.core.sample;
 import java.net.URI;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,6 +38,8 @@ import lombok.experimental.SuperBuilder;
 @Data
 public class SimpleClass {
     private String foo;
+
+    @JsonProperty("the_bar")
     private URI bar;
     private boolean baz;
     private List<String> foos;

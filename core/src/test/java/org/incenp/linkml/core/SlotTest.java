@@ -20,11 +20,13 @@ package org.incenp.linkml.core;
 
 import java.util.HashMap;
 
-import org.incenp.linkml.schema.model.PermissibleValue;
-import org.incenp.linkml.schema.model.Prefix;
-import org.incenp.linkml.schema.model.SchemaDefinition;
-import org.incenp.linkml.schema.model.SlotDefinition;
-import org.incenp.linkml.schema.model.TypeDefinition;
+import org.incenp.linkml.core.sample.ContainerOfInlinedObjects;
+import org.incenp.linkml.core.sample.ContainerOfReferences;
+import org.incenp.linkml.core.sample.ContainerOfSimpleObjects;
+import org.incenp.linkml.core.sample.ExtraSimpleDict;
+import org.incenp.linkml.core.sample.SimpleClass;
+import org.incenp.linkml.core.sample.SimpleDict;
+import org.incenp.linkml.core.sample.SimpleIdentifiableClass;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,94 +34,95 @@ public class SlotTest {
 
     @Test
     void testMultivalued() throws LinkMLRuntimeException {
-        Slot singleValuedSlot = Slot.getSlot(SchemaDefinition.class, "defaultPrefix");
+        Slot singleValuedSlot = Slot.getSlot(SimpleClass.class, "foo");
         Assertions.assertFalse(singleValuedSlot.isMultivalued());
 
-        Slot multiValuedSlot = Slot.getSlot(SchemaDefinition.class, "types");
+        Slot multiValuedSlot = Slot.getSlot(SimpleClass.class, "foos");
         Assertions.assertTrue(multiValuedSlot.isMultivalued());
     }
 
     @Test
     void testGetLinkMLName() throws LinkMLRuntimeException {
-        Slot sameNameSlot = Slot.getSlot(SchemaDefinition.class, "version");
-        Assertions.assertEquals("version", sameNameSlot.getLinkMLName());
+        Slot sameNameSlot = Slot.getSlot(SimpleClass.class, "foo");
+        Assertions.assertEquals("foo", sameNameSlot.getLinkMLName());
 
-        Slot diffNameSlot = Slot.getSlot(SchemaDefinition.class, "defaultPrefix");
-        Assertions.assertEquals("default_prefix", diffNameSlot.getLinkMLName());
+        Slot diffNameSlot = Slot.getSlot(SimpleClass.class, "bar");
+        Assertions.assertEquals("the_bar", diffNameSlot.getLinkMLName());
     }
 
     @Test
     void testIsIdentifier() throws LinkMLRuntimeException {
-        Slot identifierSlot = Slot.getSlot(SlotDefinition.class, "name");
+        Slot identifierSlot = Slot.getSlot(SimpleIdentifiableClass.class, "id");
         Assertions.assertTrue(identifierSlot.isIdentifier());
 
-        Slot nonIdentifierSlot = Slot.getSlot(SlotDefinition.class, "description");
+        Slot nonIdentifierSlot = Slot.getSlot(SimpleIdentifiableClass.class, "foo");
         Assertions.assertFalse(nonIdentifierSlot.isIdentifier());
     }
 
     @Test
     void testGetInnerType() throws LinkMLRuntimeException {
-        Slot singleValuedSlot = Slot.getSlot(SchemaDefinition.class, "defaultRange");
-        Assertions.assertEquals(TypeDefinition.class, singleValuedSlot.getInnerType());
+        Slot singleValuedSlot = Slot.getSlot(ContainerOfSimpleObjects.class, "single");
+        Assertions.assertEquals(SimpleClass.class, singleValuedSlot.getInnerType());
 
-        Slot multiValuedSlot = Slot.getSlot(SchemaDefinition.class, "types");
-        Assertions.assertEquals(TypeDefinition.class, multiValuedSlot.getInnerType());
+        Slot multiValuedSlot = Slot.getSlot(ContainerOfSimpleObjects.class, "multiple");
+        Assertions.assertEquals(SimpleClass.class, multiValuedSlot.getInnerType());
     }
 
     @Test
     void testGetInliningMode() throws LinkMLRuntimeException {
-        Slot noInliningSlot = Slot.getSlot(SchemaDefinition.class, "defaultRange");
+        Slot noInliningSlot = Slot.getSlot(ContainerOfReferences.class, "multiple");
         Assertions.assertEquals(InliningMode.NO_INLINING, noInliningSlot.getInliningMode());
 
-        Slot inlinedAsDictSlot = Slot.getSlot(SchemaDefinition.class, "slotDefinitions");
+        Slot inlinedAsDictSlot = Slot.getSlot(ContainerOfInlinedObjects.class, "inlinedAsDict");
         Assertions.assertEquals(InliningMode.DICT, inlinedAsDictSlot.getInliningMode());
     }
 
-    @Test
-    void testGetBooleanSlot() throws LinkMLRuntimeException {
-        Slot booleanSlot = Slot.getSlot(SlotDefinition.class, "isIdentifier");
-        Assertions.assertNotNull(booleanSlot);
 
-        booleanSlot = Slot.getSlot(SlotDefinition.class, "inlined");
+    void testGetBooleanSlot() throws LinkMLRuntimeException {
+        Slot booleanSlot = Slot.getSlot(SimpleClass.class, "baz");
         Assertions.assertNotNull(booleanSlot);
     }
 
     @Test
     void testGetIdentifierSlot() {
-        Slot identifierSlot = Slot.getIdentifierSlot(SlotDefinition.class);
+        Slot identifierSlot = Slot.getIdentifierSlot(SimpleIdentifiableClass.class);
         Assertions.assertNotNull(identifierSlot);
-        Assertions.assertEquals("name", identifierSlot.getLinkMLName());
+        Assertions.assertEquals("id", identifierSlot.getLinkMLName());
 
-        identifierSlot = Slot.getIdentifierSlot(PermissibleValue.class);
+        identifierSlot = Slot.getIdentifierSlot(SimpleClass.class);
         Assertions.assertNull(identifierSlot);
     }
 
     @Test
     void testGetPrimaryValueSlot() {
-        Slot primarySlot = Slot.getPrimaryValueSlot(Prefix.class);
-        Assertions.assertEquals("prefix_reference", primarySlot.getLinkMLName());
+        Slot primarySlot = Slot.getPrimaryValueSlot(SimpleDict.class);
+        Assertions.assertEquals("value", primarySlot.getLinkMLName());
 
-        primarySlot = Slot.getPrimaryValueSlot(TypeDefinition.class);
+        primarySlot = Slot.getPrimaryValueSlot(ExtraSimpleDict.class);
+        Assertions.assertEquals("value", primarySlot.getLinkMLName());
+
+        primarySlot = Slot.getPrimaryValueSlot(SimpleClass.class);
         Assertions.assertNull(primarySlot);
     }
 
     @Test
     void testAccessors() throws LinkMLRuntimeException {
-        SlotDefinition sd = new SlotDefinition();
-        Slot nameSlot = Slot.getSlot(SlotDefinition.class, "name");
-        nameSlot.setValue(sd, "the slot name");
-        Assertions.assertEquals("the slot name", sd.getName());
-        Assertions.assertEquals("the slot name", nameSlot.getValue(sd));
+        SimpleClass sc = new SimpleClass();
+        Slot fooSlot = Slot.getSlot(SimpleClass.class, "foo");
+        fooSlot.setValue(sc, "a string");
+        Assertions.assertEquals("a string", sc.getFoo());
+        Assertions.assertEquals("a string", fooSlot.getValue(sc));
     }
 
     @Test
     void testGetAllSlotsForClass() {
         HashMap<String, Slot> slots = new HashMap<>();
-        for (Slot slot : Slot.getSlots(SlotDefinition.class)) {
+        for ( Slot slot : Slot.getSlots(SimpleClass.class) ) {
             slots.put(slot.getLinkMLName(), slot);
         }
-        Assertions.assertTrue(slots.containsKey("range"));
-        Assertions.assertTrue(slots.containsKey("is_a"));
-        Assertions.assertTrue(slots.containsKey("name"));
+        Assertions.assertTrue(slots.containsKey("foo"));
+        Assertions.assertTrue(slots.containsKey("the_bar"));
+        Assertions.assertTrue(slots.containsKey("baz"));
+        Assertions.assertTrue(slots.containsKey("foos"));
     }
 }
