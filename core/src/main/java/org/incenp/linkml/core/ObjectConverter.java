@@ -291,22 +291,52 @@ public class ObjectConverter implements IConverter {
 
     @Override
     public Object serialise(Object object, ConverterContext ctx) throws LinkMLRuntimeException {
+        return serialise(object, true, ctx);
+    }
+
+    /**
+     * Converts a LinkML object into a raw object. This serializes an object into a
+     * map, with the option of including the object’s unique identifier into the
+     * map.
+     * 
+     * @param object         The LinkML object to convert.
+     * @param withIdentifier If <code>true</code>, the slot for the object’s unique
+     *                       identifier is <em>not</em> serialised; this avoids
+     *                       repeating the identifier when the object is serialised
+     *                       in such a way that the identifier is already provided
+     *                       elsewhere (typically as a dict, yielding what the
+     *                       LinkML documentation calls the “CompactDict”
+     *                       serialisation). This has no effect if the object has no
+     *                       identifier slot.
+     * @param ctx            The global converter context.
+     * @return The map that represents the original LinkML object.
+     * @throws LinkMLRuntimeException If the converter cannot convert the given
+     *                                object.
+     */
+    public Map<String, Object> serialise(Object object, boolean withIdentifier, ConverterContext ctx)
+            throws LinkMLRuntimeException {
         if ( !targetType.isInstance(object) ) {
             throw new LinkMLValueError(String.format(OBJECT_EXPECTED, targetType.getName()));
         }
 
         Map<String, Object> raw = new HashMap<>();
         for ( Slot slot : slots.values() ) {
+            if ( slot.isIdentifier() && !withIdentifier ) {
+                continue;
+            }
+
             Object slotValue = slot.getValue(object);
-            if ( slotValue != null ) {
-                if ( slot.isExtensionStore() ) {
-                    for ( Map.Entry<String, Object> extension : toMap(slotValue).entrySet() ) {
-                        raw.put(extension.getKey(), extension.getValue());
-                    }
-                } else {
-                    raw.put(slot.getLinkMLName(),
-                            ctx.getConverter(slot.getInnerType()).serialiseForSlot(slotValue, slot, ctx));
+            if ( slotValue == null ) {
+                continue;
+            }
+
+            if ( slot.isExtensionStore() ) {
+                for ( Map.Entry<String, Object> extension : toMap(slotValue).entrySet() ) {
+                    raw.put(extension.getKey(), extension.getValue());
                 }
+            } else {
+                raw.put(slot.getLinkMLName(),
+                        ctx.getConverter(slot.getInnerType()).serialiseForSlot(slotValue, slot, ctx));
             }
         }
 
@@ -334,8 +364,7 @@ public class ObjectConverter implements IConverter {
                 }
                 Map<Object, Object> map = new HashMap<>();
                 for ( Object item : items ) {
-                    // FIXME: Avoid serialising the identifier within the map in DICT mode
-                    Object rawItem = primarySlot != null ? primarySlot.getValue(item) : serialise(item, ctx);
+                    Object rawItem = primarySlot != null ? primarySlot.getValue(item) : serialise(item, false, ctx);
                     map.put(toIdentifier(item), rawItem);
                 }
                 return map;

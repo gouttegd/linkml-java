@@ -21,6 +21,7 @@ package org.incenp.linkml.core;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.incenp.linkml.core.sample.ContainerOfInlinedObjects;
@@ -212,6 +213,27 @@ public class ObjectConverterTest {
         Assertions.assertEquals("value3", msd.getValues().get(0));
 
         roundtrip(cos);
+    }
+
+    @Test
+    void testCompactDictInlining() {
+        ContainerOfInlinedObjects coi = new ContainerOfInlinedObjects();
+        coi.setInlinedAsDict(new ArrayList<>());
+        SimpleIdentifiableClass sic1 = new SimpleIdentifiableClass();
+        sic1.setFoo("a string");
+        sic1.setId("sic1");
+        coi.getInlinedAsDict().add(sic1);
+
+        ObjectConverter conv = (ObjectConverter) ctx.getConverter(ContainerOfInlinedObjects.class);
+        try {
+            Map<String, Object> raw = conv.serialise(coi, false, ctx);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> inlinedAsDict = (Map<String, Object>) raw.get("inlinedAsDict");
+            Assertions.assertFalse(inlinedAsDict.containsKey("id"));
+            Assertions.assertEquals(coi, conv.convert(raw, ctx));
+        } catch ( LinkMLRuntimeException e ) {
+            Assertions.fail("Unexpected exception", e);
+        }
     }
 
     private <T> T parse(String file, Class<T> target) throws IOException {
