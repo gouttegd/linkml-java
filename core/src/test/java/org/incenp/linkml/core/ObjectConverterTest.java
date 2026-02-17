@@ -68,6 +68,8 @@ public class ObjectConverterTest {
         Assertions.assertEquals("https://example.org/a/URI", sc.getBar().toString());
         Assertions.assertTrue(sc.isBaz());
         Assertions.assertEquals("a string in a list", sc.getFoos().get(0));
+
+        roundtrip(sc);
     }
 
     @Test
@@ -88,6 +90,8 @@ public class ObjectConverterTest {
         @SuppressWarnings("unchecked")
         Map<String, Object> unknown2AsMap = Map.class.cast(unknown2);
         Assertions.assertEquals("unknown dict", unknown2AsMap.get("name"));
+
+        roundtrip(esc);
     }
 
     @Test
@@ -103,6 +107,8 @@ public class ObjectConverterTest {
         } catch ( LinkMLRuntimeException e ) {
             Assertions.fail("Unexpected exception", e);
         }
+
+        roundtrip(sic);
     }
 
     @Test
@@ -118,6 +124,8 @@ public class ObjectConverterTest {
         Assertions.assertEquals("another string", sc.getFoo());
         Assertions.assertEquals("https://example.org/another/URI", sc.getBar().toString());
         Assertions.assertTrue(sc.isBaz());
+
+        roundtrip(obj);
     }
 
     @Test
@@ -136,6 +144,8 @@ public class ObjectConverterTest {
         sic = obj.getInlinedAsDict().get(0);
         Assertions.assertEquals("yet another string", sic.getFoo());
         Assertions.assertEquals("sic3", sic.getId());
+
+        roundtrip(obj);
     }
 
     @Test
@@ -151,6 +161,8 @@ public class ObjectConverterTest {
         Assertions.assertEquals("a string", cor.getSingle().getFoo());
         Assertions.assertTrue(cor.getMultiple().get(0) == coi.getInlinedAsList().get(0));
         Assertions.assertEquals("another string", cor.getMultiple().get(0).getFoo());
+
+        roundtrip(cor);
     }
 
     @Test
@@ -174,6 +186,8 @@ public class ObjectConverterTest {
         Assertions.assertEquals("a string", cor.getSingle().getFoo());
         Assertions.assertTrue(cor.getMultiple().get(0) == coi.getInlinedAsList().get(0));
         Assertions.assertEquals("another string", cor.getMultiple().get(0).getFoo());
+
+        roundtrip(cor);
     }
 
     @Test
@@ -196,6 +210,8 @@ public class ObjectConverterTest {
         MultivaluedSimpleDict msd = cos.getMultivaluedSimpleDict().get(0);
         Assertions.assertEquals("key3", msd.getKey());
         Assertions.assertEquals("value3", msd.getValues().get(0));
+
+        roundtrip(cos);
     }
 
     private <T> T parse(String file, Class<T> target) throws IOException {
@@ -211,5 +227,16 @@ public class ObjectConverterTest {
             Assertions.fail("Unexpected exception", e);
         }
         return null;
+    }
+
+    private <T> void roundtrip(T obj) {
+        IConverter conv = ctx.getConverter(obj.getClass());
+        try {
+            Object raw = conv.serialise(obj, ctx);
+            Object recooked = conv.convert(raw, ctx);
+            Assertions.assertEquals(obj, recooked);
+        } catch ( LinkMLRuntimeException e ) {
+            Assertions.fail("unexpected exception", e);
+        }
     }
 }

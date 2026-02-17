@@ -88,4 +88,38 @@ public class ScalarConverterBaseTest {
         } catch ( LinkMLRuntimeException e ) {
         }
     }
+
+    @Test
+    void testSerialisationReturnsSameObject() throws LinkMLRuntimeException {
+        StringConverter c = new StringConverter();
+        String s = "string value";
+
+        Assertions.assertEquals(s, c.serialise(s, ctx));
+    }
+
+    @Test
+    void testSerialisationOfInvalidValue() {
+        StringConverter c = new StringConverter();
+        try {
+            c.serialise(123, ctx);
+            Assertions.fail("Exception not thrown for attempting to serialise an invalid value type");
+        } catch ( LinkMLRuntimeException e ) {
+        }
+    }
+
+    @Test
+    void testSerialisationOfBooleanValue() throws LinkMLRuntimeException {
+        BooleanConverter c = new BooleanConverter();
+        Boolean b1 = true;
+        boolean b2 = true;
+
+        Assertions.assertEquals(b1, c.serialise(b1, ctx));
+        Assertions.assertEquals(b2, c.serialise(b2, ctx));
+
+        try {
+            c.serialise(123, ctx);
+            Assertions.fail("Exception not thrown for attempting to serialise a non-boolean value");
+        } catch ( LinkMLRuntimeException e ) {
+        }
+    }
 }
