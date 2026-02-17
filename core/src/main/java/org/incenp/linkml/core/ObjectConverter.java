@@ -47,6 +47,7 @@ public class ObjectConverter implements IConverter {
     private Map<String, Slot> slots = new HashMap<>();
     private Slot identifierSlot;
     private Slot extensionSlot;
+    private Slot primarySlot;
 
     /**
      * Creates a new converter for objects of the specified type.
@@ -63,6 +64,7 @@ public class ObjectConverter implements IConverter {
                 extensionSlot = slot;
             }
         }
+        primarySlot = Slot.getPrimaryValueSlot(slots.values());
     }
 
     @Override
@@ -256,7 +258,6 @@ public class ObjectConverter implements IConverter {
                     break;
 
                 case SIMPLE_DICT:
-                    Slot primarySlot = Slot.getPrimaryValueSlot(targetType);
                     if ( primarySlot == null ) {
                         throw new LinkMLInternalError(String.format(NO_SIMPLE_DICT, targetType.getName()));
 
@@ -355,16 +356,13 @@ public class ObjectConverter implements IConverter {
                 }
                 return list;
             } else if ( inlining == InliningMode.DICT || inlining == InliningMode.SIMPLE_DICT ) {
-                Slot primarySlot = null;
-                if ( inlining == InliningMode.SIMPLE_DICT ) {
-                    primarySlot = Slot.getPrimaryValueSlot(targetType);
-                    if ( primarySlot == null ) {
-                        throw new LinkMLInternalError(String.format(NO_SIMPLE_DICT, targetType.getName()));
-                    }
+                if ( inlining == InliningMode.SIMPLE_DICT && primarySlot == null ) {
+                    throw new LinkMLInternalError(String.format(NO_SIMPLE_DICT, targetType.getName()));
                 }
                 Map<Object, Object> map = new HashMap<>();
                 for ( Object item : items ) {
-                    Object rawItem = primarySlot != null ? primarySlot.getValue(item) : serialise(item, false, ctx);
+                    Object rawItem = inlining == InliningMode.SIMPLE_DICT ? primarySlot.getValue(item)
+                            : serialise(item, false, ctx);
                     map.put(toIdentifier(item), rawItem);
                 }
                 return map;

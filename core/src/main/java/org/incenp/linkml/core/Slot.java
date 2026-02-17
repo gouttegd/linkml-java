@@ -282,12 +282,29 @@ public class Slot {
      *      documentation about inlining as simple dictionaries</a>
      */
     public static Slot getPrimaryValueSlot(Class<?> type) {
+        return getPrimaryValueSlot(Slot.getSlots(type));
+    }
+
+    /**
+     * Finds the primary slot among a given collection of slots.
+     * <p>
+     * This method implements the logic needed to find the primary slot as described
+     * in {@link #getPrimaryValueSlot(Class)}. This is a separate method so that the
+     * logic can be reused outside of this class, by a code that has already
+     * obtained the complete list of slots for the target type.
+     * 
+     * @param slots The slots among which to find the primary slot. It is assumed
+     *              that they all belong to the same type.
+     * @return The primary slot, or <code>null</code> if there is no primary slot in
+     *         the collection.
+     */
+    public static Slot getPrimaryValueSlot(Collection<Slot> slots) {
         Slot mandatorySlot = null;
         Slot nonIdentifierSlot = null;
         int nMandatorySlots = 0;
         int nNonIdentifierSlots = 0;
-        for ( Slot slot : Slot.getSlots(type) ) {
-            if ( slot.isIdentifier() ) {
+        for ( Slot slot : slots ) {
+            if ( slot.isIdentifier() || slot.isExtensionStore() ) {
                 continue;
             }
             if ( slot.getRequirementLevel() == RequirementLevel.MANDATORY ) {
