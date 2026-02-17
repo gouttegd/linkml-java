@@ -317,44 +317,32 @@ public class ObjectConverter implements IConverter {
     public Object serialiseForSlot(Object object, Slot slot, ConverterContext ctx) throws LinkMLRuntimeException {
         if ( slot.isMultivalued() ) {
             List<Object> items = toList(object);
-            if ( hasIdentifier() ) {
-                InliningMode inlining = slot.getInliningMode();
-                if ( inlining == InliningMode.NO_INLINING ) {
-                    List<Object> list = new ArrayList<>();
-                    for ( Object item : items ) {
-                        list.add(toIdentifier(item));
-                    }
-                    return list;
-                } else if ( inlining == InliningMode.LIST ) {
-                    List<Object> list = new ArrayList<>();
-                    for ( Object item : items ) {
-                        list.add(serialise(item, ctx));
-                    }
-                    return list;
-                } else if ( inlining == InliningMode.DICT ) {
-                    Map<Object, Object> map = new HashMap<>();
-                    for ( Object item : items ) {
-                        // FIXME: Avoid serialising the identifier within the map
-                        map.put(toIdentifier(item), serialise(item, ctx));
-                    }
-                    return map;
-                } else if ( inlining == InliningMode.SIMPLE_DICT ) {
-                    Slot primarySlot = Slot.getPrimaryValueSlot(targetType);
-                    if ( primarySlot == null ) {
-                        throw new LinkMLInternalError(String.format(NO_SIMPLE_DICT, targetType.getName()));
-                    }
-                    Map<Object, Object> map = new HashMap<>();
-                    for ( Object item : items ) {
-                        Object primary = primarySlot.getValue(item);
-                        map.put(toIdentifier(item), primary);
-                    }
-                    return map;
-                }
-            } else {
-                // Multi-valued non-identifiable object (necessarily inlined as list)
+            InliningMode inlining = slot.getInliningMode();
+            if ( !hasIdentifier() || inlining == InliningMode.LIST ) {
                 List<Object> list = new ArrayList<>();
                 for ( Object item : items ) {
                     list.add(serialise(item, ctx));
+                }
+                return list;
+            } else if ( inlining == InliningMode.DICT || inlining == InliningMode.SIMPLE_DICT ) {
+                Slot primarySlot = null;
+                if ( inlining == InliningMode.SIMPLE_DICT ) {
+                    primarySlot = Slot.getPrimaryValueSlot(targetType);
+                    if ( primarySlot == null ) {
+                        throw new LinkMLInternalError(String.format(NO_SIMPLE_DICT, targetType.getName()));
+                    }
+                }
+                Map<Object, Object> map = new HashMap<>();
+                for ( Object item : items ) {
+                    // FIXME: Avoid serialising the identifier within the map in DICT mode
+                    Object rawItem = primarySlot != null ? primarySlot.getValue(item) : serialise(item, ctx);
+                    map.put(toIdentifier(item), rawItem);
+                }
+                return map;
+            } else { // No inlining
+                List<Object> list = new ArrayList<>();
+                for ( Object item : items ) {
+                    list.add(toIdentifier(item));
                 }
                 return list;
             }
@@ -368,7 +356,6 @@ public class ObjectConverter implements IConverter {
                 return serialise(object, ctx);
             }
         }
-        return null;
     }
 
     /**
