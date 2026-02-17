@@ -64,6 +64,28 @@ public abstract class ScalarConverterBase implements IConverter {
      */
     protected abstract Object convertImpl(Object raw, ConverterContext ctx) throws LinkMLRuntimeException;
 
+    @Override
+    public Object serialise(Object object, ConverterContext ctx) throws LinkMLRuntimeException {
+        if ( getType().isInstance(object) ) {
+            return object;
+        } else {
+            throw new LinkMLInternalError("Invalid value");
+        }
+    }
+
+    @Override
+    public Object serialiseForSlot(Object object, Slot slot, ConverterContext ctx) throws LinkMLRuntimeException {
+        if ( slot.isMultivalued() ) {
+            ArrayList<Object> list = new ArrayList<>();
+            for ( Object item : toList(object) ) {
+                list.add(serialise(item, ctx));
+            }
+            return list;
+        } else {
+            return serialise(object, ctx);
+        }
+    }
+
     /**
      * Checks that a raw object is a list, and casts it as such.
      * 

@@ -38,6 +38,7 @@ public class ObjectConverter implements IConverter {
     private final static String LIST_EXPECTED = "Invalid value type, list expected";
     private final static String STRING_EXPECTED = "Invalid value type, string expected";
     private final static String SCALAR_EXPECTED = "Invalid value type, scalar expected";
+    private final static String OBJECT_EXPECTED = "Invalid value type, '%s' expected";
     private final static String CREATE_ERROR = "Cannot create object of type '%s'";
     private final static String NO_IDENTIFIER = "Missing identifier for type '%s'";
     private final static String NO_SIMPLE_DICT = "Type '%s' is not compatible with simple dict inlining";
@@ -286,6 +287,107 @@ public class ObjectConverter implements IConverter {
                 slot.setValue(dest, convert(toMap(raw), ctx));
             }
         }
+    }
+
+    @Override
+    public Object serialise(Object object, ConverterContext ctx) throws LinkMLRuntimeException {
+        if ( !targetType.isInstance(object) ) {
+            throw new LinkMLValueError(String.format(OBJECT_EXPECTED, targetType.getName()));
+        }
+
+        Map<String, Object> raw = new HashMap<>();
+        for ( Slot slot : slots.values() ) {
+            Object slotValue = slot.getValue(object);
+            if ( slotValue != null ) {
+                if ( slot.isExtensionStore() ) {
+                    for ( Map.Entry<String, Object> extension : toMap(slotValue).entrySet() ) {
+                        raw.put(extension.getKey(), extension.getValue());
+                    }
+                } else {
+                    raw.put(slot.getLinkMLName(),
+                            ctx.getConverter(slot.getInnerType()).serialiseForSlot(slotValue, slot, ctx));
+                }
+            }
+        }
+
+        return raw;
+    }
+
+    @Override
+    public Object serialiseForSlot(Object object, Slot slot, ConverterContext ctx) throws LinkMLRuntimeException {
+        if ( slot.isMultivalued() ) {
+            List<Object> items = toList(object);
+            if ( hasIdentifier() ) {
+                InliningMode inlining = slot.getInliningMode();
+                if ( inlining == InliningMode.NO_INLINING ) {
+                    List<Object> list = new ArrayList<>();
+                    for ( Object item : items ) {
+                        list.add(toIdentifier(item));
+                    }
+                    return list;
+                } else if ( inlining == InliningMode.LIST ) {
+                    List<Object> list = new ArrayList<>();
+                    for ( Object item : items ) {
+                        list.add(serialise(item, ctx));
+                    }
+                    return list;
+                } else if ( inlining == InliningMode.DICT ) {
+                    Map<Object, Object> map = new HashMap<>();
+                    for ( Object item : items ) {
+                        // FIXME: Avoid serialising the identifier within the map
+                        map.put(toIdentifier(item), serialise(item, ctx));
+                    }
+                    return map;
+                } else if ( inlining == InliningMode.SIMPLE_DICT ) {
+                    Slot primarySlot = Slot.getPrimaryValueSlot(targetType);
+                    if ( primarySlot == null ) {
+                        throw new LinkMLInternalError(String.format(NO_SIMPLE_DICT, targetType.getName()));
+                    }
+                    Map<Object, Object> map = new HashMap<>();
+                    for ( Object item : items ) {
+                        Object primary = primarySlot.getValue(item);
+                        map.put(toIdentifier(item), primary);
+                    }
+                    return map;
+                }
+            } else {
+                // Multi-valued non-identifiable object (necessarily inlined as list)
+                List<Object> list = new ArrayList<>();
+                for ( Object item : items ) {
+                    list.add(serialise(item, ctx));
+                }
+                return list;
+            }
+        } else {
+            // Single-valued object
+            if ( hasIdentifier() && slot.getInliningMode() == InliningMode.NO_INLINING ) {
+                return toIdentifier(object);
+            } else {
+                // Non-identifiable object or inlined identifiable object; in both cases, can
+                // only be serialised as a map
+                return serialise(object, ctx);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets the unique identifier for the given object.
+     * 
+     * @param object The object for which to get the identifier.
+     * @return The unique identifier for the object.
+     * @throws LinkMLRuntimeException If the object is not of the expected type, or
+     *                                if it has no identifier value.
+     */
+    protected Object toIdentifier(Object object) throws LinkMLRuntimeException {
+        if ( !targetType.isInstance(object) ) {
+            throw new LinkMLValueError(String.format(OBJECT_EXPECTED, targetType.getName()));
+        }
+        Object identifier = identifierSlot.getValue(object);
+        if ( identifier == null ) {
+            throw new LinkMLValueError(String.format(NO_IDENTIFIER, targetType.getName()));
+        }
+        return identifier;
     }
 
     /**
