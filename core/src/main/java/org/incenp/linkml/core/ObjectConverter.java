@@ -300,7 +300,7 @@ public class ObjectConverter implements IConverter {
      * map.
      * 
      * @param object         The LinkML object to convert.
-     * @param withIdentifier If <code>true</code>, the slot for the object’s unique
+     * @param withIdentifier If <code>false</code>, the slot for the object’s unique
      *                       identifier is <em>not</em> serialised; this avoids
      *                       repeating the identifier when the object is serialised
      *                       in such a way that the identifier is already provided
