@@ -220,9 +220,9 @@ public class ConverterContext {
             } else if ( failOnMissing ) {
                 // Check if there is another object with that name
                 if ( getObject(Object.class, da.name, false) != null ) {
-                    throw new LinkMLRuntimeException(String.format("Cannot dereference '%s': invalid type", da.name));
+                    throw new LinkMLValueError(String.format("Cannot dereference '%s': invalid type", da.name));
                 } else {
-                    throw new LinkMLRuntimeException(String.format("Cannot dereference '%s': no such object", da.name));
+                    throw new LinkMLValueError(String.format("Cannot dereference '%s': no such object", da.name));
                 }
             }
         }

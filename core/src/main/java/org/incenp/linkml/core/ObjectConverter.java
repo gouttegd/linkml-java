@@ -176,7 +176,7 @@ public class ObjectConverter implements IConverter {
         if ( hasIdentifier() ) {
             Object identifier = raw.get(identifierSlot.getLinkMLName());
             if ( identifier == null ) {
-                throw new LinkMLRuntimeException(String.format(NO_IDENTIFIER, targetType.getName()));
+                throw new LinkMLValueError(String.format(NO_IDENTIFIER, targetType.getName()));
             }
             id = identifier.toString();
         }
@@ -204,7 +204,7 @@ public class ObjectConverter implements IConverter {
             try {
                 object = targetType.newInstance();
             } catch ( InstantiationException | IllegalAccessException e ) {
-                throw new LinkMLRuntimeException(String.format(CREATE_ERROR, targetType.getName()), e);
+                throw new LinkMLInternalError(String.format(CREATE_ERROR, targetType.getName()), e);
             }
         }
         convertTo(raw, object, ctx);
@@ -257,7 +257,7 @@ public class ObjectConverter implements IConverter {
                 case SIMPLE_DICT:
                     Slot primarySlot = Slot.getPrimaryValueSlot(targetType);
                     if ( primarySlot == null ) {
-                        throw new LinkMLRuntimeException(String.format(NO_SIMPLE_DICT, targetType.getName()));
+                        throw new LinkMLInternalError(String.format(NO_SIMPLE_DICT, targetType.getName()));
 
                     }
                     IConverter primaryConv = ctx.getConverter(primarySlot.getInnerType());
@@ -298,12 +298,12 @@ public class ObjectConverter implements IConverter {
     @SuppressWarnings("unchecked")
     protected Map<String, Object> toMap(Object value) throws LinkMLRuntimeException {
         if ( !(value instanceof Map) ) {
-            throw new LinkMLRuntimeException(MAP_EXPECTED);
+            throw new LinkMLValueError(MAP_EXPECTED);
         }
         Map<Object, Object> map = (Map<Object, Object>) value;
         for ( Object key : map.keySet() ) {
             if ( !(key instanceof String) ) {
-                throw new LinkMLRuntimeException(STRING_EXPECTED);
+                throw new LinkMLValueError(STRING_EXPECTED);
             }
         }
         return (Map<String, Object>) value;
@@ -319,7 +319,7 @@ public class ObjectConverter implements IConverter {
     @SuppressWarnings("unchecked")
     protected List<Object> toList(Object value) throws LinkMLRuntimeException {
         if ( !(value instanceof List) ) {
-            throw new LinkMLRuntimeException(LIST_EXPECTED);
+            throw new LinkMLValueError(LIST_EXPECTED);
         }
         return (List<Object>) value;
     }
@@ -337,12 +337,12 @@ public class ObjectConverter implements IConverter {
     @SuppressWarnings("unchecked")
     protected List<String> toStringList(Object value) throws LinkMLRuntimeException {
         if ( !(value instanceof List) ) {
-            throw new LinkMLRuntimeException(LIST_EXPECTED);
+            throw new LinkMLValueError(LIST_EXPECTED);
         }
         ArrayList<String> list = new ArrayList<>();
         for ( Object rawItem : (List<Object>) value ) {
             if ( rawItem instanceof List || rawItem instanceof Map ) {
-                throw new LinkMLRuntimeException(SCALAR_EXPECTED);
+                throw new LinkMLValueError(SCALAR_EXPECTED);
             }
             list.add(rawItem.toString());
         }
@@ -361,7 +361,7 @@ public class ObjectConverter implements IConverter {
      */
     protected String toString(Object value) throws LinkMLRuntimeException {
         if ( value instanceof List || value instanceof Map ) {
-            throw new LinkMLRuntimeException(SCALAR_EXPECTED);
+            throw new LinkMLValueError(SCALAR_EXPECTED);
         }
         return value.toString();
     }

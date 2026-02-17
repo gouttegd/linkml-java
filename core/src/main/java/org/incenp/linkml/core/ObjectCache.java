@@ -63,12 +63,12 @@ public class ObjectCache {
         try {
             cached = type.newInstance();
         } catch ( InstantiationException | IllegalAccessException e ) {
-            throw new LinkMLRuntimeException(String.format(CREATE_ERROR, name, type.getName()), e);
+            throw new LinkMLInternalError(String.format(CREATE_ERROR, name, type.getName()), e);
         }
 
         Slot identifierSlot = Slot.getIdentifierSlot(type);
         if ( identifierSlot == null ) {
-            throw new LinkMLRuntimeException(String.format(NO_IDENTIFIER, type.getName()));
+            throw new LinkMLInternalError(String.format(NO_IDENTIFIER, type.getName()));
         }
         identifierSlot.setValue(cached, name);
         cache.put(name, cached);

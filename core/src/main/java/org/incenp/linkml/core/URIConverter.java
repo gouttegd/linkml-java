@@ -36,7 +36,7 @@ public class URIConverter extends ScalarConverterBase {
         try {
             return new URI(raw.toString());
         } catch ( URISyntaxException e ) {
-            throw new LinkMLRuntimeException(String.format("Invalid value, URI expected: %s", raw));
+            throw new LinkMLValueError(String.format("Invalid value, URI expected: %s", raw), e);
         }
     }
 

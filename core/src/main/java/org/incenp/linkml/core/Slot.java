@@ -41,6 +41,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * about a slot at runtime, (2) get or set the value of a slot.
  */
 public class Slot {
+
+    private static final String SET_VALUE_ERROR = "Cannot set value of slot '%s': %s";
+    private static final String GET_VALUE_ERROR = "Cannot get value of slot '%s': %s";
+
     private Field field;
     private Method writeAccessor;
     private Method readAccessor;
@@ -65,7 +69,7 @@ public class Slot {
             writeAccessor = klass.getDeclaredMethod(getWriteAccessorName(field), new Class<?>[] { outerType });
             readAccessor = klass.getDeclaredMethod(getReadAccessorName(field), (Class<?>[]) null);
         } catch ( NoSuchMethodException | SecurityException e ) {
-            throw new LinkMLRuntimeException(String.format("Missing accessor for slot '%s'", field.getName()), e);
+            throw new LinkMLInternalError(String.format("Missing accessor for slot '%s'", field.getName()), e);
         }
 
         Inlining inliningAnnotation = field.getAnnotation(Inlining.class);
@@ -177,13 +181,18 @@ public class Slot {
     public void setValue(Object target, Object value) throws LinkMLRuntimeException {
         try {
             writeAccessor.invoke(target, new Object[] { value });
-        } catch ( IllegalAccessException | IllegalArgumentException | InvocationTargetException e ) {
-            // FIXME: We should distinguish between:
-            // 1. the target object is not valid (not of the expected type);
-            // 2. the value object is not valid (not of the expected type, or any other
-            // error that may be thrown by the accessor);
-            // 3. any other reflection error.
-            throw new LinkMLRuntimeException(String.format("Cannot assign value to slot '%s'", getLinkMLName()), e);
+        } catch ( IllegalArgumentException e ) {
+            // Either the target object is not valid (especially, it does not declare the
+            // expected accessor method), or the value object is not valid (not of the
+            // correct type).
+            throw new LinkMLInternalError(String.format(SET_VALUE_ERROR, getLinkMLName(), "invalid object"), e);
+        } catch ( InvocationTargetException e ) {
+            // An error occurred within the accessor method (most likely, it didn't like the
+            // value it got passed).
+            throw new LinkMLValueError(String.format(SET_VALUE_ERROR, getLinkMLName(), "invalid value"), e);
+        } catch ( IllegalAccessException e ) {
+            // Should not happen if the target object is a valid LinkML object
+            throw new LinkMLInternalError(String.format(SET_VALUE_ERROR, getLinkMLName(), "illegal access"), e);
         }
     }
 
@@ -201,11 +210,17 @@ public class Slot {
     public Object getValue(Object source) throws LinkMLRuntimeException {
         try {
             return readAccessor.invoke(source, (Object[]) null);
-        } catch ( IllegalAccessException | IllegalArgumentException | InvocationTargetException e ) {
-            // FIXME: As above, we should distinguish between:
-            // 1. the source object is not valid;
-            // 2. any other reflection error.
-            throw new LinkMLRuntimeException(String.format("Cannot get value of slot '%s'", getLinkMLName()), e);
+        } catch ( IllegalArgumentException e ) {
+            // The target object is not valid (especially, it does not declare the expected
+            // accessor method).
+            throw new LinkMLInternalError(String.format(GET_VALUE_ERROR, getLinkMLName(), "invalid object"), e);
+        } catch ( InvocationTargetException e ) {
+            // An error occurred within the accessor method. That is not really expected to
+            // ever happen: why would a read accessor throw an exception?
+            throw new LinkMLInternalError(String.format(GET_VALUE_ERROR, getLinkMLName(), "invalid state"), e);
+        } catch ( IllegalAccessException e ) {
+            // Should not happen if the target object is a valid LinkML object
+            throw new LinkMLInternalError(String.format(GET_VALUE_ERROR, getLinkMLName(), "illegal access"), e);
         }
     }
 

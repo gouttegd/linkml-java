@@ -19,17 +19,18 @@
 package org.incenp.linkml.core;
 
 /**
- * Base class for all exceptions caused by an error within the LinkML runtime.
+ * An exception caused by some invalid data among the data manipulated by the
+ * LinkML runtime.
  */
-public class LinkMLRuntimeException extends Exception {
+public class LinkMLValueError extends LinkMLRuntimeException {
 
-    private static final long serialVersionUID = 8282311125749458714L;
+    private static final long serialVersionUID = 3944286776143001579L;
 
-    public LinkMLRuntimeException(String msg) {
+    public LinkMLValueError(String msg) {
         super(msg);
     }
 
-    public LinkMLRuntimeException(String msg, Throwable inner) {
+    public LinkMLValueError(String msg, Throwable inner) {
         super(msg, inner);
     }
 }

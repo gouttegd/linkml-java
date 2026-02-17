@@ -33,9 +33,9 @@ public abstract class ScalarConverterBase implements IConverter {
     @Override
     public Object convert(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
         if ( raw == null ) {
-            throw new LinkMLRuntimeException("Invalid null value, scalar type expected");
+            throw new LinkMLValueError("Invalid null value, scalar type expected");
         } else if ( raw instanceof List || raw instanceof Map ) {
-            throw new LinkMLRuntimeException("Invalid complex value, scalar type expected");
+            throw new LinkMLValueError("Invalid complex value, scalar type expected");
         }
         return convertImpl(raw, ctx);
     }
@@ -74,7 +74,7 @@ public abstract class ScalarConverterBase implements IConverter {
     @SuppressWarnings("unchecked")
     protected List<Object> toList(Object raw) throws LinkMLRuntimeException {
         if ( !(raw instanceof List) ) {
-            throw new LinkMLRuntimeException("Invalid value type, list expected");
+            throw new LinkMLValueError("Invalid value type, list expected");
         }
         return (List<Object>) raw;
     }

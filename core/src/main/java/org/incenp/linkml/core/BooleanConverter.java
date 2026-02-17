@@ -39,7 +39,7 @@ public class BooleanConverter extends ScalarConverterBase {
             } else if ( stringValue.equalsIgnoreCase("false") ) {
                 return false;
             } else {
-                throw new LinkMLRuntimeException(String.format("Invalid value, boolean expected: %s", stringValue));
+                throw new LinkMLValueError(String.format("Invalid value, boolean expected: %s", stringValue));
             }
         }
     }
