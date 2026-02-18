@@ -50,20 +50,20 @@ public class SchemaDocumentTest {
             Assertions.assertEquals(2, organismCollectionClass.getAttributes().size());
             SlotDefinition organismsSlotDefinition = doc.getAttribute(organismCollectionClass.getName(), "organisms");
             Assertions.assertEquals("organisms", organismsSlotDefinition.getName());
-            Assertions.assertTrue(organismsSlotDefinition.isMultivalued());
-            Assertions.assertTrue(organismsSlotDefinition.isInlined());
-            Assertions.assertTrue(organismsSlotDefinition.isInlinedAsList());
+            Assertions.assertTrue(organismsSlotDefinition.getMultivalued());
+            Assertions.assertTrue(organismsSlotDefinition.getInlined());
+            Assertions.assertTrue(organismsSlotDefinition.getInlinedAsList());
             Assertions.assertNotNull(organismsSlotDefinition.getRange());
             Assertions.assertEquals(organismClass, organismsSlotDefinition.getRange());
 
             Assertions.assertEquals(3, organismClass.getAttributes().size());
             SlotDefinition idSlot = doc.getAttribute(organismClass.getName(), "id");
             SlotDefinition hasParentSlot = doc.getAttribute(organismClass.getName(), "has_parent");
-            Assertions.assertTrue(idSlot.isIdentifier());
+            Assertions.assertTrue(idSlot.getIsIdentifier());
             Assertions.assertEquals(organismClass, hasParentSlot.getRange());
-            Assertions.assertFalse(hasParentSlot.isMultivalued());
-            Assertions.assertFalse(hasParentSlot.isInlined());
-            Assertions.assertFalse(hasParentSlot.isInlinedAsList());
+            Assertions.assertNull(hasParentSlot.getMultivalued());
+            Assertions.assertNull(hasParentSlot.getInlined());
+            Assertions.assertNull(hasParentSlot.getInlinedAsList());
 
             Assertions.assertEquals(2, organismClass.getSlots().size());
 

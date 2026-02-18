@@ -40,5 +40,5 @@ public abstract class Definition extends Element {
     private Definition parent;
 
     @JsonProperty("abstract")
-    private boolean isAbstract;
+    private Boolean isAbstract;
 }

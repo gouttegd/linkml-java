@@ -38,23 +38,23 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class SlotDefinition extends Definition {
     @JsonProperty("identifier")
-    private boolean isIdentifier;
+    private Boolean isIdentifier;
 
     @JsonProperty("designates_type")
-    private boolean isTypeDesignator;
+    private Boolean isTypeDesignator;
 
     private Element range;
 
-    private boolean required;
+    private Boolean required;
 
-    private boolean recommended;
+    private Boolean recommended;
 
-    private boolean multivalued;
+    private Boolean multivalued;
 
-    private boolean inlined;
+    private Boolean inlined;
 
     @JsonProperty("inlined_as_list")
-    private boolean inlinedAsList;
+    private Boolean inlinedAsList;
 
     private SlotDefinition globalSlot;
 
