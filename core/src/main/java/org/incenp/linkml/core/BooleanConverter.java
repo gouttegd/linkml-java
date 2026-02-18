@@ -43,13 +43,4 @@ public class BooleanConverter extends ScalarConverterBase {
             }
         }
     }
-
-    @Override
-    public Object serialise(Object cooked, ConverterContext ctx) throws LinkMLRuntimeException {
-        if ( cooked instanceof Boolean ) {
-            return cooked;
-        } else {
-            throw new LinkMLInternalError("Invalid type");
-        }
-    }
 }
