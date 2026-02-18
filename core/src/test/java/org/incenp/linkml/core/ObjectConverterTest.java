@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.incenp.linkml.core.sample.ContainerOfBooleanValues;
 import org.incenp.linkml.core.sample.ContainerOfInlinedObjects;
 import org.incenp.linkml.core.sample.ContainerOfReferences;
 import org.incenp.linkml.core.sample.ContainerOfSimpleDicts;
@@ -59,6 +60,7 @@ public class ObjectConverterTest {
         ctx.addConverter(ContainerOfReferences.class);
         ctx.addConverter(ContainerOfInlinedObjects.class);
         ctx.addConverter(ContainerOfSimpleDicts.class);
+        ctx.addConverter(ContainerOfBooleanValues.class);
     }
 
     @Test
@@ -67,7 +69,7 @@ public class ObjectConverterTest {
 
         Assertions.assertEquals("a string", sc.getFoo());
         Assertions.assertEquals("https://example.org/a/URI", sc.getBar().toString());
-        Assertions.assertTrue(sc.isBaz());
+        Assertions.assertTrue(sc.getBaz());
         Assertions.assertEquals("a string in a list", sc.getFoos().get(0));
 
         roundtrip(sc);
@@ -118,13 +120,13 @@ public class ObjectConverterTest {
 
         Assertions.assertEquals("a string", obj.getSingle().getFoo());
         Assertions.assertEquals("https://example.org/a/URI", obj.getSingle().getBar().toString());
-        Assertions.assertFalse(obj.getSingle().isBaz());
+        Assertions.assertFalse(obj.getSingle().getBaz());
 
         Assertions.assertEquals(1, obj.getMultiple().size());
         SimpleClass sc = obj.getMultiple().get(0);
         Assertions.assertEquals("another string", sc.getFoo());
         Assertions.assertEquals("https://example.org/another/URI", sc.getBar().toString());
-        Assertions.assertTrue(sc.isBaz());
+        Assertions.assertTrue(sc.getBaz());
 
         roundtrip(obj);
     }
@@ -234,6 +236,20 @@ public class ObjectConverterTest {
         } catch ( LinkMLRuntimeException e ) {
             Assertions.fail("Unexpected exception", e);
         }
+    }
+
+    @Test
+    void testBooleanValues() throws IOException {
+        ContainerOfBooleanValues cobv = parse("container-of-boolean-values.yaml", ContainerOfBooleanValues.class);
+
+        Assertions.assertTrue(cobv.getFoo());
+        Assertions.assertFalse(cobv.getBar());
+        Assertions.assertNull(cobv.getBaz());
+        Assertions.assertTrue(cobv.isPrimitiveFoo());
+        Assertions.assertFalse(cobv.isPrimitiveBar());
+        Assertions.assertFalse(cobv.isPrimitiveBaz());
+
+        roundtrip(cobv);
     }
 
     private <T> T parse(String file, Class<T> target) throws IOException {

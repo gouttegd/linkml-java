@@ -25,7 +25,7 @@ public class BooleanConverter extends ScalarConverterBase {
 
     @Override
     public Class<?> getType() {
-        return Boolean.TYPE;
+        return Boolean.class;
     }
 
     @Override
@@ -35,9 +35,9 @@ public class BooleanConverter extends ScalarConverterBase {
         } else {
             String stringValue = raw.toString();
             if ( stringValue.equalsIgnoreCase("true") ) {
-                return true;
+                return Boolean.TRUE;
             } else if ( stringValue.equalsIgnoreCase("false") ) {
-                return false;
+                return Boolean.FALSE;
             } else {
                 throw new LinkMLValueError(String.format("Invalid value, boolean expected: %s", stringValue));
             }

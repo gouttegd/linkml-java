@@ -49,10 +49,25 @@ import java.util.Map;
  */
 public class ConverterContext {
 
+    private static Map<Class<?>, Class<?>> boxingAliases;
+
     private Map<Class<?>, IConverter> converters = new HashMap<>();
     private ObjectCache objectCache = new ObjectCache();
     private List<DelayedAssignment> delayedAssignments = new ArrayList<>();
     private Map<String, String> prefixMap = new HashMap<>();
+
+    static {
+        // We need to deal with the fact that some types exist both as a "primitive"
+        // type (e.g. boolean) and as a "boxed" type (Boolean). The assumption here is
+        // that we will have converters that declare themselves as being able to deal
+        // with the boxed types, and we will automatically use them to deal with the
+        // corresponding primitive type.
+        boxingAliases = new HashMap<>();
+        boxingAliases.put(Boolean.class, Boolean.TYPE);
+        boxingAliases.put(Integer.class, Integer.TYPE);
+        boxingAliases.put(Float.class, Float.TYPE);
+        boxingAliases.put(Double.class, Double.TYPE);
+    }
 
     /**
      * Registers a converter for objects of the given class.
@@ -71,6 +86,10 @@ public class ConverterContext {
      */
     public void addConverter(IConverter converter) {
         converters.put(converter.getType(), converter);
+        Class<?> alias = boxingAliases.get(converter.getType());
+        if ( alias != null ) {
+            converters.put(alias, converter);
+        }
     }
 
     /**
