@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.incenp.linkml.core.sample.ContainerOfBooleanValues;
 import org.incenp.linkml.core.sample.ContainerOfInlinedObjects;
+import org.incenp.linkml.core.sample.ContainerOfIntegerValues;
 import org.incenp.linkml.core.sample.ContainerOfReferences;
 import org.incenp.linkml.core.sample.ContainerOfSimpleDicts;
 import org.incenp.linkml.core.sample.ContainerOfSimpleObjects;
@@ -50,6 +51,9 @@ public class ObjectConverterTest {
         ctx.addConverter(new StringConverter());
         ctx.addConverter(new URIConverter());
         ctx.addConverter(new BooleanConverter());
+        ctx.addConverter(new IntegerConverter());
+        ctx.addConverter(new FloatConverter());
+        ctx.addConverter(new DoubleConverter());
         ctx.addConverter(SimpleClass.class);
         ctx.addConverter(SimpleIdentifiableClass.class);
         ctx.addConverter(ExtensibleSimpleClass.class);
@@ -61,6 +65,7 @@ public class ObjectConverterTest {
         ctx.addConverter(ContainerOfInlinedObjects.class);
         ctx.addConverter(ContainerOfSimpleDicts.class);
         ctx.addConverter(ContainerOfBooleanValues.class);
+        ctx.addConverter(ContainerOfIntegerValues.class);
     }
 
     @Test
@@ -250,6 +255,19 @@ public class ObjectConverterTest {
         Assertions.assertFalse(cobv.isPrimitiveBaz());
 
         roundtrip(cobv);
+    }
+
+    @Test
+    void testIntegerValues() throws IOException {
+        ContainerOfIntegerValues coiv = parse("container-of-integer-values.yaml", ContainerOfIntegerValues.class);
+
+        Assertions.assertTrue(coiv.getFoo() == 123);
+        Assertions.assertNotNull(coiv.getBar());
+        Assertions.assertTrue(coiv.getBar() == 456);
+        Assertions.assertTrue(coiv.getBaz().get(0) == 321);
+        Assertions.assertTrue(coiv.getBaz().get(1) == 654);
+
+        roundtrip(coiv);
     }
 
     private <T> T parse(String file, Class<T> target) throws IOException {

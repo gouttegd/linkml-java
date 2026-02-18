@@ -22,6 +22,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.incenp.linkml.core.sample.ContainerOfIntegerValues;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -90,11 +91,95 @@ public class ScalarConverterBaseTest {
     }
 
     @Test
+    void testIntegerConversion() throws LinkMLRuntimeException {
+        IntegerConverter c = new IntegerConverter();
+        Object i = c.convert(123, ctx);
+        Assertions.assertTrue(i instanceof Integer);
+        Assertions.assertTrue((int) i == 123);
+
+        i = c.convert("123", ctx);
+        Assertions.assertTrue(i instanceof Integer);
+        Assertions.assertTrue((int) i == 123);
+
+        try {
+            c.convert("not a number", ctx);
+            Assertions.fail("Exception not thrown for an invalid integer value");
+        } catch ( LinkMLRuntimeException e ) {
+            Assertions.assertInstanceOf(NumberFormatException.class, e.getCause());
+        }
+    }
+
+    @Test
+    void testFloatConversion() throws LinkMLRuntimeException {
+        FloatConverter c = new FloatConverter();
+        Object f = c.convert(123.456f, ctx);
+        Assertions.assertTrue(f instanceof Float);
+        Assertions.assertTrue((float) f == 123.456f);
+
+        f = c.convert("123.456", ctx);
+        Assertions.assertTrue(f instanceof Float);
+        Assertions.assertTrue((float) f == 123.456f);
+
+        try {
+            c.convert("not a number", ctx);
+            Assertions.fail("Exception not thrown for an invalid float value");
+        } catch ( LinkMLRuntimeException e ) {
+            Assertions.assertInstanceOf(NumberFormatException.class, e.getCause());
+        }
+    }
+
+    @Test
+    void testDoubleConversion() throws LinkMLRuntimeException {
+        DoubleConverter c = new DoubleConverter();
+        Object d = c.convert(123.456, ctx);
+        Assertions.assertTrue(d instanceof Double);
+        Assertions.assertTrue((double) d == 123.456);
+
+        d = c.convert("123.456", ctx);
+        Assertions.assertTrue(d instanceof Double);
+        Assertions.assertTrue((double) d == 123.456);
+
+        try {
+            c.convert("not a number", ctx);
+            Assertions.fail("Exception not thrown for an invalid float value");
+        } catch ( LinkMLRuntimeException e ) {
+            Assertions.assertInstanceOf(NumberFormatException.class, e.getCause());
+        }
+    }
+
+    @Test
+    void testMultivaluedConversion() throws LinkMLRuntimeException {
+        IntegerConverter c = new IntegerConverter();
+        ArrayList<Object> raw = new ArrayList<>();
+        raw.add(123);
+        raw.add(456);
+
+        ContainerOfIntegerValues coiv = new ContainerOfIntegerValues();
+        Slot slot = Slot.getSlot(ContainerOfIntegerValues.class, "baz");
+        c.convertForSlot(raw, coiv, slot, ctx);
+
+        Assertions.assertEquals(coiv.getBaz().get(0), 123);
+        Assertions.assertEquals(coiv.getBaz().get(1), 456);
+
+        try {
+            c.convertForSlot(789, coiv, slot, ctx);
+            Assertions.fail("Exception not thrown for an invalid list value");
+        } catch ( LinkMLRuntimeException e ) {
+            Assertions.assertEquals("Invalid value type, list expected", e.getMessage());
+        }
+    }
+
+    @Test
     void testSerialisationReturnsSameObject() throws LinkMLRuntimeException {
-        StringConverter c = new StringConverter();
+        IConverter c = new StringConverter();
         String s = "string value";
 
         Assertions.assertEquals(s, c.serialise(s, ctx));
+
+        c = new IntegerConverter();
+        Integer i = 123;
+
+        Assertions.assertEquals(i, c.serialise(i, ctx));
     }
 
     @Test
