@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.incenp.linkml.core.annotations.Converter;
+
 /**
  * Global context for converting LinkML objects (as parsed from a JSON/YAML
  * document) into their corresponding Java objects.
@@ -99,12 +101,19 @@ public class ConverterContext {
      * @param type The type to query.
      * @return The registered converter for the type, or <code>null</code> if no
      *         converter has been registered for that type.
+     * @throws LinkMLInternalError
      */
-    public IConverter getConverter(Class<?> type) {
-        IConverter conv = converters.get(type);
-        if ( conv == null ) {
-            conv = new ObjectConverter(type);
-            converters.put(type, conv);
+    public IConverter getConverter(Class<?> type) throws LinkMLRuntimeException {
+        IConverter conv = null;
+        Converter annot = type.getAnnotation(Converter.class);
+        if ( annot != null ) {
+            conv = getCustomConverter(annot.value());
+        } else {
+            conv = converters.get(type);
+            if ( conv == null ) {
+                conv = new ObjectConverter(type);
+                converters.put(type, conv);
+            }
         }
         return conv;
     }
@@ -123,19 +132,25 @@ public class ConverterContext {
         IConverter conv = null;
         Class<?> type = slot.getCustomConverter();
         if ( type != null ) {
-            conv = customConverters.get(type);
-            if ( conv == null ) {
-                try {
-                    conv = (IConverter) type.newInstance();
-                    customConverters.put(type, conv);
-                } catch ( InstantiationException | IllegalAccessException e ) {
-                    throw new LinkMLInternalError("Cannot instantiate custom converter", e);
-                }
-            }
+            conv = getCustomConverter(type);
         } else {
             conv = getConverter(slot.getInnerType());
         }
 
+        return conv;
+    }
+
+    // Code common to both variants of getConverter
+    private IConverter getCustomConverter(Class<?> converterType) throws LinkMLRuntimeException {
+        IConverter conv = customConverters.get(converterType);
+        if ( conv == null ) {
+            try {
+                conv = (IConverter) converterType.newInstance();
+                customConverters.put(converterType, conv);
+            } catch ( InstantiationException | IllegalAccessException e ) {
+                throw new LinkMLInternalError("Cannot instantiate custom converter", e);
+            }
+        }
         return conv;
     }
 

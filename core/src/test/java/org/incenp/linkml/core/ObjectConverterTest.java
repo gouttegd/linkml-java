@@ -202,7 +202,7 @@ public class ObjectConverterTest {
     }
 
     @Test
-    void testCompactDictInlining() {
+    void testCompactDictInlining() throws LinkMLRuntimeException {
         ContainerOfInlinedObjects coi = new ContainerOfInlinedObjects();
         coi.setInlinedAsDict(new ArrayList<>());
         SimpleIdentifiableClass sic1 = new SimpleIdentifiableClass();
@@ -211,15 +211,11 @@ public class ObjectConverterTest {
         coi.getInlinedAsDict().add(sic1);
 
         ObjectConverter conv = (ObjectConverter) ctx.getConverter(ContainerOfInlinedObjects.class);
-        try {
-            Map<String, Object> raw = conv.serialise(coi, false, ctx);
-            @SuppressWarnings("unchecked")
-            Map<String, Object> inlinedAsDict = (Map<String, Object>) raw.get("inlinedAsDict");
-            Assertions.assertFalse(inlinedAsDict.containsKey("id"));
-            Assertions.assertEquals(coi, conv.convert(raw, ctx));
-        } catch ( LinkMLRuntimeException e ) {
-            Assertions.fail("Unexpected exception", e);
-        }
+        Map<String, Object> raw = conv.serialise(coi, false, ctx);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> inlinedAsDict = (Map<String, Object>) raw.get("inlinedAsDict");
+        Assertions.assertFalse(inlinedAsDict.containsKey("id"));
+        Assertions.assertEquals(coi, conv.convert(raw, ctx));
     }
 
     @Test
@@ -250,7 +246,7 @@ public class ObjectConverterTest {
     }
 
     @Test
-    void testCustomConverters() throws IOException {
+    void testCustomConverters() throws IOException, LinkMLRuntimeException {
         ctx.addPrefix("FBbi", "http://purl.obolibrary.org/obo/FBbi_");
         ClassWithCustomConverter cwcc = parse("custom-converters.yaml", ClassWithCustomConverter.class);
 
@@ -262,12 +258,8 @@ public class ObjectConverterTest {
 
         // Check that IRIs are compacted back
         ObjectConverter conv = (ObjectConverter) ctx.getConverter(ClassWithCustomConverter.class);
-        try {
-            Map<String, Object> raw = conv.serialise(cwcc, false, ctx);
-            Assertions.assertEquals("FBbi:00000123", raw.get("uri"));
-        } catch ( LinkMLRuntimeException e ) {
-            Assertions.fail("Unexpected exception", e);
-        }
+        Map<String, Object> raw = conv.serialise(cwcc, false, ctx);
+        Assertions.assertEquals("FBbi:00000123", raw.get("uri"));
     }
 
     private <T> T parse(String file, Class<T> target) throws IOException {
@@ -286,8 +278,8 @@ public class ObjectConverterTest {
     }
 
     private <T> void roundtrip(T obj) {
-        IConverter conv = ctx.getConverter(obj.getClass());
         try {
+            IConverter conv = ctx.getConverter(obj.getClass());
             Object raw = conv.serialise(obj, ctx);
             Object recooked = conv.convert(raw, ctx);
             Assertions.assertEquals(obj, recooked);

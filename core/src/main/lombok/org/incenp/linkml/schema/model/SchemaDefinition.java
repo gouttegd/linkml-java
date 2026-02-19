@@ -27,7 +27,7 @@ import org.incenp.linkml.core.annotations.Converter;
 import org.incenp.linkml.core.annotations.Inlining;
 import org.incenp.linkml.core.annotations.LinkURI;
 import org.incenp.linkml.core.annotations.Requirement;
-import org.incenp.linkml.schema.ClassDefinitionConverter;
+import org.incenp.linkml.schema.SchemaDefinitionConverter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -47,6 +47,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
+@Converter(SchemaDefinitionConverter.class)
 public class SchemaDefinition extends Element {
     @Requirement(RequirementLevel.MANDATORY)
     private URI id;
@@ -80,6 +81,5 @@ public class SchemaDefinition extends Element {
     private List<SlotDefinition> slotDefinitions;
 
     @Inlining(InliningMode.DICT)
-    @Converter(ClassDefinitionConverter.class)
     private List<ClassDefinition> classes;
 }

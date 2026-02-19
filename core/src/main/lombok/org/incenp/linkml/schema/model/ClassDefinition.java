@@ -24,6 +24,7 @@ import org.incenp.linkml.core.CurieConverter;
 import org.incenp.linkml.core.InliningMode;
 import org.incenp.linkml.core.annotations.Converter;
 import org.incenp.linkml.core.annotations.Inlining;
+import org.incenp.linkml.schema.ClassDefinitionConverter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -43,6 +44,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
+@Converter(ClassDefinitionConverter.class)
 public class ClassDefinition extends Definition {
     private List<SlotDefinition> slots;
 

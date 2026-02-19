@@ -212,7 +212,7 @@ public class SchemaDocument {
     private SchemaDefinition parseSchema(File file)
             throws IOException, InvalidSchemaException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        ConverterContext ctx = getLinkMLContext();
+        ConverterContext ctx = new ConverterContext();
 
         // Parse the top-level schema and all its imports recursively
         SchemaDefinition schema = parseSchema(new FileSchemaSource(file), mapper, ctx);
@@ -324,11 +324,5 @@ public class SchemaDocument {
         } catch ( MalformedURLException e ) {
             throw new InvalidSchemaException(String.format(UNRESOLVABLE_IMPORT, name), e);
         }
-    }
-
-    private ConverterContext getLinkMLContext() {
-        ConverterContext ctx = new ConverterContext();
-        ctx.addConverter(new SchemaDefinitionConverter());
-        return ctx;
     }
 }
