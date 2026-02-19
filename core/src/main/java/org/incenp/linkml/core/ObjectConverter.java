@@ -124,7 +124,7 @@ public class ObjectConverter implements IConverter {
                     logger.debug("Ignoring unknown or unsupported slot '{}'", entry.getKey());
                 }
             } else {
-                ctx.getConverter(slot.getInnerType()).convertForSlot(entry.getValue(), dest, slot, ctx);
+                ctx.getConverter(slot).convertForSlot(entry.getValue(), dest, slot, ctx);
             }
         }
     }
@@ -262,7 +262,7 @@ public class ObjectConverter implements IConverter {
                         throw new LinkMLInternalError(String.format(NO_SIMPLE_DICT, targetType.getName()));
 
                     }
-                    IConverter primaryConv = ctx.getConverter(primarySlot.getInnerType());
+                    IConverter primaryConv = ctx.getConverter(primarySlot);
                     for ( Map.Entry<String, Object> rawItem : toMap(raw).entrySet() ) {
                         Object item = ctx.getObject(targetType, rawItem.getKey(), true);
                         primaryConv.convertForSlot(rawItem.getValue(), item, primarySlot, ctx);
@@ -336,8 +336,7 @@ public class ObjectConverter implements IConverter {
                     raw.put(extension.getKey(), extension.getValue());
                 }
             } else {
-                raw.put(slot.getLinkMLName(),
-                        ctx.getConverter(slot.getInnerType()).serialiseForSlot(slotValue, slot, ctx));
+                raw.put(slot.getLinkMLName(), ctx.getConverter(slot).serialiseForSlot(slotValue, slot, ctx));
             }
         }
 

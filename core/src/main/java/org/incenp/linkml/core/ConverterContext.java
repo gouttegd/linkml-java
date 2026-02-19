@@ -52,6 +52,7 @@ public class ConverterContext {
     private static Map<Class<?>, Class<?>> boxingAliases;
 
     private Map<Class<?>, IConverter> converters = new HashMap<>();
+    private Map<Class<?>, IConverter> customConverters = new HashMap<>();
     private ObjectCache objectCache = new ObjectCache();
     private List<DelayedAssignment> delayedAssignments = new ArrayList<>();
     private Map<String, String> prefixMap = new HashMap<>();
@@ -101,6 +102,39 @@ public class ConverterContext {
      */
     public IConverter getConverter(Class<?> type) {
         return converters.get(type);
+    }
+
+    /**
+     * Gets the converter for the type of object expected by the given slot.
+     * 
+     * @param slot The slot for which a converter is needed.
+     * @return The appropriate converter.
+     * @throws LinkMLRuntimeException If (1) the slot is configured to use a custom
+     *                                converter, but the custom converter could not
+     *                                be instantiated; or (2) if there is no known
+     *                                converter for the slot type.
+     */
+    public IConverter getConverter(Slot slot) throws LinkMLRuntimeException {
+        IConverter conv = null;
+        Class<?> type = slot.getCustomConverter();
+        if ( type != null ) {
+            conv = customConverters.get(type);
+            if ( conv == null ) {
+                try {
+                    conv = (IConverter) type.newInstance();
+                    customConverters.put(type, conv);
+                } catch ( InstantiationException | IllegalAccessException e ) {
+                    throw new LinkMLInternalError("Cannot instantiate custom converter", e);
+                }
+            }
+        } else {
+            conv = converters.get(slot.getInnerType());
+            if ( conv == null ) {
+                throw new LinkMLInternalError("No available converter");
+            }
+        }
+
+        return conv;
     }
 
     /**

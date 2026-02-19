@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.incenp.linkml.core.annotations.Converter;
 import org.incenp.linkml.core.annotations.ExtensionHolder;
 import org.incenp.linkml.core.annotations.Identifier;
 import org.incenp.linkml.core.annotations.Inlining;
@@ -153,6 +154,21 @@ public class Slot {
         }
         Requirement reqAnnotation = field.getAnnotation(Requirement.class);
         return reqAnnotation != null ? reqAnnotation.value() : RequirementLevel.OPTIONAL;
+    }
+
+    /**
+     * Gets the custom converter class to use to convert values intended for this
+     * slot, if any.
+     * <p>
+     * A slot can indicate that it needs a custom converter by mean of a
+     * {@link Converter} annotation.
+     * 
+     * @return The custom converter for the slot, or <code>null</code> if the code
+     *         does not mandate a custom converter.
+     */
+    public Class<?> getCustomConverter() {
+        Converter annot = field.getAnnotation(Converter.class);
+        return annot != null ? annot.value() : null;
     }
 
     /**
