@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.incenp.linkml.core.sample.ClassWithCustomConverter;
 import org.incenp.linkml.core.sample.ContainerOfBooleanValues;
 import org.incenp.linkml.core.sample.ContainerOfInlinedObjects;
 import org.incenp.linkml.core.sample.ContainerOfIntegerValues;
@@ -66,6 +67,9 @@ public class ObjectConverterTest {
         ctx.addConverter(ContainerOfSimpleDicts.class);
         ctx.addConverter(ContainerOfBooleanValues.class);
         ctx.addConverter(ContainerOfIntegerValues.class);
+        ctx.addConverter(ClassWithCustomConverter.class);
+
+        ctx.addPrefix("FBbi", "http://purl.obolibrary.org/obo/FBbi_");
     }
 
     @Test
@@ -268,6 +272,26 @@ public class ObjectConverterTest {
         Assertions.assertTrue(coiv.getBaz().get(1) == 654);
 
         roundtrip(coiv);
+    }
+
+    @Test
+    void testCustomConverters() throws IOException {
+        ClassWithCustomConverter cwcc = parse("custom-converters.yaml", ClassWithCustomConverter.class);
+
+        Assertions.assertEquals("http://purl.obolibrary.org/obo/FBbi_00000123", cwcc.getUri());
+        Assertions.assertEquals("http://purl.obolibrary.org/obo/FBbi_00000456", cwcc.getUris().get(0));
+        Assertions.assertEquals("http://purl.obolibrary.org/obo/FBbi_00000789", cwcc.getUris().get(1));
+
+        roundtrip(cwcc);
+
+        // Check that IRIs are compacted back
+        ObjectConverter conv = (ObjectConverter) ctx.getConverter(ClassWithCustomConverter.class);
+        try {
+            Map<String, Object> raw = conv.serialise(cwcc, false, ctx);
+            Assertions.assertEquals("FBbi:00000123", raw.get("uri"));
+        } catch ( LinkMLRuntimeException e ) {
+            Assertions.fail("Unexpected exception", e);
+        }
     }
 
     private <T> T parse(String file, Class<T> target) throws IOException {

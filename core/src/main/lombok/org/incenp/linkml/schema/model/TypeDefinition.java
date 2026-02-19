@@ -18,6 +18,9 @@
 
 package org.incenp.linkml.schema.model;
 
+import org.incenp.linkml.core.CurieConverter;
+import org.incenp.linkml.core.annotations.Converter;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AccessLevel;
@@ -42,4 +45,8 @@ public class TypeDefinition extends Element {
     private String base;
 
     private String repr;
+
+    @JsonProperty("type_uri")
+    @Converter(CurieConverter.class)
+    private String URI;
 }

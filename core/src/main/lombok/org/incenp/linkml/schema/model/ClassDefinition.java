@@ -20,7 +20,9 @@ package org.incenp.linkml.schema.model;
 
 import java.util.List;
 
+import org.incenp.linkml.core.CurieConverter;
 import org.incenp.linkml.core.InliningMode;
+import org.incenp.linkml.core.annotations.Converter;
 import org.incenp.linkml.core.annotations.Inlining;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -50,6 +52,10 @@ public class ClassDefinition extends Definition {
 
     @Inlining(InliningMode.DICT)
     private List<SlotDefinition> attributes;
+
+    @JsonProperty("class_uri")
+    @Converter(CurieConverter.class)
+    private String URI;
 
     @Override
     public void setParent(Definition parent) {

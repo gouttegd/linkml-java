@@ -56,6 +56,7 @@ public class ConverterContext {
     private ObjectCache objectCache = new ObjectCache();
     private List<DelayedAssignment> delayedAssignments = new ArrayList<>();
     private Map<String, String> prefixMap = new HashMap<>();
+    private Map<String, String> iri2CurieCache = new HashMap<>();
 
     static {
         // We need to deal with the fact that some types exist both as a "primitive"
@@ -171,6 +172,37 @@ public class ConverterContext {
 
         // Non-resolvable prefix name, return as is
         return name;
+    }
+
+    /**
+     * Compacts an IRI into a shortened identifier (“CURIE“).
+     * 
+     * @param iri The IRI to shorten.
+     * @return The shortened identifier, or the original string if there no known
+     *         suitable prefix for the given IRI.
+     */
+    public String compact(String iri) {
+        String shortId = iri2CurieCache.get(iri);
+
+        if ( shortId == null ) {
+            String bestPrefix = null;
+            int bestLength = 0;
+
+            for ( String prefixName : prefixMap.keySet() ) {
+                String prefix = prefixMap.get(prefixName);
+                if ( iri.startsWith(prefix) && prefix.length() > bestLength ) {
+                    bestPrefix = prefixName;
+                    bestLength = prefix.length();
+                }
+            }
+
+            if ( bestPrefix != null ) {
+                shortId = bestPrefix + ":" + iri.substring(bestLength);
+                iri2CurieCache.put(iri, shortId);
+            }
+        }
+
+        return shortId != null ? shortId : iri;
     }
 
     /**

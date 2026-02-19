@@ -18,6 +18,9 @@
 
 package org.incenp.linkml.schema.model;
 
+import org.incenp.linkml.core.CurieConverter;
+import org.incenp.linkml.core.annotations.Converter;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AccessLevel;
@@ -55,6 +58,10 @@ public class SlotDefinition extends Definition {
 
     @JsonProperty("inlined_as_list")
     private Boolean inlinedAsList;
+
+    @JsonProperty("slot_uri")
+    @Converter(CurieConverter.class)
+    private String URI;
 
     private SlotDefinition globalSlot;
 

@@ -16,36 +16,31 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.schema.model;
+package org.incenp.linkml.core.sample;
 
 import java.util.List;
 
 import org.incenp.linkml.core.CurieConverter;
 import org.incenp.linkml.core.annotations.Converter;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Represents the definition an element whose instances must be drawn from a
- * specified set of permissible values.
+ * An example of a class using slots with custom converters.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder(toBuilder = true)
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class EnumDefinition extends Definition {
-    @JsonProperty("permissible_values")
-    private List<PermissibleValue> permissibleValues;
+public class ClassWithCustomConverter {
 
-    @JsonProperty("enum_uri")
     @Converter(CurieConverter.class)
-    private String URI;
+    private String uri;
+
+    @Converter(CurieConverter.class)
+    private List<String> uris;
 }
