@@ -18,6 +18,7 @@
 
 package org.incenp.linkml.core;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,8 +50,6 @@ import java.util.Map;
  */
 public class ConverterContext {
 
-    private static Map<Class<?>, Class<?>> boxingAliases;
-
     private Map<Class<?>, IConverter> converters = new HashMap<>();
     private Map<Class<?>, IConverter> customConverters = new HashMap<>();
     private ObjectCache objectCache = new ObjectCache();
@@ -58,17 +57,21 @@ public class ConverterContext {
     private Map<String, String> prefixMap = new HashMap<>();
     private Map<String, String> iri2CurieCache = new HashMap<>();
 
-    static {
-        // We need to deal with the fact that some types exist both as a "primitive"
-        // type (e.g. boolean) and as a "boxed" type (Boolean). The assumption here is
-        // that we will have converters that declare themselves as being able to deal
-        // with the boxed types, and we will automatically use them to deal with the
-        // corresponding primitive type.
-        boxingAliases = new HashMap<>();
-        boxingAliases.put(Boolean.class, Boolean.TYPE);
-        boxingAliases.put(Integer.class, Integer.TYPE);
-        boxingAliases.put(Float.class, Float.TYPE);
-        boxingAliases.put(Double.class, Double.TYPE);
+    public ConverterContext() {
+        // Register converters for all the basic types.
+        converters.put(String.class, new StringConverter());
+        converters.put(Boolean.class, new BooleanConverter());
+        converters.put(Integer.class, new IntegerConverter());
+        converters.put(Float.class, new FloatConverter());
+        converters.put(Double.class, new DoubleConverter());
+        converters.put(URI.class, new URIConverter());
+
+        // For the primitive types, use the same converters as their boxed counterparts
+        converters.put(Boolean.TYPE, converters.get(Boolean.class));
+        converters.put(Integer.TYPE, converters.get(Integer.class));
+        converters.put(Float.TYPE, converters.get(Float.class));
+        converters.put(Double.TYPE, converters.get(Double.class));
+
     }
 
     /**
@@ -88,10 +91,6 @@ public class ConverterContext {
      */
     public void addConverter(IConverter converter) {
         converters.put(converter.getType(), converter);
-        Class<?> alias = boxingAliases.get(converter.getType());
-        if ( alias != null ) {
-            converters.put(alias, converter);
-        }
     }
 
     /**
@@ -102,7 +101,12 @@ public class ConverterContext {
      *         converter has been registered for that type.
      */
     public IConverter getConverter(Class<?> type) {
-        return converters.get(type);
+        IConverter conv = converters.get(type);
+        if ( conv == null ) {
+            conv = new ObjectConverter(type);
+            converters.put(type, conv);
+        }
+        return conv;
     }
 
     /**
@@ -129,10 +133,7 @@ public class ConverterContext {
                 }
             }
         } else {
-            conv = converters.get(slot.getInnerType());
-            if ( conv == null ) {
-                throw new LinkMLInternalError("No available converter");
-            }
+            conv = getConverter(slot.getInnerType());
         }
 
         return conv;

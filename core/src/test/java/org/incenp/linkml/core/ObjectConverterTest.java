@@ -45,32 +45,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 public class ObjectConverterTest {
 
-    private ConverterContext ctx;
-
-    ObjectConverterTest() {
-        ctx = new ConverterContext();
-        ctx.addConverter(new StringConverter());
-        ctx.addConverter(new URIConverter());
-        ctx.addConverter(new BooleanConverter());
-        ctx.addConverter(new IntegerConverter());
-        ctx.addConverter(new FloatConverter());
-        ctx.addConverter(new DoubleConverter());
-        ctx.addConverter(SimpleClass.class);
-        ctx.addConverter(SimpleIdentifiableClass.class);
-        ctx.addConverter(ExtensibleSimpleClass.class);
-        ctx.addConverter(SimpleDict.class);
-        ctx.addConverter(ExtraSimpleDict.class);
-        ctx.addConverter(MultivaluedSimpleDict.class);
-        ctx.addConverter(ContainerOfSimpleObjects.class);
-        ctx.addConverter(ContainerOfReferences.class);
-        ctx.addConverter(ContainerOfInlinedObjects.class);
-        ctx.addConverter(ContainerOfSimpleDicts.class);
-        ctx.addConverter(ContainerOfBooleanValues.class);
-        ctx.addConverter(ContainerOfIntegerValues.class);
-        ctx.addConverter(ClassWithCustomConverter.class);
-
-        ctx.addPrefix("FBbi", "http://purl.obolibrary.org/obo/FBbi_");
-    }
+    private ConverterContext ctx = new ConverterContext();
 
     @Test
     void testConvertingSimpleClass() throws IOException {
@@ -276,6 +251,7 @@ public class ObjectConverterTest {
 
     @Test
     void testCustomConverters() throws IOException {
+        ctx.addPrefix("FBbi", "http://purl.obolibrary.org/obo/FBbi_");
         ClassWithCustomConverter cwcc = parse("custom-converters.yaml", ClassWithCustomConverter.class);
 
         Assertions.assertEquals("http://purl.obolibrary.org/obo/FBbi_00000123", cwcc.getUri());

@@ -23,9 +23,11 @@ import java.util.List;
 
 import org.incenp.linkml.core.InliningMode;
 import org.incenp.linkml.core.RequirementLevel;
+import org.incenp.linkml.core.annotations.Converter;
 import org.incenp.linkml.core.annotations.Inlining;
 import org.incenp.linkml.core.annotations.LinkURI;
 import org.incenp.linkml.core.annotations.Requirement;
+import org.incenp.linkml.schema.ClassDefinitionConverter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -78,5 +80,6 @@ public class SchemaDefinition extends Element {
     private List<SlotDefinition> slotDefinitions;
 
     @Inlining(InliningMode.DICT)
+    @Converter(ClassDefinitionConverter.class)
     private List<ClassDefinition> classes;
 }
