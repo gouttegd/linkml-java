@@ -18,6 +18,8 @@
 
 package org.incenp.linkml.schema.model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AccessLevel;
@@ -41,4 +43,8 @@ public abstract class Definition extends Element {
 
     @JsonProperty("abstract")
     private Boolean isAbstract;
+
+    private Boolean mixin;
+
+    private List<Definition> mixins;
 }
