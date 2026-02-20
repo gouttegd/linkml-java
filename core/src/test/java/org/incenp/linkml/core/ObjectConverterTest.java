@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.incenp.linkml.core.sample.BaseSelfDesignatedClass;
 import org.incenp.linkml.core.sample.ClassWithCustomConverter;
 import org.incenp.linkml.core.sample.ContainerOfBooleanValues;
 import org.incenp.linkml.core.sample.ContainerOfInlinedObjects;
@@ -31,6 +32,7 @@ import org.incenp.linkml.core.sample.ContainerOfIntegerValues;
 import org.incenp.linkml.core.sample.ContainerOfReferences;
 import org.incenp.linkml.core.sample.ContainerOfSimpleDicts;
 import org.incenp.linkml.core.sample.ContainerOfSimpleObjects;
+import org.incenp.linkml.core.sample.DerivedSelfDesignatedClass;
 import org.incenp.linkml.core.sample.ExtensibleSimpleClass;
 import org.incenp.linkml.core.sample.ExtraSimpleDict;
 import org.incenp.linkml.core.sample.MultivaluedSimpleDict;
@@ -264,10 +266,38 @@ public class ObjectConverterTest {
         Assertions.assertEquals("FBbi:00000123", raw.get("uri"));
     }
 
+    @Test
+    void testTypeDesignator() throws IOException {
+        String text = "foo: A string\nbar: Another string\ntype: DerivedSelfDesignatedClass\n";
+        BaseSelfDesignatedClass bsdc = parseString(text, BaseSelfDesignatedClass.class);
+
+        Assertions.assertInstanceOf(DerivedSelfDesignatedClass.class, bsdc);
+        DerivedSelfDesignatedClass dsdc = (DerivedSelfDesignatedClass) bsdc;
+        Assertions.assertEquals("A string", dsdc.getFoo());
+        Assertions.assertEquals("Another string", dsdc.getBar());
+        Assertions.assertEquals("DerivedSelfDesignatedClass", dsdc.getType());
+
+        roundtrip(bsdc);
+    }
+
     private <T> T parse(String file, Class<T> target) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         FileInputStream stream = new FileInputStream(new File("src/test/resources/core/samples/", file));
         Object raw = mapper.readValue(stream, Map.class);
+
+        try {
+            Object cooked = ctx.getConverter(target).convert(raw, ctx);
+            Assertions.assertTrue(target.isInstance(cooked));
+            return target.cast(cooked);
+        } catch ( LinkMLRuntimeException e ) {
+            Assertions.fail("Unexpected exception", e);
+        }
+        return null;
+    }
+
+    private <T> T parseString(String text, Class<T> target) throws IOException {
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        Object raw = mapper.readValue(text, Map.class);
 
         try {
             Object cooked = ctx.getConverter(target).convert(raw, ctx);

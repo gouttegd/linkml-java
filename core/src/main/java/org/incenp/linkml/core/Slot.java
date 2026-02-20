@@ -32,6 +32,7 @@ import org.incenp.linkml.core.annotations.Identifier;
 import org.incenp.linkml.core.annotations.Inlining;
 import org.incenp.linkml.core.annotations.Requirement;
 import org.incenp.linkml.core.annotations.SlotName;
+import org.incenp.linkml.core.annotations.TypeDesignator;
 
 /**
  * Represents a “slot” (that is, a field) on a specific LinkML object.
@@ -97,11 +98,21 @@ public class Slot {
     /**
      * Indicates whether the slot holds an identifier for the class it belongs to.
      * 
-     * @return <true> if the slot is an identifier slot, otherwise
+     * @return <code>true</code> if the slot is an identifier slot, otherwise
      *         <code>false</code>.
      */
     public boolean isIdentifier() {
         return field.isAnnotationPresent(Identifier.class);
+    }
+
+    /**
+     * Indicates whether the slot acts as the designator for its class.
+     * 
+     * @return <code>true</code> is the slot is the class’ type designator,
+     *         otherwise <code>false</code>.
+     */
+    public boolean isTypeDesignator() {
+        return field.isAnnotationPresent(TypeDesignator.class);
     }
 
     /**

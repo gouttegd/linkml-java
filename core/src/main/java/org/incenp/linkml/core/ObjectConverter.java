@@ -42,10 +42,12 @@ public class ObjectConverter implements IConverter {
     private final static String CREATE_ERROR = "Cannot create object of type '%s'";
     private final static String NO_IDENTIFIER = "Missing identifier for type '%s'";
     private final static String NO_SIMPLE_DICT = "Type '%s' is not compatible with simple dict inlining";
+    private final static String UNKNOWN_TYPE = "Unknown designated type '%s'";
 
     private Class<?> targetType;
     private Map<String, Slot> slots = new HashMap<>();
     private Slot identifierSlot;
+    private Slot designatorSlot;
     private Slot extensionSlot;
     private Slot primarySlot;
 
@@ -62,6 +64,8 @@ public class ObjectConverter implements IConverter {
                 identifierSlot = slot;
             } else if ( slot.isExtensionStore() ) {
                 extensionSlot = slot;
+            } else if ( slot.isTypeDesignator() ) {
+                designatorSlot = slot;
             }
         }
         primarySlot = Slot.getPrimaryValueSlot(slots.values());
@@ -96,6 +100,17 @@ public class ObjectConverter implements IConverter {
      */
     public boolean hasIdentifier() {
         return identifierSlot != null;
+    }
+
+    /**
+     * Indicates whether the class this converter is intended for has a type
+     * designator slot.
+     * <p>
+     * A “type designator slot” is a slot that references the exact class of an
+     * instance of an object.
+     */
+    public boolean hasTypeDesignator() {
+        return designatorSlot != null;
     }
 
     /**
@@ -175,6 +190,33 @@ public class ObjectConverter implements IConverter {
      *                                found within the raw map.
      */
     public Object convert(Map<String, Object> raw, ConverterContext ctx) throws LinkMLRuntimeException {
+        ObjectConverter conv = this;
+        if ( hasTypeDesignator() ) {
+            // FIXME: Several issues here.
+            // First, we only supporting referencing a type by name. According to the LinkML
+            // doc, a type designator can also be a URI (or a CURIE), in which case it
+            // refers to the class by its class URI.
+            // Second, we assume that all classes derived from a LinkML schema lives in the
+            // same package. This is not ideal but, if all we have to refer to a class is an
+            // unqualified name, it does not seem like an unreasonable assumption.
+            // Third, LinkML allows the type designator slot to be multivalued, in which
+            // case we should pick “the most specific class” among all the classes listed
+            // (what to do if the list contains several classes at the same inheritance
+            // level is unspecified). Currently we only support the single-valued case.
+            Object designator = raw.get(designatorSlot.getLinkMLName());
+            if ( designator != null ) {
+                String pkgName = getType().getPackage().getName();
+                String clsName = toString(designator);
+                try {
+                    Class<?> designatedType = Class.forName(pkgName + "." + clsName);
+                    conv = (ObjectConverter) ctx.getConverter(designatedType);
+                } catch ( ClassNotFoundException e ) {
+                    // We treat that as a value error because providing a correct name in the class
+                    // designator is the responsibility of whoever produced the data.
+                    throw new LinkMLValueError(String.format(UNKNOWN_TYPE, pkgName));
+                }
+            }
+        }
         String id = null;
         if ( hasIdentifier() ) {
             Object identifier = raw.get(identifierSlot.getLinkMLName());
@@ -183,7 +225,7 @@ public class ObjectConverter implements IConverter {
             }
             id = identifier.toString();
         }
-        return convert(raw, id, ctx);
+        return conv.convert(raw, id, ctx);
     }
 
     /**
