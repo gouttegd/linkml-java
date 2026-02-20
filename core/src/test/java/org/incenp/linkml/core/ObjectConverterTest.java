@@ -34,6 +34,7 @@ import org.incenp.linkml.core.sample.ContainerOfSimpleObjects;
 import org.incenp.linkml.core.sample.ExtensibleSimpleClass;
 import org.incenp.linkml.core.sample.ExtraSimpleDict;
 import org.incenp.linkml.core.sample.MultivaluedSimpleDict;
+import org.incenp.linkml.core.sample.SampleEnum;
 import org.incenp.linkml.core.sample.SimpleClass;
 import org.incenp.linkml.core.sample.SimpleDict;
 import org.incenp.linkml.core.sample.SimpleIdentifiableClass;
@@ -55,6 +56,7 @@ public class ObjectConverterTest {
         Assertions.assertEquals("https://example.org/a/URI", sc.getBar().toString());
         Assertions.assertTrue(sc.getBaz());
         Assertions.assertEquals("a string in a list", sc.getFoos().get(0));
+        Assertions.assertEquals(SampleEnum.FOO, sc.getType());
 
         roundtrip(sc);
     }

@@ -18,30 +18,41 @@
 
 package org.incenp.linkml.core.sample;
 
-import java.net.URI;
-import java.util.List;
-
-import org.incenp.linkml.core.annotations.SlotName;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * An example of a simple class containing only scalar fields.
+ * An example of a simple LinkML enum.
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@SuperBuilder(toBuilder = true)
-@Data
-public class SimpleClass {
-    private String foo;
+public enum SampleEnum {
+    FOO("foo"),
+    BAR("bar"),
+    BAZ("baz");
 
-    @SlotName("the_bar")
-    private URI bar;
-    private Boolean baz;
-    private List<String> foos;
-    private SampleEnum type;
+    private static final Map<String, SampleEnum> MAP;
+
+    private String repr;
+
+    static {
+        Map<String, SampleEnum> map = new HashMap<>();
+        for ( SampleEnum value : SampleEnum.values() ) {
+            map.put(value.toString(), value);
+        }
+
+        MAP = Collections.unmodifiableMap(map);
+    }
+
+    SampleEnum(String s) {
+        repr = s;
+    }
+
+    @Override
+    public String toString() {
+        return repr;
+    }
+
+    public static SampleEnum fromString(String s) {
+        return MAP.get(s);
+    }
 }

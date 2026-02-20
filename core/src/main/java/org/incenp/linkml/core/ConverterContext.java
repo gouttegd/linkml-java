@@ -111,7 +111,11 @@ public class ConverterContext {
         } else {
             conv = converters.get(type);
             if ( conv == null ) {
-                conv = new ObjectConverter(type);
+                if ( type.isEnum() ) {
+                    conv = new EnumConverter(type);
+                } else {
+                    conv = new ObjectConverter(type);
+                }
                 converters.put(type, conv);
             }
         }

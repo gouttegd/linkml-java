@@ -1,6 +1,7 @@
 foo: a string
 the_bar: https://example.org/a/URI
 baz: true
+type: foo
 foos:
   - a string in a list
 unknown1: unknown string
