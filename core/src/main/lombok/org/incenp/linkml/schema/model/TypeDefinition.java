@@ -20,8 +20,7 @@ package org.incenp.linkml.schema.model;
 
 import org.incenp.linkml.core.CurieConverter;
 import org.incenp.linkml.core.annotations.Converter;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.incenp.linkml.core.annotations.SlotName;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -39,14 +38,14 @@ import lombok.experimental.SuperBuilder;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class TypeDefinition extends Element {
-    @JsonProperty("typeof")
+    @SlotName("typeof")
     private TypeDefinition typeOf;
 
     private String base;
 
     private String repr;
 
-    @JsonProperty("type_uri")
+    @SlotName("type_uri")
     @Converter(CurieConverter.class)
     private String URI;
 }

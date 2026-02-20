@@ -24,9 +24,8 @@ import org.incenp.linkml.core.CurieConverter;
 import org.incenp.linkml.core.InliningMode;
 import org.incenp.linkml.core.annotations.Converter;
 import org.incenp.linkml.core.annotations.Inlining;
+import org.incenp.linkml.core.annotations.SlotName;
 import org.incenp.linkml.schema.ClassDefinitionConverter;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -48,14 +47,14 @@ import lombok.experimental.SuperBuilder;
 public class ClassDefinition extends Definition {
     private List<SlotDefinition> slots;
 
-    @JsonProperty("slot_usage")
+    @SlotName("slot_usage")
     @Inlining(InliningMode.DICT)
     private List<SlotDefinition> slotUsage;
 
     @Inlining(InliningMode.DICT)
     private List<SlotDefinition> attributes;
 
-    @JsonProperty("class_uri")
+    @SlotName("class_uri")
     @Converter(CurieConverter.class)
     private String URI;
 

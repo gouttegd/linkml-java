@@ -22,8 +22,7 @@ import java.util.List;
 
 import org.incenp.linkml.core.CurieConverter;
 import org.incenp.linkml.core.annotations.Converter;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.incenp.linkml.core.annotations.SlotName;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -42,10 +41,10 @@ import lombok.experimental.SuperBuilder;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class EnumDefinition extends Definition {
-    @JsonProperty("permissible_values")
+    @SlotName("permissible_values")
     private List<PermissibleValue> permissibleValues;
 
-    @JsonProperty("enum_uri")
+    @SlotName("enum_uri")
     @Converter(CurieConverter.class)
     private String URI;
 }

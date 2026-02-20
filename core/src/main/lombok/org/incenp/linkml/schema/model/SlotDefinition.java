@@ -20,8 +20,7 @@ package org.incenp.linkml.schema.model;
 
 import org.incenp.linkml.core.CurieConverter;
 import org.incenp.linkml.core.annotations.Converter;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.incenp.linkml.core.annotations.SlotName;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -40,10 +39,10 @@ import lombok.experimental.SuperBuilder;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SlotDefinition extends Definition {
-    @JsonProperty("identifier")
+    @SlotName("identifier")
     private Boolean isIdentifier;
 
-    @JsonProperty("designates_type")
+    @SlotName("designates_type")
     private Boolean isTypeDesignator;
 
     private Element range;
@@ -56,10 +55,10 @@ public class SlotDefinition extends Definition {
 
     private Boolean inlined;
 
-    @JsonProperty("inlined_as_list")
+    @SlotName("inlined_as_list")
     private Boolean inlinedAsList;
 
-    @JsonProperty("slot_uri")
+    @SlotName("slot_uri")
     @Converter(CurieConverter.class)
     private String URI;
 

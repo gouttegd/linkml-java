@@ -16,31 +16,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.incenp.linkml.core.sample;
+package org.incenp.linkml.core.annotations;
 
-import java.net.URI;
-import java.util.List;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import org.incenp.linkml.core.annotations.SlotName;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
- * An example of a simple class containing only scalar fields.
+ * An annotation to indicate the original name of a slot in the defining LinkML
+ * schema.
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@SuperBuilder(toBuilder = true)
-@Data
-public class SimpleClass {
-    private String foo;
-
-    @SlotName("the_bar")
-    private URI bar;
-    private Boolean baz;
-    private List<String> foos;
+@Retention(RUNTIME)
+@Target(FIELD)
+public @interface SlotName {
+    String value();
 }

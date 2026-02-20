@@ -22,8 +22,7 @@ import org.incenp.linkml.core.RequirementLevel;
 import org.incenp.linkml.core.annotations.Identifier;
 import org.incenp.linkml.core.annotations.LinkURI;
 import org.incenp.linkml.core.annotations.Requirement;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.incenp.linkml.core.annotations.SlotName;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -47,12 +46,12 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @Data
 public class Prefix {
-    @JsonProperty("prefix_prefix")
+    @SlotName("prefix_prefix")
     @Identifier
     @LinkURI("https://www.w3.org/ns/shacl#prefix")
     private String prefixName;
 
-    @JsonProperty("prefix_reference")
+    @SlotName("prefix_reference")
     @Requirement(RequirementLevel.MANDATORY)
     @LinkURI("http://www.w3.org/ns/shacl#namespace")
     private String iriPrefix;

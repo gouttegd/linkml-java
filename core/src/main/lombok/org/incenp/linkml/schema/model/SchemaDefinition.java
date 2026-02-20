@@ -27,9 +27,8 @@ import org.incenp.linkml.core.annotations.Converter;
 import org.incenp.linkml.core.annotations.Inlining;
 import org.incenp.linkml.core.annotations.LinkURI;
 import org.incenp.linkml.core.annotations.Requirement;
+import org.incenp.linkml.core.annotations.SlotName;
 import org.incenp.linkml.schema.SchemaDefinitionConverter;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -62,10 +61,10 @@ public class SchemaDefinition extends Element {
     @Inlining(InliningMode.SIMPLE_DICT)
     private List<Prefix> prefixes;
 
-    @JsonProperty("default_prefix")
+    @SlotName("default_prefix")
     private String defaultPrefix;
 
-    @JsonProperty("default_range")
+    @SlotName("default_range")
     private TypeDefinition defaultRange;
 
     private List<String> imports;
@@ -76,7 +75,7 @@ public class SchemaDefinition extends Element {
     @Inlining(InliningMode.DICT)
     private List<EnumDefinition> enums;
 
-    @JsonProperty("slot_definitions")
+    @SlotName("slot_definitions")
     @Inlining(InliningMode.DICT)
     private List<SlotDefinition> slotDefinitions;
 

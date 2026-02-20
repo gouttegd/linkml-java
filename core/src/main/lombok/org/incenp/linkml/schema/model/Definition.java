@@ -20,7 +20,7 @@ package org.incenp.linkml.schema.model;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.incenp.linkml.core.annotations.SlotName;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -38,10 +38,10 @@ import lombok.experimental.SuperBuilder;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public abstract class Definition extends Element {
-    @JsonProperty("is_a")
+    @SlotName("is_a")
     private Definition parent;
 
-    @JsonProperty("abstract")
+    @SlotName("abstract")
     private Boolean isAbstract;
 
     private Boolean mixin;

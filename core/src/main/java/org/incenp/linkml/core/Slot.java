@@ -31,8 +31,7 @@ import org.incenp.linkml.core.annotations.ExtensionHolder;
 import org.incenp.linkml.core.annotations.Identifier;
 import org.incenp.linkml.core.annotations.Inlining;
 import org.incenp.linkml.core.annotations.Requirement;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.incenp.linkml.core.annotations.SlotName;
 
 /**
  * Represents a “slot” (that is, a field) on a specific LinkML object.
@@ -87,7 +86,7 @@ public class Slot {
      * @return The original LinkML name.
      */
     public String getLinkMLName() {
-        JsonProperty propertyAnnotation = field.getAnnotation(JsonProperty.class);
+        SlotName propertyAnnotation = field.getAnnotation(SlotName.class);
         if ( propertyAnnotation != null ) {
             return propertyAnnotation.value();
         } else {
