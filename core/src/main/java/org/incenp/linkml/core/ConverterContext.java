@@ -297,6 +297,12 @@ public class ConverterContext {
      * {@link #getObjects(Slot, List, Object)} methods, which could not be performed
      * at the time that method was called because the requested object was not known
      * to the context yet.
+     * <p>
+     * If a referenced object is still unknown when delayed assignments are
+     * performed, an empty object of the desired type and with the referenced
+     * identifier will be automatically created. Use
+     * {@link #finalizeAssignments(boolean)} to treat missing references as an error
+     * instead.
      * 
      * @throws LinkMLRuntimeException If an assignment cannot be performed.
      */
@@ -322,12 +328,16 @@ public class ConverterContext {
             Object value = getObject(da.type, da.name, false);
             if ( value != null ) {
                 da.setValue(value);
-            } else if ( failOnMissing ) {
+            } else {
                 // Check if there is another object with that name
                 if ( getObject(Object.class, da.name, false) != null ) {
                     throw new LinkMLValueError(String.format("Cannot dereference '%s': invalid type", da.name));
-                } else {
+                } else if ( failOnMissing ) {
                     throw new LinkMLValueError(String.format("Cannot dereference '%s': no such object", da.name));
+                } else {
+                    // Create an empty object
+                    value = getObject(da.type, da.name, true);
+                    da.setValue(value);
                 }
             }
         }

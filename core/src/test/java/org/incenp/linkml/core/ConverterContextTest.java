@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.incenp.linkml.core.sample.ContainerOfReferences;
+import org.incenp.linkml.core.sample.SimpleDict;
 import org.incenp.linkml.core.sample.SimpleIdentifiableClass;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -92,5 +93,45 @@ public class ConverterContextTest {
         // Now we should get both "sic1" and "sic2"
         Assertions.assertEquals(2, list.size());
         Assertions.assertTrue(sic2 == list.get(1));
+    }
+
+    @Test
+    void testFailingOnInvalidReferences() throws LinkMLRuntimeException {
+        ConverterContext ctx = new ConverterContext();
+
+        ContainerOfReferences cor = new ContainerOfReferences();
+        Slot singleSlot = Slot.getSlot(ContainerOfReferences.class, "single");
+
+        ctx.getObject(singleSlot, "sic1", cor);
+        Assertions.assertNull(cor.getSingle());
+        try {
+            ctx.finalizeAssignments(true);
+            Assertions.fail("Exception not thrown for a missing reference");
+        } catch ( LinkMLRuntimeException e ) {
+            Assertions.assertEquals("Cannot dereference 'sic1': no such object", e.getMessage());
+        }
+
+        ctx.getObject(SimpleDict.class, "sic1", true);
+        try {
+            ctx.finalizeAssignments();
+            Assertions.fail("Exception not thrown for an invalid reference");
+        } catch ( LinkMLRuntimeException e ) {
+            Assertions.assertEquals("Cannot dereference 'sic1': invalid type", e.getMessage());
+        }
+    }
+
+    @Test
+    void testCreatingEmptyObjectsOnDereferencing() throws LinkMLRuntimeException {
+        ConverterContext ctx = new ConverterContext();
+
+        ContainerOfReferences cor = new ContainerOfReferences();
+        Slot singleSlot = Slot.getSlot(ContainerOfReferences.class, "single");
+
+        ctx.getObject(singleSlot, "sic1", cor);
+        Assertions.assertNull(cor.getSingle());
+
+        ctx.finalizeAssignments();
+        Assertions.assertNotNull(cor.getSingle());
+        Assertions.assertEquals("sic1", cor.getSingle().getId());
     }
 }
