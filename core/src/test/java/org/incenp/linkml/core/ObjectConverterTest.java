@@ -27,6 +27,7 @@ import java.util.Map;
 import org.incenp.linkml.core.sample.BaseSelfDesignatedClass;
 import org.incenp.linkml.core.sample.ClassWithCustomConverter;
 import org.incenp.linkml.core.sample.ContainerOfBooleanValues;
+import org.incenp.linkml.core.sample.ContainerOfIRIIdentifiableObjects;
 import org.incenp.linkml.core.sample.ContainerOfInlinedObjects;
 import org.incenp.linkml.core.sample.ContainerOfIntegerValues;
 import org.incenp.linkml.core.sample.ContainerOfReferences;
@@ -35,6 +36,7 @@ import org.incenp.linkml.core.sample.ContainerOfSimpleObjects;
 import org.incenp.linkml.core.sample.DerivedSelfDesignatedClass;
 import org.incenp.linkml.core.sample.ExtensibleSimpleClass;
 import org.incenp.linkml.core.sample.ExtraSimpleDict;
+import org.incenp.linkml.core.sample.IRISimpleIdentifiableClass;
 import org.incenp.linkml.core.sample.MultivaluedSimpleDict;
 import org.incenp.linkml.core.sample.SampleEnum;
 import org.incenp.linkml.core.sample.SimpleClass;
@@ -278,6 +280,68 @@ public class ObjectConverterTest {
         Assertions.assertEquals("DerivedSelfDesignatedClass", dsdc.getType());
 
         roundtrip(bsdc);
+    }
+
+    @Test
+    void testReferenceToIRIIdentifiers() throws IOException, LinkMLRuntimeException {
+        ctx.addPrefix("PFX", "https://example.org/");
+        String text = "id: PFX:0001\nfoo: A string\n";
+        IRISimpleIdentifiableClass isic = parseString(text, IRISimpleIdentifiableClass.class);
+
+        Assertions.assertEquals("A string", isic.getFoo());
+        Assertions.assertEquals("https://example.org/0001", isic.getId());
+
+        text = "singleReference: PFX:0001";
+        ContainerOfIRIIdentifiableObjects coii = parseString(text, ContainerOfIRIIdentifiableObjects.class);
+        Assertions.assertTrue(isic == coii.getSingleReference());
+
+        // Test that the identifiers are shortened back upon serialisation
+        ObjectConverter conv = (ObjectConverter) ctx.getConverter(ContainerOfIRIIdentifiableObjects.class);
+        Map<String, Object> raw = conv.serialise(coii, false, ctx);
+        Assertions.assertEquals("PFX:0001", raw.get("singleReference"));
+        conv = (ObjectConverter) ctx.getConverter(IRISimpleIdentifiableClass.class);
+        raw = conv.serialise(isic, true, ctx);
+        Assertions.assertEquals("PFX:0001", raw.get("id"));
+
+        // Now test with forward references
+        ctx = new ConverterContext();
+        ctx.addPrefix("PFX", "https://example.org/");
+        coii = parseString(text, ContainerOfIRIIdentifiableObjects.class);
+        isic = parseString("id: PFX:0001\nfoo: A string", IRISimpleIdentifiableClass.class);
+        Assertions.assertNull(coii.getSingleReference());
+        ctx.finalizeAssignments();
+        Assertions.assertEquals("https://example.org/0001", coii.getSingleReference().getId());
+        Assertions.assertTrue(isic == coii.getSingleReference());
+
+        // Now with multi-valued slots
+        ctx = new ConverterContext();
+        ctx.addPrefix("PFX", "https://example.org/");
+        isic = parseString("id: PFX:0003\nfoo: A string", IRISimpleIdentifiableClass.class);
+        coii = parseString("multipleReferences:\n  - PFX:0003\n", ContainerOfIRIIdentifiableObjects.class);
+        Assertions.assertEquals("https://example.org/0003", isic.getId());
+        Assertions.assertTrue(isic == coii.getMultipleReferences().get(0));
+
+        // Multi-valued slots with forward references
+        ctx = new ConverterContext();
+        ctx.addPrefix("PFX", "https://example.org");
+        coii = parseString("multipleReferences:\n  - PFX:0004\n", ContainerOfIRIIdentifiableObjects.class);
+        isic = parseString("id: PFX:0004\nfoo: A string", IRISimpleIdentifiableClass.class);
+        Assertions.assertTrue(coii.getMultipleReferences().isEmpty());
+        ctx.finalizeAssignments();
+        Assertions.assertTrue(isic == coii.getMultipleReferences().get(0));
+    }
+
+    @Test
+    void testInliningWithIRIIdentifiers() throws IOException {
+        ctx.addPrefix("PFX", "https://example.org/");
+        ContainerOfIRIIdentifiableObjects coii = parseString("multipleInlinedAsList:\n  - id: PFX:0001\n",
+                ContainerOfIRIIdentifiableObjects.class);
+        Assertions.assertEquals("https://example.org/0001", coii.getMultipleInlinedAsList().get(0).getId());
+
+        coii = parseString("multipleInlinedAsDict:\n  PFX:0002:\n    foo: A string\n",
+                ContainerOfIRIIdentifiableObjects.class);
+        Assertions.assertEquals("https://example.org/0002", coii.getMultipleInlinedAsDict().get(0).getId());
+        roundtrip(coii);
     }
 
     private <T> T parse(String file, Class<T> target) throws IOException {

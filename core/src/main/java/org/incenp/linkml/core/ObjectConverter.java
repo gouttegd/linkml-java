@@ -37,7 +37,6 @@ public class ObjectConverter implements IConverter {
     private final static String MAP_EXPECTED = "Invalid value type, map expected";
     private final static String LIST_EXPECTED = "Invalid value type, list expected";
     private final static String STRING_EXPECTED = "Invalid value type, string expected";
-    private final static String SCALAR_EXPECTED = "Invalid value type, scalar expected";
     private final static String OBJECT_EXPECTED = "Invalid value type, '%s' expected";
     private final static String CREATE_ERROR = "Cannot create object of type '%s'";
     private final static String NO_IDENTIFIER = "Missing identifier for type '%s'";
@@ -206,7 +205,7 @@ public class ObjectConverter implements IConverter {
             Object designator = raw.get(designatorSlot.getLinkMLName());
             if ( designator != null ) {
                 String pkgName = getType().getPackage().getName();
-                String clsName = toString(designator);
+                String clsName = ctx.getConverter(designatorSlot).convert(designator, ctx).toString();
                 try {
                     Class<?> designatedType = Class.forName(pkgName + "." + clsName);
                     conv = (ObjectConverter) ctx.getConverter(designatedType);
@@ -223,7 +222,7 @@ public class ObjectConverter implements IConverter {
             if ( identifier == null ) {
                 throw new LinkMLValueError(String.format(NO_IDENTIFIER, targetType.getName()));
             }
-            id = identifier.toString();
+            id = getIdentifier(identifier, ctx);
         }
         return conv.convert(raw, id, ctx);
     }
@@ -278,7 +277,7 @@ public class ObjectConverter implements IConverter {
             if ( hasIdentifier() ) {
                 switch ( slot.getInliningMode() ) {
                 case NO_INLINING:
-                    ctx.getObjects(targetType, toStringList(raw), value);
+                    ctx.getObjects(targetType, getIdentifierList(raw, ctx), value);
                     break;
 
                 case LIST:
@@ -291,9 +290,9 @@ public class ObjectConverter implements IConverter {
                     for ( Map.Entry<String, Object> rawItem : toMap(raw).entrySet() ) {
                         Object item = null;
                         if ( rawItem.getValue() == null ) {
-                            item = ctx.getObject(targetType, rawItem.getKey(), true);
+                            item = ctx.getObject(targetType, getIdentifier(rawItem.getKey(), ctx), true);
                         } else {
-                            item = convert(toMap(rawItem.getValue()), rawItem.getKey(), ctx);
+                            item = convert(toMap(rawItem.getValue()), getIdentifier(rawItem.getKey(), ctx), ctx);
                         }
                         value.add(item);
                     }
@@ -306,7 +305,7 @@ public class ObjectConverter implements IConverter {
                     }
                     IConverter primaryConv = ctx.getConverter(primarySlot);
                     for ( Map.Entry<String, Object> rawItem : toMap(raw).entrySet() ) {
-                        Object item = ctx.getObject(targetType, rawItem.getKey(), true);
+                        Object item = ctx.getObject(targetType, getIdentifier(rawItem.getKey(), ctx), true);
                         primaryConv.convertForSlot(rawItem.getValue(), item, primarySlot, ctx);
                         value.add(item);
                     }
@@ -323,13 +322,57 @@ public class ObjectConverter implements IConverter {
         } else {
             // Single-valued object
             if ( hasIdentifier() && slot.getInliningMode() == InliningMode.NO_INLINING ) {
-                ctx.getObject(slot, toString(raw), dest);
+                ctx.getObject(slot, getIdentifier(raw, ctx), dest);
             } else {
                 // Non-identifiable object or inlined identifiable object; in both cases, can
                 // only be expected to be represented as a map
                 slot.setValue(dest, convert(toMap(raw), ctx));
             }
         }
+    }
+
+    /**
+     * Converts the given raw object into an identifier for the target object type.
+     * <p>
+     * This invokes whatever converter is configured for the identifier slot of the
+     * target type. Most often it should be the {@link StringConverter} (as
+     * identifier slots are mostly expected to be string-typed), but it could also
+     * be the {@link CurieConverter}, if the identifier slot is typed as a
+     * <code>uriOrCurie</code>.
+     * 
+     * @param raw The raw identifier to convert.
+     * @param ctx The global converter context.
+     * @return The converted identifier.
+     * @throws LinkMLRuntimeException If any error occurs during the conversion
+     *                                attempt.
+     */
+    protected String getIdentifier(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
+        return ctx.getConverter(identifierSlot).convert(raw, ctx).toString();
+    }
+
+    /**
+     * Converts the given list of raw objects into identifiers for the target object
+     * type.
+     * <p>
+     * This method does basically the same thing as
+     * {@link #getIdentifier(Object, ConverterContext)} for every raw object in the
+     * provided list.
+     * 
+     * @param raw The raw object to convert. It is expected to be a list containing
+     *            the raw identifiers.
+     * @param ctx The global converter context.
+     * @return The list of converter identifiers.
+     * @throws LinkMLRuntimeException If any error occurs during the conversion
+     *                                attempt. This includes the case where the
+     *                                provided raw object is not a list.
+     */
+    protected List<String> getIdentifierList(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
+        IConverter conv = ctx.getConverter(identifierSlot);
+        ArrayList<String> list = new ArrayList<>();
+        for ( Object rawItem : toList(raw) ) {
+            list.add(conv.convert(rawItem, ctx).toString());
+        }
+        return list;
     }
 
     @Override
@@ -404,20 +447,20 @@ public class ObjectConverter implements IConverter {
                 for ( Object item : items ) {
                     Object rawItem = inlining == InliningMode.SIMPLE_DICT ? primarySlot.getValue(item)
                             : serialise(item, false, ctx);
-                    map.put(toIdentifier(item), rawItem);
+                    map.put(toIdentifier(item, ctx), rawItem);
                 }
                 return map;
             } else { // No inlining
                 List<Object> list = new ArrayList<>();
                 for ( Object item : items ) {
-                    list.add(toIdentifier(item));
+                    list.add(toIdentifier(item, ctx));
                 }
                 return list;
             }
         } else {
             // Single-valued object
             if ( hasIdentifier() && slot.getInliningMode() == InliningMode.NO_INLINING ) {
-                return toIdentifier(object);
+                return toIdentifier(object, ctx);
             } else {
                 // Non-identifiable object or inlined identifiable object; in both cases, can
                 // only be serialised as a map
@@ -434,7 +477,7 @@ public class ObjectConverter implements IConverter {
      * @throws LinkMLRuntimeException If the object is not of the expected type, or
      *                                if it has no identifier value.
      */
-    protected Object toIdentifier(Object object) throws LinkMLRuntimeException {
+    protected Object toIdentifier(Object object, ConverterContext ctx) throws LinkMLRuntimeException {
         if ( !targetType.isInstance(object) ) {
             throw new LinkMLValueError(String.format(OBJECT_EXPECTED, targetType.getName()));
         }
@@ -442,7 +485,7 @@ public class ObjectConverter implements IConverter {
         if ( identifier == null ) {
             throw new LinkMLValueError(String.format(NO_IDENTIFIER, targetType.getName()));
         }
-        return identifier;
+        return ctx.getConverter(identifierSlot).serialise(identifier, ctx);
     }
 
     /**
@@ -479,47 +522,5 @@ public class ObjectConverter implements IConverter {
             throw new LinkMLValueError(LIST_EXPECTED);
         }
         return (List<Object>) value;
-    }
-
-    /**
-     * Checks that a raw object is a list of scalars, and converts it to a list of
-     * strings.
-     * 
-     * @param value The raw object to check and convert.
-     * @return A list of strings. Note that this is a <em>new</em> list, not the
-     *         original object.
-     * @throws LinkMLRuntimeException If the raw object is not a list of scalar
-     *                                values.
-     */
-    @SuppressWarnings("unchecked")
-    protected List<String> toStringList(Object value) throws LinkMLRuntimeException {
-        if ( !(value instanceof List) ) {
-            throw new LinkMLValueError(LIST_EXPECTED);
-        }
-        ArrayList<String> list = new ArrayList<>();
-        for ( Object rawItem : (List<Object>) value ) {
-            if ( rawItem instanceof List || rawItem instanceof Map ) {
-                throw new LinkMLValueError(SCALAR_EXPECTED);
-            }
-            list.add(rawItem.toString());
-        }
-        return list;
-    }
-
-    /**
-     * Checks that a raw object is a scalar value, and converts it to a string.
-     * <p>
-     * For the purpose of the converter, a <em>scalar</em> value is anything that is
-     * neither a list nor a map.
-     * 
-     * @param value The raw object to check and convert.
-     * @return The string value of the raw object.
-     * @throws LinkMLRuntimeException If the raw object is not a scalar value.
-     */
-    protected String toString(Object value) throws LinkMLRuntimeException {
-        if ( value instanceof List || value instanceof Map ) {
-            throw new LinkMLValueError(SCALAR_EXPECTED);
-        }
-        return value.toString();
     }
 }
