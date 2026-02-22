@@ -30,6 +30,7 @@ import org.incenp.linkml.core.annotations.Converter;
 import org.incenp.linkml.core.annotations.ExtensionHolder;
 import org.incenp.linkml.core.annotations.Identifier;
 import org.incenp.linkml.core.annotations.Inlining;
+import org.incenp.linkml.core.annotations.LinkURI;
 import org.incenp.linkml.core.annotations.Requirement;
 import org.incenp.linkml.core.annotations.SlotName;
 import org.incenp.linkml.core.annotations.TypeDesignator;
@@ -113,6 +114,23 @@ public class Slot {
      */
     public boolean isTypeDesignator() {
         return field.isAnnotationPresent(TypeDesignator.class);
+    }
+
+    /**
+     * Gets the URI that identifies the slot.
+     * <p>
+     * The “Link URI” is especially intended to be used for import/export from/to
+     * RDF, but it may have other uses as well.
+     * <p>
+     * Since we do not have access to the defining schema, we are entirely dependent
+     * on the presence of a {@link LinkURI} annotation, which should have been
+     * inserted by the code generator.
+     * 
+     * @return The link URI for the slot.
+     */
+    public String getLinkedURI() {
+        LinkURI annot = field.getAnnotation(LinkURI.class);
+        return annot != null ? annot.value() : null;
     }
 
     /**

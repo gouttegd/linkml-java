@@ -48,7 +48,7 @@ import lombok.experimental.SuperBuilder;
 public class Prefix {
     @SlotName("prefix_prefix")
     @Identifier
-    @LinkURI("https://www.w3.org/ns/shacl#prefix")
+    @LinkURI("http://www.w3.org/ns/shacl#prefix")
     private String prefixName;
 
     @SlotName("prefix_reference")

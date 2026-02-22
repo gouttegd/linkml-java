@@ -49,6 +49,7 @@ public class ObjectConverter implements IConverter {
     private Slot designatorSlot;
     private Slot extensionSlot;
     private Slot primarySlot;
+    private PrefixDeclarationExtractor prefixExtractor;
 
     /**
      * Creates a new converter for objects of the specified type.
@@ -68,6 +69,7 @@ public class ObjectConverter implements IConverter {
             }
         }
         primarySlot = Slot.getPrimaryValueSlot(slots.values());
+        prefixExtractor = PrefixDeclarationExtractor.getExtractor(slots.values());
     }
 
     @Override
@@ -124,6 +126,13 @@ public class ObjectConverter implements IConverter {
      *                                cannot be assigned.
      */
     public void convertTo(Map<String, Object> rawMap, Object dest, ConverterContext ctx) throws LinkMLRuntimeException {
+        // If this object has a prefix expansion slot, process it before everything else
+        if ( prefixExtractor != null ) {
+            for ( Map.Entry<String, String> prefix : prefixExtractor.extractPrefixes(rawMap, dest, ctx).entrySet() ) {
+                ctx.addPrefix(prefix.getKey(), prefix.getValue());
+            }
+        }
+
         Map<String, Object> extensions = null;
         for ( Map.Entry<String, Object> entry : rawMap.entrySet() ) {
             Slot slot = slots.get(entry.getKey());

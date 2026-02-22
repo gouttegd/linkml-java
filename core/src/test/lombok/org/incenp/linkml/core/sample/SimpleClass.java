@@ -21,6 +21,7 @@ package org.incenp.linkml.core.sample;
 import java.net.URI;
 import java.util.List;
 
+import org.incenp.linkml.core.annotations.LinkURI;
 import org.incenp.linkml.core.annotations.SlotName;
 
 import lombok.AccessLevel;
@@ -41,6 +42,8 @@ public class SimpleClass {
 
     @SlotName("the_bar")
     private URI bar;
+
+    @LinkURI("https://example.org/baz")
     private Boolean baz;
     private List<String> foos;
     private SampleEnum type;

@@ -52,6 +52,12 @@ public class SlotTest {
     }
 
     @Test
+    void testGetLinkURI() throws LinkMLRuntimeException {
+        Slot bazSlot = Slot.getSlot(SimpleClass.class, "baz");
+        Assertions.assertEquals("https://example.org/baz", bazSlot.getLinkedURI());
+    }
+
+    @Test
     void testIsIdentifier() throws LinkMLRuntimeException {
         Slot identifierSlot = Slot.getSlot(SimpleIdentifiableClass.class, "id");
         Assertions.assertTrue(identifierSlot.isIdentifier());
