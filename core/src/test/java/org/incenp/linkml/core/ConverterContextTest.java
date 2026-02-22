@@ -113,10 +113,10 @@ public class ConverterContextTest {
 
         ctx.getObject(SimpleDict.class, "sic1", true);
         try {
-            ctx.finalizeAssignments();
+            ctx.finalizeAssignments(true);
             Assertions.fail("Exception not thrown for an invalid reference");
         } catch ( LinkMLRuntimeException e ) {
-            Assertions.assertEquals("Cannot dereference 'sic1': invalid type", e.getMessage());
+            Assertions.assertEquals("Cannot dereference 'sic1': no such object", e.getMessage());
         }
     }
 

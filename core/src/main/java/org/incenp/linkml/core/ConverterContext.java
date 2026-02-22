@@ -237,7 +237,9 @@ public class ConverterContext {
      *               if an object with that name did not already exist.
      * @return The dereferenced object, or <code>null</code> if the object did not
      *         already exist and <code>create</code> is <code>false</code>.
-     * @throws LinkMLRuntimeException If we cannot create the object as needed.
+     * @throws LinkMLRuntimeException If the object type is not suitable for global
+     *                                objects, or if we cannot create the object as
+     *                                needed.
      */
     public <T> T getObject(Class<T> type, String name, boolean create) throws LinkMLRuntimeException {
         return objectCache.getObject(type, name, create);
@@ -254,8 +256,9 @@ public class ConverterContext {
      * @param target The object to which to assign the dereferenced object.
      * @return The dereferenced object, or <code>null</code> if the object does not
      *         exist in the context at the time this method is called.
-     * @throws LinkMLRuntimeException If the retrieved object cannot be assigned to
-     *                                the slot.
+     * @throws LinkMLRuntimeException If the object type is not suitable for global
+     *                                objects, or if the retrieved object cannot be
+     *                                assigned to the slot.
      */
     public Object getObject(Slot slot, String name, Object target) throws LinkMLRuntimeException {
         Object value = objectCache.getObject(slot.getInnerType(), name, false);
@@ -277,8 +280,10 @@ public class ConverterContext {
      * @param type   The type of the objects to dereference.
      * @param names  The names to resolve into dereferenced objects.
      * @param target The list to which the dereferenced objects should be assigned.
+     * @throws LinkMLRuntimeException If the object type is not suitable for global
+     *                                objects.
      */
-    public void getObjects(Class<?> type, List<String> names, List<Object> target) {
+    public void getObjects(Class<?> type, List<String> names, List<Object> target) throws LinkMLRuntimeException {
         for ( String name : names ) {
             Object value = objectCache.getObject(type, name);
             if ( value == null ) {
@@ -328,17 +333,12 @@ public class ConverterContext {
             Object value = getObject(da.type, da.name, false);
             if ( value != null ) {
                 da.setValue(value);
+            } else if ( failOnMissing ) {
+                throw new LinkMLValueError(String.format("Cannot dereference '%s': no such object", da.name));
             } else {
-                // Check if there is another object with that name
-                if ( getObject(Object.class, da.name, false) != null ) {
-                    throw new LinkMLValueError(String.format("Cannot dereference '%s': invalid type", da.name));
-                } else if ( failOnMissing ) {
-                    throw new LinkMLValueError(String.format("Cannot dereference '%s': no such object", da.name));
-                } else {
-                    // Create an empty object
-                    value = getObject(da.type, da.name, true);
-                    da.setValue(value);
-                }
+                // Create an empty object
+                value = getObject(da.type, da.name, true);
+                da.setValue(value);
             }
         }
     }

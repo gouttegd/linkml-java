@@ -23,6 +23,7 @@ import java.util.HashMap;
 import org.incenp.linkml.core.sample.ContainerOfInlinedObjects;
 import org.incenp.linkml.core.sample.ContainerOfReferences;
 import org.incenp.linkml.core.sample.ContainerOfSimpleObjects;
+import org.incenp.linkml.core.sample.ExtensibleSimpleClass;
 import org.incenp.linkml.core.sample.ExtraSimpleDict;
 import org.incenp.linkml.core.sample.SimpleClass;
 import org.incenp.linkml.core.sample.SimpleDict;
@@ -124,5 +125,11 @@ public class SlotTest {
         Assertions.assertTrue(slots.containsKey("the_bar"));
         Assertions.assertTrue(slots.containsKey("baz"));
         Assertions.assertTrue(slots.containsKey("foos"));
+    }
+
+    @Test
+    void testDeclaringClass() throws LinkMLRuntimeException {
+        Slot identifierSlot = Slot.getSlot(ExtensibleSimpleClass.class, "foo");
+        Assertions.assertEquals(SimpleClass.class, identifierSlot.getDeclaringClass());
     }
 }

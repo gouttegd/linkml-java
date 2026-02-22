@@ -18,6 +18,7 @@
 
 package org.incenp.linkml.core;
 
+import org.incenp.linkml.core.sample.ExtendedIdentifiableClass;
 import org.incenp.linkml.core.sample.SimpleDict;
 import org.incenp.linkml.core.sample.SimpleIdentifiableClass;
 import org.junit.jupiter.api.Assertions;
@@ -56,5 +57,33 @@ public class ObjectCacheTest {
 
         SimpleDict sd = cache.getObject(SimpleDict.class, "sic1", false);
         Assertions.assertNull(sd);
+    }
+
+    @Test
+    void testCachingByType() throws LinkMLRuntimeException {
+        ObjectCache cache = new ObjectCache();
+        SimpleIdentifiableClass sic1 = cache.getObject(SimpleIdentifiableClass.class, "id1", true);
+
+        // We can store an object of a different type with the same ID
+        SimpleDict sd1 = cache.getObject(SimpleDict.class, "id1", true);
+
+        // We can retrieve the correct type of object
+        Object o1 = cache.getObject(SimpleIdentifiableClass.class, "id1");
+        Object o2 = cache.getObject(SimpleDict.class, "id1");
+        Assertions.assertTrue(o1 != o2);
+        Assertions.assertTrue(sic1 == o1);
+        Assertions.assertTrue(sd1 == o2);
+    }
+
+    @Test
+    void testChachingDerivedObjects() throws LinkMLRuntimeException {
+        ObjectCache cache = new ObjectCache();
+        // Caching an object of type ExtendedIdentifiableClass
+        ExtendedIdentifiableClass eic1 = cache.getObject(ExtendedIdentifiableClass.class, "id1", true);
+
+        // Retrieving it as a SimpleIdentifiableClass
+        SimpleIdentifiableClass sic1 = cache.getObject(SimpleIdentifiableClass.class, "id1");
+        Assertions.assertNotNull(sic1);
+        Assertions.assertTrue(eic1 == sic1);
     }
 }

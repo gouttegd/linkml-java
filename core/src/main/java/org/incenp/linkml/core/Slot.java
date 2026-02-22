@@ -193,6 +193,18 @@ public class Slot {
     }
 
     /**
+     * Gets the class in which the slot is declared.
+     * <p>
+     * If the slot has been inherited from a parent class, this will return that
+     * parent class.
+     * 
+     * @return The highest level class in which the slot is originally declared.
+     */
+    public Class<?> getDeclaringClass() {
+        return field.getDeclaringClass();
+    }
+
+    /**
      * Assigns a value to the slot for the given object.
      * 
      * @param target The LinkML object holding the slot.

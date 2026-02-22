@@ -34,7 +34,8 @@ public class ObjectCache {
     private static final String CREATE_ERROR = "Cannot create global object '%s' of type '%s'";
     private static final String NO_IDENTIFIER = "Missing identifier for type '%s'";
 
-    private Map<String, Object> cache = new HashMap<>();
+    private Map<Class<?>, Map<String, Object>> cache = new HashMap<>();
+    private Map<Class<?>, Slot> slotCache = new HashMap<>();
 
     /**
      * Looks up for an object with the specified name.
@@ -48,10 +49,25 @@ public class ObjectCache {
      *         <code>null</code> if (1) the object that was in the cache was not of
      *         the expected type, or (2) the object was not in the cache and
      *         <code>create</code> is <code>false</code>.
-     * @throws LinkMLRuntimeException If the object could not be created as needed.
+     * @throws LinkMLRuntimeException If the specified type of object is not one
+     *                                that can be cached (because it has no
+     *                                identifier slot), or if the object could not
+     *                                be created as needed.
      */
     public <T> T getObject(Class<T> type, String name, boolean create) throws LinkMLRuntimeException {
-        Object cached = cache.get(name);
+        Slot identifierSlot = getIdentifierSlot(type);
+        if ( identifierSlot == null ) {
+            throw new LinkMLInternalError(String.format(NO_IDENTIFIER, type.getName()));
+        }
+
+        Class<?> baseType = identifierSlot.getDeclaringClass();
+        Map<String, Object> typeCache = cache.get(baseType);
+        if ( typeCache == null ) {
+            typeCache = new HashMap<>();
+            cache.put(baseType, typeCache);
+        }
+
+        Object cached = typeCache.get(name);
         if ( cached != null ) {
             return type.isInstance(cached) ? type.cast(cached) : null;
         }
@@ -66,12 +82,8 @@ public class ObjectCache {
             throw new LinkMLInternalError(String.format(CREATE_ERROR, name, type.getName()), e);
         }
 
-        Slot identifierSlot = Slot.getIdentifierSlot(type);
-        if ( identifierSlot == null ) {
-            throw new LinkMLInternalError(String.format(NO_IDENTIFIER, type.getName()));
-        }
         identifierSlot.setValue(cached, name);
-        cache.put(name, cached);
+        typeCache.put(name, cached);
 
         return type.cast(cached);
     }
@@ -84,10 +96,12 @@ public class ObjectCache {
      * @param name The name of the object to return.
      * @return The requested object, or <code>null</code> if the object was not in
      *         the cache or was not of the expected type.
+     * @throws LinkMLRuntimeException If the specified type of object is not one
+     *                                that can be cached, because it has no
+     *                                identifier slot.
      */
-    public <T> T getObject(Class<T> type, String name) {
-        Object cached = cache.get(name);
-        return cached != null && type.isInstance(cached) ? type.cast(cached) : null;
+    public <T> T getObject(Class<T> type, String name) throws LinkMLRuntimeException {
+        return getObject(type, name, false);
     }
 
     /**
@@ -95,5 +109,18 @@ public class ObjectCache {
      */
     public int getSize() {
         return cache.size();
+    }
+
+    private Slot getIdentifierSlot(Class<?> type) {
+        // Finding the identifier slot for a type requires iterating through all the
+        // fields for that type, so we keep a cache of identifier slots by type.
+        Slot slot = slotCache.get(type);
+        if ( slot == null ) {
+            slot = Slot.getIdentifierSlot(type);
+            if ( slot != null ) {
+                slotCache.put(type, slot);
+            }
+        }
+        return slot;
     }
 }
