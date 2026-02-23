@@ -284,7 +284,7 @@ public class ObjectConverterTest {
     }
 
     @Test
-    void testTypeDesignator() throws IOException {
+    void testTypeDesignator() throws IOException, LinkMLRuntimeException {
         String text = "foo: A string\nbar: Another string\ntype: DerivedSelfDesignatedClass\n";
         BaseSelfDesignatedClass bsdc = parseString(text, BaseSelfDesignatedClass.class);
 
@@ -295,6 +295,14 @@ public class ObjectConverterTest {
         Assertions.assertEquals("DerivedSelfDesignatedClass", dsdc.getType());
 
         roundtrip(bsdc);
+
+        // Try serialising again, but this time with the type designator slot unset; the
+        // type designator should still appear in the serialised object
+        bsdc.setType(null);
+        ObjectConverter conv = (ObjectConverter) ctx.getConverter(bsdc.getClass());
+        Map<String, Object> raw = conv.serialise(bsdc, true, ctx);
+        Assertions.assertTrue(raw.containsKey("type"));
+        Assertions.assertEquals("DerivedSelfDesignatedClass", raw.get("type"));
     }
 
     @Test

@@ -435,9 +435,15 @@ public class ObjectConverter implements IConverter {
                 continue;
             }
 
-            Object slotValue = slot.getValue(object);
-            if ( slotValue == null ) {
-                continue;
+            Object slotValue;
+            if ( slot.isTypeDesignator() ) {
+                // Ignore whatever may be contained in the slot and use the actual type name
+                slotValue = targetType.getSimpleName();
+            } else {
+                slotValue = slot.getValue(object);
+                if ( slotValue == null ) {
+                    continue;
+                }
             }
 
             if ( slot.isExtensionStore() ) {
