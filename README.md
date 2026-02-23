@@ -36,6 +36,6 @@ repository and acts as a temporary home page.
 
 Copying
 -------
-LinkML-Java is distributed under the terms of the GNU General Public
-License, version 3 or higher. The full license is included in the
-[COPYING file](COPYING) of the source distribution.
+LinkML-Java is distributed under the terms of the 3-clause BSD license.
+The full license is included in the [COPYING file](COPYING) of the
+source distribution.
