@@ -33,6 +33,8 @@
 
 package org.incenp.linkml.core;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,7 +70,7 @@ import org.incenp.linkml.core.annotations.Converter;
 public class ConverterContext {
 
     private Map<Class<?>, IConverter> converters = new HashMap<>();
-    private Map<Class<?>, IConverter> customConverters = new HashMap<>();
+    private Map<Slot, IConverter> slotConverters = new HashMap<>();
     private ObjectCache objectCache = new ObjectCache();
     private List<DelayedAssignment> delayedAssignments = new ArrayList<>();
     private Map<String, String> prefixMap = new HashMap<>();
@@ -119,20 +121,26 @@ public class ConverterContext {
      * @throws LinkMLInternalError
      */
     public IConverter getConverter(Class<?> type) throws LinkMLRuntimeException {
-        IConverter conv = null;
-        Converter annot = type.getAnnotation(Converter.class);
-        if ( annot != null ) {
-            conv = getCustomConverter(annot.value());
-        } else {
-            conv = converters.get(type);
+        IConverter conv = converters.get(type);
+        if ( conv == null ) {
+            Class<?> parent = type;
+            do {
+                Converter annot = parent.getAnnotation(Converter.class);
+                if ( annot != null ) {
+                    conv = getCustomConverter(annot.value(), type);
+                }
+                parent = parent.getSuperclass();
+            } while ( conv == null && parent != null );
+
             if ( conv == null ) {
                 if ( type.isEnum() ) {
                     conv = new EnumConverter(type);
                 } else {
                     conv = new ObjectConverter(type);
                 }
-                converters.put(type, conv);
             }
+
+            converters.put(type, conv);
         }
         return conv;
     }
@@ -148,29 +156,56 @@ public class ConverterContext {
      *                                converter for the slot type.
      */
     public IConverter getConverter(Slot slot) throws LinkMLRuntimeException {
-        IConverter conv = null;
-        Class<?> type = slot.getCustomConverter();
-        if ( type != null ) {
-            conv = getCustomConverter(type);
-        } else {
-            conv = getConverter(slot.getInnerType());
+        IConverter conv = slotConverters.get(slot);
+        if ( conv == null ) {
+            Class<?> type = slot.getCustomConverter();
+            if ( type != null ) {
+                conv = getCustomConverter(type, slot.getInnerType());
+            } else {
+                conv = getConverter(slot.getInnerType());
+            }
+            slotConverters.put(slot, conv);
         }
-
         return conv;
     }
 
     // Code common to both variants of getConverter
-    private IConverter getCustomConverter(Class<?> converterType) throws LinkMLRuntimeException {
-        IConverter conv = customConverters.get(converterType);
-        if ( conv == null ) {
-            try {
-                conv = (IConverter) converterType.newInstance();
-                customConverters.put(converterType, conv);
-            } catch ( InstantiationException | IllegalAccessException e ) {
-                throw new LinkMLInternalError("Cannot instantiate custom converter", e);
+    private IConverter getCustomConverter(Class<?> converterType, Class<?> targetType) throws LinkMLRuntimeException {
+        // A custom converter must have either (1) a default constructor (no argument)
+        // or (2) a constructor that takes the type of object to convert as its single
+        // argument. (It may have other constructors as well but one of those two must
+        // be available)
+        Constructor<?> defaultConstructor = null;
+        Constructor<?> typedConstructor = null;
+        for ( Constructor<?> cons : converterType.getDeclaredConstructors() ) {
+            if ( cons.getParameterCount() == 0 ) {
+                defaultConstructor = cons;
+            } else if ( cons.getParameterCount() == 1 ) {
+                if ( cons.getParameters()[0].getType().equals(Class.class) ) {
+                    typedConstructor = cons;
+                }
             }
         }
-        return conv;
+
+        Object conv = null;
+        try {
+            if ( typedConstructor != null ) {
+                conv = typedConstructor.newInstance(targetType);
+            } else {
+                conv = defaultConstructor.newInstance();
+            }
+        } catch ( InstantiationException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e ) {
+            throw new LinkMLInternalError("Cannot instantiate custom converter", e);
+        }
+
+        if ( conv == null ) {
+            throw new LinkMLInternalError("Cannot instantiate custom converter: no suitable constructor");
+        } else if ( !(conv instanceof IConverter) ) {
+            throw new LinkMLInternalError("Cannot instantiate custom converter: invalid type");
+        }
+
+        return (IConverter) conv;
     }
 
     /**
