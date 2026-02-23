@@ -149,4 +149,19 @@ public class ConverterContextTest {
         Assertions.assertNotNull(cor.getSingle());
         Assertions.assertEquals("sic1", cor.getSingle().getId());
     }
+
+    @Test
+    void testPrefixManager() {
+        ConverterContext ctx = new ConverterContext();
+        ctx.addPrefix("pfx1", "expansion1/");
+        ctx.addPrefix("pfx2:", "expansion1/longer/prefix/");
+
+        Assertions.assertEquals("expansion1/value", ctx.resolve("pfx1:value"));
+        Assertions.assertEquals("expansion1/longer/prefix/value", ctx.resolve("pfx2:value"));
+        Assertions.assertEquals("pfx3:value", ctx.resolve("pfx3:value"));
+
+        Assertions.assertEquals("pfx1:value", ctx.compact("expansion1/value"));
+        Assertions.assertEquals("pfx2:value", ctx.compact("expansion1/longer/prefix/value"));
+        Assertions.assertEquals("expansion3/value", ctx.compact("expansion3/value"));
+    }
 }

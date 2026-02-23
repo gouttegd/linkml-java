@@ -218,7 +218,12 @@ public class ConverterContext {
      * @param prefix The corresponding IRI prefix.
      */
     public void addPrefix(String name, String prefix) {
-        prefixMap.put(name, prefix);
+        if ( name.endsWith(":") ) {
+            name = name.substring(0, name.length() - 1);
+        }
+        if ( !name.isEmpty() && !prefix.isEmpty() ) {
+            prefixMap.put(name, prefix);
+        }
     }
 
     /**
