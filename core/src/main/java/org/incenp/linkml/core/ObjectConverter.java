@@ -55,7 +55,6 @@ public class ObjectConverter implements IConverter {
     private final static String OBJECT_EXPECTED = "Invalid value type, '%s' expected";
     private final static String CREATE_ERROR = "Cannot create object of type '%s'";
     private final static String NO_IDENTIFIER = "Missing identifier for type '%s'";
-    private final static String NO_SIMPLE_DICT = "Type '%s' is not compatible with simple dict inlining";
     private final static String UNKNOWN_TYPE = "Unknown designated type '%s'";
 
     private Class<?> targetType;
@@ -127,6 +126,32 @@ public class ObjectConverter implements IConverter {
      */
     public boolean hasTypeDesignator() {
         return designatorSlot != null;
+    }
+
+    /**
+     * Indicates whether the class this converter is intended for is eligible for
+     * SimpleDict inlining.
+     * <p>
+     * When deserialising, we can accept SimpleDict inlining if the class has both
+     * an identifier slot and a primary value slot.
+     * <p>
+     * When serialising, we can only accept SimpleDict inlining if, in addition, the
+     * class has <em>no other slots</em> beyond those two.
+     * 
+     * @param write If <code>true</code>, check for eligbility for SimpleDict
+     *              serialisation; otherwise, check for eligibility for SimpleDict
+     *              deserialisation.
+     * @return <code>true</code> if the class can be (de)serialised as a SimpleDict,
+     *         otherwise <code>false</code>.
+     */
+    public boolean isEligibleForSimpleDict(boolean write) {
+        if ( identifierSlot == null && primarySlot == null ) {
+            return false;
+        } else if ( write ) {
+            return slots.size() == 2;
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -298,47 +323,10 @@ public class ObjectConverter implements IConverter {
             throws LinkMLRuntimeException {
         if ( slot.isMultivalued() ) {
             List<Object> value = new ArrayList<>();
-            if ( hasIdentifier() ) {
-                switch ( slot.getInliningMode() ) {
-                case NO_INLINING:
-                    ctx.getObjects(targetType, getIdentifierList(raw, ctx), value);
-                    break;
-
-                case LIST:
-                    for ( Object rawItem : toList(raw) ) {
-                        value.add(convert(rawItem, ctx));
-                    }
-                    break;
-
-                case DICT:
-                    for ( Map.Entry<String, Object> rawItem : toMap(raw).entrySet() ) {
-                        Object item = null;
-                        if ( rawItem.getValue() == null ) {
-                            item = ctx.getObject(targetType, getIdentifier(rawItem.getKey(), ctx), true);
-                        } else {
-                            item = convert(toMap(rawItem.getValue()), getIdentifier(rawItem.getKey(), ctx), ctx);
-                        }
-                        value.add(item);
-                    }
-                    break;
-
-                case SIMPLE_DICT:
-                    if ( primarySlot == null ) {
-                        throw new LinkMLInternalError(String.format(NO_SIMPLE_DICT, targetType.getName()));
-
-                    }
-                    IConverter primaryConv = ctx.getConverter(primarySlot);
-                    for ( Map.Entry<String, Object> rawItem : toMap(raw).entrySet() ) {
-                        Object item = ctx.getObject(targetType, getIdentifier(rawItem.getKey(), ctx), true);
-                        primaryConv.convertForSlot(rawItem.getValue(), item, primarySlot, ctx);
-                        value.add(item);
-                    }
-                    break;
-                }
-
+            if ( hasIdentifier() && slot.getInliningMode() == InliningMode.NO_INLINING ) {
+                ctx.getObjects(targetType, getIdentifierList(raw, ctx), value);
             } else {
-                // Multi-valued non-identifiable object (necessary inlined as a list)
-                for ( Object rawItem : toList(raw) ) {
+                for ( Object rawItem : normaliseList(raw, slot) ) {
                     value.add(convert(rawItem, ctx));
                 }
             }
@@ -470,13 +458,10 @@ public class ObjectConverter implements IConverter {
                 }
                 return list;
             } else if ( inlining == InliningMode.DICT || inlining == InliningMode.SIMPLE_DICT ) {
-                if ( inlining == InliningMode.SIMPLE_DICT && primarySlot == null ) {
-                    throw new LinkMLInternalError(String.format(NO_SIMPLE_DICT, targetType.getName()));
-                }
+                boolean simpleDict = isEligibleForSimpleDict(true);
                 Map<Object, Object> map = new HashMap<>();
                 for ( Object item : items ) {
-                    Object rawItem = inlining == InliningMode.SIMPLE_DICT ? primarySlot.getValue(item)
-                            : serialise(item, false, ctx);
+                    Object rawItem = simpleDict ? primarySlot.getValue(item) : serialise(item, false, ctx);
                     map.put(toIdentifier(item, ctx), rawItem);
                 }
                 return map;
@@ -552,5 +537,76 @@ public class ObjectConverter implements IConverter {
             throw new LinkMLValueError(LIST_EXPECTED);
         }
         return (List<Object>) value;
+    }
+
+    /**
+     * Normalises a raw multi-valued slot.
+     * <p>
+     * This is mostly a convenience method to make the job of
+     * {@link #convertForSlot(Object, Object, Slot, ConverterContext)} easier. Given
+     * the raw value of a multi-valued slot, it always provides a list
+     * representation of it, whether the value has indeed been serialised as a list
+     * or as any kind of dict.
+     * <p>
+     * This incidentally implements the <a href=
+     * "https://linkml.io/linkml-model/latest/docs/specification/06mapping/#collection-form-normalization">non-repair
+     * collection form normalisations</a> described in the LinkML specification.
+     * 
+     * @param raw  The raw value to convert.
+     * @param slot The slot for which the value is intended. This is used to compare
+     *             the actual serialisation form with the form expected as per the
+     *             original schema.
+     * @return A list with the raw values. This may be the original value (simply
+     *         casted as a list) if it already was a list to begin with, or a new
+     *         list transformed from whatever actual serialisation was used.
+     * @throws LinkMLRuntimeException (1) If the slot expected a list serialisation
+     *                                and we got any kind of dict, or the other way
+     *                                round. (2) If we got something that looks like
+     *                                a SimpleDict, for a class that does not
+     *                                support this kind of serialisation. (3) Or if
+     *                                we get anything else than a list or a dict.
+     */
+    @SuppressWarnings("unchecked")
+    protected List<Object> normaliseList(Object raw, Slot slot) throws LinkMLRuntimeException {
+        InliningMode expected = slot.getInliningMode();
+        if ( raw instanceof List ) {
+            if ( hasIdentifier() && expected != InliningMode.LIST ) {
+                throw new LinkMLValueError(MAP_EXPECTED);
+            }
+            return (List<Object>) raw;
+        } else if ( raw instanceof Map ) {
+            if ( expected == InliningMode.LIST || !hasIdentifier() ) {
+                throw new LinkMLValueError(LIST_EXPECTED);
+            }
+
+            List<Object> normalisedList = new ArrayList<>();
+            for ( Map.Entry<String, Object> rawItem : toMap(raw).entrySet() ) {
+                String id = rawItem.getKey();
+                Map<String, Object> rawValue = null;
+                if ( rawItem.getValue() == null ) {
+                    // "Empty" object, fabricate an ExpandedDict with just the identifier
+                    rawValue = new HashMap<>();
+                    rawValue.put(identifierSlot.getLinkMLName(), id);
+                } else if ( rawItem.getValue() instanceof Map ) {
+                    // Compact or ExpandedDict
+                    rawValue = toMap(rawItem.getValue());
+                    if ( !rawValue.containsKey(identifierSlot.getLinkMLName()) ) {
+                        // CompactDict; inject the key
+                        rawValue.put(identifierSlot.getLinkMLName(), id);
+                    }
+                } else if ( isEligibleForSimpleDict(false) ) {
+                    // Assume SimpleDict, transform into an Expanded Dict
+                    rawValue = new HashMap<>();
+                    rawValue.put(identifierSlot.getLinkMLName(), id);
+                    rawValue.put(primarySlot.getLinkMLName(), rawItem.getValue());
+                } else {
+                    throw new LinkMLValueError(MAP_EXPECTED);
+                }
+                normalisedList.add(rawValue);
+            }
+            return normalisedList;
+        } else {
+            throw new LinkMLValueError(LIST_EXPECTED);
+        }
     }
 }

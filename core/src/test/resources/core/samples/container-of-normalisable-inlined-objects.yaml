@@ -1,0 +1,12 @@
+simpleDict:
+  key1:
+    key: key1
+    value: value1
+extraSimpleDict:
+  key2:
+    value: value2
+multivaluedSimpleDict:
+  key3:
+    key: key3
+    values:
+      - value3

@@ -157,6 +157,29 @@ public class ObjectConverterTest {
     }
 
     @Test
+    void testNormalisingLists() throws IOException {
+        ContainerOfSimpleDicts cos = parse("container-of-normalisable-inlined-objects.yaml",
+                ContainerOfSimpleDicts.class);
+
+        SimpleDict sd = cos.getSimpleDict().get(0);
+        Assertions.assertNotNull(sd);
+        Assertions.assertEquals("key1", sd.getKey());
+        Assertions.assertEquals("value1", sd.getValue());
+
+        ExtraSimpleDict esd = cos.getExtraSimpleDict().get(0);
+        Assertions.assertNotNull(esd);
+        Assertions.assertEquals("key2", esd.getKey());
+        Assertions.assertEquals("value2", esd.getValue());
+        Assertions.assertNull(esd.getExtra());
+
+        Assertions.assertNotNull(cos.getMultivaluedSimpleDict());
+        Assertions.assertEquals(1, cos.getMultivaluedSimpleDict().size());
+        MultivaluedSimpleDict msd = cos.getMultivaluedSimpleDict().get(0);
+        Assertions.assertEquals("key3", msd.getKey());
+        Assertions.assertEquals("value3", msd.getValues().get(0));
+    }
+
+    @Test
     void testConvertingContainerOfReferences() throws IOException {
         // First read the inlined objects
         ContainerOfInlinedObjects coi = parse("container-of-inlined-objects.yaml", ContainerOfInlinedObjects.class);
@@ -365,6 +388,17 @@ public class ObjectConverterTest {
                 ContainerOfIRIIdentifiableObjects.class);
         Assertions.assertEquals("https://example.org/0002", coii.getMultipleInlinedAsDict().get(0).getId());
         roundtrip(coii);
+    }
+
+    @Test
+    void testSimpleDictEligibility() {
+        ObjectConverter conv = new ObjectConverter(SimpleDict.class);
+        Assertions.assertTrue(conv.isEligibleForSimpleDict(false));
+        Assertions.assertTrue(conv.isEligibleForSimpleDict(true));
+
+        conv = new ObjectConverter(ExtraSimpleDict.class);
+        Assertions.assertTrue(conv.isEligibleForSimpleDict(false));
+        Assertions.assertFalse(conv.isEligibleForSimpleDict(true));
     }
 
     private <T> T parse(String file, Class<T> target) throws IOException {
