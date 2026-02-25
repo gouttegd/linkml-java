@@ -386,67 +386,6 @@ public class Slot {
     }
 
     /**
-     * Finds the primary slot for the given type.
-     * <p>
-     * The “primary” slot of a LinkML class is the slot to which assign the value of
-     * a dict entry when using the “SimpleDict” inlining mode. As per the rules set
-     * forth in LinkML’s documentation, the primary slot is either:
-     * <ul>
-     * <li>the one non-identifier slot, if the class has only one such slot beyond
-     * the identifier slot;
-     * <li>the one <em>mandatory</em> non-identifier slot, if the class has several
-     * non-identifier slots but only one marked as mandatory.
-     * </ul>
-     * If the class has more than one non-identifier slot without any single one of
-     * them being mandatory, or more than one mandatory non-identifier slot, then
-     * the class has <em>no</em> primary slot (and is not eligible for inlining in
-     * SimpleDict mode).
-     * 
-     * @param type The type for which to retrieve the primary slot.
-     * @return The primary slot for the type, or <code>null</code> if the type has
-     *         no primary slot.
-     * 
-     * @see <a href=
-     *      "https://linkml.io/linkml/schemas/inlining.html#inlining-as-simple-dictionaries">LinkML
-     *      documentation about inlining as simple dictionaries</a>
-     */
-    public static Slot getPrimaryValueSlot(Class<?> type) {
-        return getPrimaryValueSlot(Slot.getSlots(type));
-    }
-
-    /**
-     * Finds the primary slot among a given collection of slots.
-     * <p>
-     * This method implements the logic needed to find the primary slot as described
-     * in {@link #getPrimaryValueSlot(Class)}. This is a separate method so that the
-     * logic can be reused outside of this class, by a code that has already
-     * obtained the complete list of slots for the target type.
-     * 
-     * @param slots The slots among which to find the primary slot. It is assumed
-     *              that they all belong to the same type.
-     * @return The primary slot, or <code>null</code> if there is no primary slot in
-     *         the collection.
-     */
-    public static Slot getPrimaryValueSlot(Collection<Slot> slots) {
-        Slot mandatorySlot = null;
-        Slot nonIdentifierSlot = null;
-        int nMandatorySlots = 0;
-        int nNonIdentifierSlots = 0;
-        for ( Slot slot : slots ) {
-            if ( slot.isIdentifier() || slot.isExtensionStore() ) {
-                continue;
-            }
-            if ( slot.getRequirementLevel() == RequirementLevel.MANDATORY ) {
-                mandatorySlot = slot;
-                nMandatorySlots += 1;
-            }
-            nonIdentifierSlot = slot;
-            nNonIdentifierSlots += 1;
-        }
-        return nNonIdentifierSlots == 1 ? nonIdentifierSlot : nMandatorySlots == 1 ? mandatorySlot : null;
-    }
-
-    /**
      * Gets the Slot object corresponding to a given field in a given class.
      * <p>
      * This is mostly a convenience method for

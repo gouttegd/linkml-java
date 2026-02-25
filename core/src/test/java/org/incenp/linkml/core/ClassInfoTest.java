@@ -71,6 +71,18 @@ public class ClassInfoTest {
     }
 
     @Test
+    void testGetPrimaryValueSlot() {
+        Slot primarySlot = ClassInfo.get(SimpleDict.class).getPrimarySlot();
+        Assertions.assertEquals("value", primarySlot.getLinkMLName());
+
+        primarySlot = ClassInfo.get(ExtraSimpleDict.class).getPrimarySlot();
+        Assertions.assertEquals("value", primarySlot.getLinkMLName());
+
+        primarySlot = ClassInfo.get(SimpleClass.class).getPrimarySlot();
+        Assertions.assertNull(primarySlot);
+    }
+
+    @Test
     void testDetectSimpleDictEligibility() {
         Assertions.assertTrue(ClassInfo.get(SimpleDict.class).isEligibleForSimpleDict(false));
         Assertions.assertTrue(ClassInfo.get(SimpleDict.class).isEligibleForSimpleDict(true));

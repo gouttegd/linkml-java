@@ -58,6 +58,7 @@ public class ClassInfo {
     private Slot extensionSlot;
     private Slot primarySlot;
     private boolean identifierIsLocal;
+    private boolean primarySlotChecked;
 
     /**
      * Creates a new instance from the specified Java class.
@@ -85,7 +86,6 @@ public class ClassInfo {
                 slotsByURI.put(uri, slot);
             }
         }
-        primarySlot = Slot.getPrimaryValueSlot(slots.values());
     }
 
     /**
@@ -135,7 +135,7 @@ public class ClassInfo {
      *         otherwise <code>false</code>.
      */
     public boolean isEligibleForSimpleDict(boolean write) {
-        if ( identifierSlot == null || primarySlot == null ) {
+        if ( identifierSlot == null || getPrimarySlot() == null ) {
             return false;
         } else if ( write ) {
             return slots.size() == 2;
@@ -233,13 +233,48 @@ public class ClassInfo {
     /**
      * Gets the slot intended to hold the “primary value” of the object.
      * <p>
-     * The concept of “primary value slot” is used for the <em>SimpleDict</em>
-     * serialisation form.
+     * The “primary” slot of a LinkML class is the slot to which to assign the value
+     * of a dict entry when using the “SimpleDict” inlining mode. As per the rules
+     * set forth in LinkML’s documentation, the primary slot is either:
+     * <ul>
+     * <li>the one non-identifier slot, if the class has only one such slot beyond
+     * the identifier slot;
+     * <li>the one <em>mandatory</em> non-identifier slot, if the class has several
+     * non-identifier slots but only one marked as mandatory.
+     * </ul>
+     * <p>
+     * If the class has more than one non-identifier slot without any single one of
+     * them being mandatory, or more than one mandatory non-identifier slot, then
+     * the class has <em>no</em> primary slot (and is not eligible for inlining in
+     * SimpleDict mode).
+     * <p>
+     * Of note, “identifier slot” here refers to either a proper identifier slot
+     * (holding a globally unique identifier) or a key slot (holding a locally
+     * unique identifier).
      * 
      * @return The primary value slot, or <code>null</code> if the class has no such
      *         slot.
      */
     public Slot getPrimarySlot() {
+        if ( !primarySlotChecked ) {
+            Slot mandatorySlot = null;
+            Slot nonIdentifierSlot = null;
+            int nMandatorySlots = 0;
+            int nNonIdentifierSlots = 0;
+            for ( Slot slot : slots.values() ) {
+                if ( slot == identifierSlot || slot == extensionSlot ) {
+                    continue;
+                }
+                if ( slot.getRequirementLevel() == RequirementLevel.MANDATORY ) {
+                    mandatorySlot = slot;
+                    nMandatorySlots += 1;
+                }
+                nonIdentifierSlot = slot;
+                nNonIdentifierSlots += 1;
+            }
+            primarySlot = nNonIdentifierSlots == 1 ? nonIdentifierSlot : nMandatorySlots == 1 ? mandatorySlot : null;
+            primarySlotChecked = true;
+        }
         return primarySlot;
     }
 
