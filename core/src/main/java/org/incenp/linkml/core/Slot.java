@@ -66,7 +66,6 @@ public class Slot {
     private Method writeAccessor;
     private Method readAccessor;
     private Class<?> outerType;
-    private InliningMode inliningMode;
 
     /**
      * Creates a new instance.
@@ -88,10 +87,6 @@ public class Slot {
         } catch ( NoSuchMethodException | SecurityException e ) {
             throw new LinkMLInternalError(String.format("Missing accessor for slot '%s'", field.getName()), e);
         }
-
-        Inlined inlinedAnnotation = field.getAnnotation(Inlined.class);
-        inliningMode = inlinedAnnotation != null ? inlinedAnnotation.asList() ? InliningMode.LIST : InliningMode.DICT
-                : InliningMode.NO_INLINING;
     }
 
     /**
@@ -190,13 +185,56 @@ public class Slot {
 
     /**
      * Indicates how the slot value(s) is(are) inlined.
+     * <p>
+     * Note that this returns the <em>effectively expected</em> inlining mode, that
+     * takes into account both (1) the presence of the {@link Inlined} annotation on
+     * the field representing the slot, (2) whether the slot is single- or
+     * multi-valued, and (3) the type of the slot.
+     * <p>
+     * For example, if a multi-valued slot has for type a class that has no
+     * identifier slot of any kind, then the slot is necessarily expected to be
+     * inlined as a list, regardless of whether it has been explicitly marked as
+     * such.
      * 
-     * @return <code>null</code> if the slot expects an object reference (no
-     *         inlining); otherwise, a {@link InliningMode} value specifying how the
-     *         value(s) should be inlined.
+     * @return The expected inlining mode for the slot, or <code>null</code> if
+     *         inlining is not relevant (if the slot expects a scalar or a list of
+     *         scalars, rather than an object or a list of objects).
      */
     public InliningMode getInliningMode() {
-        return inliningMode;
+        ClassInfo ci = ClassInfo.get(getInnerType());
+        if ( ci == null ) {
+            return null; // Inlining is not relevant for scalar types
+        } else if ( !ci.hasIdentifier() ) {
+            // No identifier of any kind -- necessarily inlined
+            return isMultivalued() ? InliningMode.LIST : InliningMode.DICT;
+        } else if ( !ci.isGloballyUnique() ) {
+            // Locally unique object -- necessarily inlined
+            if ( !isMultivalued() ) {
+                // Can only be serialised as a dict
+                return InliningMode.DICT;
+            } else {
+                // Eligible for list and dict inlining
+                Inlined annot = field.getAnnotation(Inlined.class);
+                if ( annot == null ) {
+                    // It's not very clear from the LinkML spec what the default should be in that
+                    // case (if neither inlined nor inlined_as_list has been specified in the
+                    // schema), but apparently the LinkML validator expects a dict.
+                    return InliningMode.DICT;
+                } else {
+                    return annot.asList() ? InliningMode.LIST : InliningMode.DICT;
+                }
+            }
+        } else {
+            // Globally unique object -- eligible for all forms of serialisation
+            Inlined annot = field.getAnnotation(Inlined.class);
+            if ( annot == null ) {
+                return InliningMode.NO_INLINING;
+            } else if ( isMultivalued() ) {
+                return annot.asList() ? InliningMode.LIST : InliningMode.DICT;
+            } else {
+                return InliningMode.DICT;
+            }
+        }
     }
 
     /**

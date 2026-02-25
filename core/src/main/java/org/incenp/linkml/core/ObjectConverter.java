@@ -57,14 +57,8 @@ public class ObjectConverter implements IConverter {
     private final static String NO_IDENTIFIER = "Missing identifier for type '%s'";
     private final static String UNKNOWN_TYPE = "Unknown designated type '%s'";
 
-    private Class<?> targetType;
-    private Map<String, Slot> slots = new HashMap<>();
-    private Slot identifierSlot;
-    private Slot designatorSlot;
-    private Slot extensionSlot;
-    private Slot primarySlot;
+    protected ClassInfo klass;
     private PrefixDeclarationExtractor prefixExtractor;
-    private boolean identifierIsKey;
 
     /**
      * Creates a new converter for objects of the specified type.
@@ -72,99 +66,13 @@ public class ObjectConverter implements IConverter {
      * @param klass The type into which to convert raw objects.
      */
     public ObjectConverter(Class<?> klass) {
-        targetType = klass;
-        for ( Slot slot : Slot.getSlots(klass) ) {
-            slots.put(slot.getLinkMLName(), slot);
-            if ( slot.isIdentifier() || slot.isKey() ) {
-                identifierSlot = slot;
-                identifierIsKey = identifierSlot.isIdentifier();
-            } else if ( slot.isExtensionStore() ) {
-                extensionSlot = slot;
-            } else if ( slot.isTypeDesignator() ) {
-                designatorSlot = slot;
-            }
-        }
-        primarySlot = Slot.getPrimaryValueSlot(slots.values());
-        prefixExtractor = PrefixDeclarationExtractor.getExtractor(slots.values());
+        this.klass = ClassInfo.get(klass);
+        prefixExtractor = PrefixDeclarationExtractor.getExtractor(this.klass.getSlots());
     }
 
     @Override
     public Class<?> getType() {
-        return targetType;
-    }
-
-    /**
-     * Gets the specified slot.
-     * <p>
-     * This is mostly intended for the benefit of derived classes, so that they do
-     * not have to call {@link Slot#getSlot(Class, String)} themselves (which would
-     * be a duplication of the job done in the constructor of this class).
-     * 
-     * @param name The name of the slot.
-     * @return The corresponding slot, or <code>null</code> if the class for which
-     *         this object is a converter does not have any slot with that name.
-     */
-    protected Slot getSlot(String name) {
-        return slots.get(name);
-    }
-
-    /**
-     * Indicates whether this converter converts raw objects into “globally
-     * identifiable objects”.
-     * <p>
-     * A “globally identifiable object” is an instance of a LinkML class that has an
-     * identifier slot.
-     */
-    public boolean hasGlobalIdentifier() {
-        return identifierSlot != null && identifierIsKey;
-    }
-
-    /**
-     * Indicates whether this converter converts raw objects into “identifiable
-     * objects” (whether local or global).
-     * <p>
-     * An “identifiable object” is an instance of a LinkML class that has either an
-     * identifier slot or a key slot.
-     */
-    public boolean hasIdentifier() {
-        return identifierSlot != null;
-    }
-
-    /**
-     * Indicates whether the class this converter is intended for has a type
-     * designator slot.
-     * <p>
-     * A “type designator slot” is a slot that references the exact class of an
-     * instance of an object.
-     */
-    public boolean hasTypeDesignator() {
-        return designatorSlot != null;
-    }
-
-    /**
-     * Indicates whether the class this converter is intended for is eligible for
-     * SimpleDict inlining.
-     * <p>
-     * When deserialising, we can accept SimpleDict inlining if the class has both
-     * an identifier slot and a primary value slot.
-     * <p>
-     * When serialising, we can only accept SimpleDict inlining if, in addition, the
-     * class has <em>no other slots</em> beyond those two.
-     * 
-     * @param write If <code>true</code>, check for eligbility for SimpleDict
-     *              serialisation; otherwise, check for eligibility for SimpleDict
-     *              deserialisation.
-     * @return <code>true</code> if the class can be (de)serialised as a SimpleDict,
-     *         otherwise <code>false</code>.
-     */
-    public boolean isEligibleForSimpleDict(boolean write) {
-        if ( identifierSlot == null && primarySlot == null ) {
-            return false;
-        } else if ( write ) {
-            return slots.size() == 2;
-        } else {
-            return true;
-        }
+        return klass.getType();
     }
 
     /**
@@ -188,12 +96,12 @@ public class ObjectConverter implements IConverter {
 
         Map<String, Object> extensions = null;
         for ( Map.Entry<String, Object> entry : rawMap.entrySet() ) {
-            Slot slot = slots.get(entry.getKey());
+            Slot slot = klass.getSlot(entry.getKey());
             if ( slot == null ) {
-                if ( extensionSlot != null ) {
+                if ( klass.hasExtensionSlot() ) {
                     if ( extensions == null ) {
                         extensions = new HashMap<>();
-                        extensionSlot.setValue(dest, extensions);
+                        klass.getExtensionSlot().setValue(dest, extensions);
                     }
                     extensions.put(entry.getKey(), entry.getValue());
                 } else {
@@ -252,7 +160,8 @@ public class ObjectConverter implements IConverter {
      */
     public Object convert(Map<String, Object> raw, ConverterContext ctx) throws LinkMLRuntimeException {
         ObjectConverter conv = this;
-        if ( hasTypeDesignator() ) {
+        if ( klass.hasTypeDesignator() ) {
+            Slot designatorSlot = klass.getTypeDesignatorSlot();
             // FIXME: Several issues here.
             // First, we only supporting referencing a type by name. According to the LinkML
             // doc, a type designator can also be a URI (or a CURIE), in which case it
@@ -279,10 +188,10 @@ public class ObjectConverter implements IConverter {
             }
         }
         String id = null;
-        if ( hasGlobalIdentifier() ) {
-            Object identifier = raw.get(identifierSlot.getLinkMLName());
+        if ( klass.isGloballyUnique() ) {
+            Object identifier = raw.get(klass.getIdentifierSlot().getLinkMLName());
             if ( identifier == null ) {
-                throw new LinkMLValueError(String.format(NO_IDENTIFIER, targetType.getName()));
+                throw new LinkMLValueError(String.format(NO_IDENTIFIER, getType().getName()));
             }
             id = getGlobalIdentifier(identifier, ctx);
         }
@@ -305,12 +214,12 @@ public class ObjectConverter implements IConverter {
             throws LinkMLRuntimeException {
         Object object = null;
         if ( id != null ) {
-            object = ctx.getObject(targetType, id, true);
+            object = ctx.getObject(klass.getType(), id, true);
         } else {
             try {
-                object = targetType.newInstance();
+                object = getType().newInstance();
             } catch ( InstantiationException | IllegalAccessException e ) {
-                throw new LinkMLInternalError(String.format(CREATE_ERROR, targetType.getName()), e);
+                throw new LinkMLInternalError(String.format(CREATE_ERROR, getType().getName()), e);
             }
         }
         convertTo(raw, object, ctx);
@@ -319,9 +228,6 @@ public class ObjectConverter implements IConverter {
 
     /**
      * Converts the value of a single slot and assigns it to the target object.
-     * <p>
-     * This is the core of the converter. Its complexity stems mostly from the fact
-     * that is has to deal with the various types of “inlining”.
      * 
      * @param raw  The raw value of the slot.
      * @param slot The slot to which the value should be assigned.
@@ -334,19 +240,20 @@ public class ObjectConverter implements IConverter {
     @Override
     public void convertForSlot(Object raw, Object dest, Slot slot, ConverterContext ctx)
             throws LinkMLRuntimeException {
+        InliningMode inlining = slot.getInliningMode();
         if ( slot.isMultivalued() ) {
             List<Object> value = new ArrayList<>();
-            if ( hasGlobalIdentifier() && slot.getInliningMode() == InliningMode.NO_INLINING ) {
-                ctx.getObjects(targetType, getGlobalIdentifierList(raw, ctx), value);
+            if ( inlining == InliningMode.NO_INLINING ) {
+                ctx.getObjects(getType(), getGlobalIdentifierList(raw, ctx), value);
             } else {
-                for ( Object rawItem : normaliseList(raw, slot) ) {
+                for ( Object rawItem : normaliseList(raw, inlining) ) {
                     value.add(convert(rawItem, ctx));
                 }
             }
             slot.setValue(dest, value);
         } else {
             // Single-valued object
-            if ( hasGlobalIdentifier() && slot.getInliningMode() == InliningMode.NO_INLINING ) {
+            if ( inlining == InliningMode.NO_INLINING ) {
                 ctx.getObject(slot, getGlobalIdentifier(raw, ctx), dest);
             } else {
                 // Non-identifiable object or inlined identifiable object; in both cases, can
@@ -372,7 +279,7 @@ public class ObjectConverter implements IConverter {
      *                                attempt.
      */
     protected String getGlobalIdentifier(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
-        return ctx.getConverter(identifierSlot).convert(raw, ctx).toString();
+        return ctx.getConverter(klass.getIdentifierSlot()).convert(raw, ctx).toString();
     }
 
     /**
@@ -392,7 +299,7 @@ public class ObjectConverter implements IConverter {
      *                                provided raw object is not a list.
      */
     protected List<String> getGlobalIdentifierList(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
-        IConverter conv = ctx.getConverter(identifierSlot);
+        IConverter conv = ctx.getConverter(klass.getIdentifierSlot());
         ArrayList<String> list = new ArrayList<>();
         for ( Object rawItem : toList(raw) ) {
             list.add(conv.convert(rawItem, ctx).toString());
@@ -427,12 +334,12 @@ public class ObjectConverter implements IConverter {
      */
     public Map<String, Object> serialise(Object object, boolean withIdentifier, ConverterContext ctx)
             throws LinkMLRuntimeException {
-        if ( !targetType.isInstance(object) ) {
-            throw new LinkMLValueError(String.format(OBJECT_EXPECTED, targetType.getName()));
+        if ( !getType().isInstance(object) ) {
+            throw new LinkMLValueError(String.format(OBJECT_EXPECTED, getType().getName()));
         }
 
         Map<String, Object> raw = new HashMap<>();
-        for ( Slot slot : slots.values() ) {
+        for ( Slot slot : klass.getSlots() ) {
             if ( (slot.isIdentifier() || slot.isKey()) && !withIdentifier ) {
                 continue;
             }
@@ -440,7 +347,7 @@ public class ObjectConverter implements IConverter {
             Object slotValue;
             if ( slot.isTypeDesignator() ) {
                 // Ignore whatever may be contained in the slot and use the actual type name
-                slotValue = targetType.getSimpleName();
+                slotValue = getType().getSimpleName();
             } else {
                 slotValue = slot.getValue(object);
                 if ( slotValue == null ) {
@@ -462,22 +369,21 @@ public class ObjectConverter implements IConverter {
 
     @Override
     public Object serialiseForSlot(Object object, Slot slot, ConverterContext ctx) throws LinkMLRuntimeException {
+        InliningMode inlining = slot.getInliningMode();
         if ( slot.isMultivalued() ) {
             List<Object> items = toList(object);
-            InliningMode inlining = slot.getInliningMode();
             // FIXME: Check behaviour regarding identifier/key
-            if ( !hasIdentifier() || inlining == InliningMode.LIST ) {
+            if ( inlining == InliningMode.LIST ) {
                 List<Object> list = new ArrayList<>();
                 for ( Object item : items ) {
                     list.add(serialise(item, ctx));
                 }
                 return list;
-            } else if ( !hasGlobalIdentifier() || inlining == InliningMode.DICT
-                    || inlining == InliningMode.SIMPLE_DICT ) {
-                boolean simpleDict = isEligibleForSimpleDict(true);
+            } else if ( inlining == InliningMode.DICT ) {
+                boolean simpleDict = klass.isEligibleForSimpleDict(true);
                 Map<Object, Object> map = new HashMap<>();
                 for ( Object item : items ) {
-                    Object rawItem = simpleDict ? primarySlot.getValue(item) : serialise(item, false, ctx);
+                    Object rawItem = simpleDict ? klass.getPrimarySlot().getValue(item) : serialise(item, false, ctx);
                     map.put(toIdentifier(item, ctx), rawItem);
                 }
                 return map;
@@ -490,7 +396,7 @@ public class ObjectConverter implements IConverter {
             }
         } else {
             // Single-valued object
-            if ( hasGlobalIdentifier() && slot.getInliningMode() == InliningMode.NO_INLINING ) {
+            if ( inlining == InliningMode.NO_INLINING ) {
                 return toIdentifier(object, ctx);
             } else {
                 // Not globally identifiable object or inlined object; in both cases, can only
@@ -512,12 +418,13 @@ public class ObjectConverter implements IConverter {
      *                                if it has no identifier value.
      */
     protected Object toIdentifier(Object object, ConverterContext ctx) throws LinkMLRuntimeException {
-        if ( !targetType.isInstance(object) ) {
-            throw new LinkMLValueError(String.format(OBJECT_EXPECTED, targetType.getName()));
+        if ( !getType().isInstance(object) ) {
+            throw new LinkMLValueError(String.format(OBJECT_EXPECTED, getType().getName()));
         }
+        Slot identifierSlot = klass.getIdentifierSlot();
         Object identifier = identifierSlot.getValue(object);
         if ( identifier == null ) {
-            throw new LinkMLValueError(String.format(NO_IDENTIFIER, targetType.getName()));
+            throw new LinkMLValueError(String.format(NO_IDENTIFIER, getType().getName()));
         }
         return ctx.getConverter(identifierSlot).serialise(identifier, ctx);
     }
@@ -586,18 +493,18 @@ public class ObjectConverter implements IConverter {
      *                                we get anything else than a list or a dict.
      */
     @SuppressWarnings("unchecked")
-    protected List<Object> normaliseList(Object raw, Slot slot) throws LinkMLRuntimeException {
-        InliningMode expected = slot.getInliningMode();
+    protected List<Object> normaliseList(Object raw, InliningMode expected) throws LinkMLRuntimeException {
         if ( raw instanceof List ) {
-            if ( hasIdentifier() && expected != InliningMode.LIST ) {
+            if ( expected != InliningMode.LIST ) {
                 throw new LinkMLValueError(MAP_EXPECTED);
             }
             return (List<Object>) raw;
         } else if ( raw instanceof Map ) {
-            if ( expected == InliningMode.LIST || !hasIdentifier() ) {
+            if ( expected == InliningMode.LIST ) {
                 throw new LinkMLValueError(LIST_EXPECTED);
             }
 
+            Slot identifierSlot = klass.getIdentifierSlot();
             List<Object> normalisedList = new ArrayList<>();
             for ( Map.Entry<String, Object> rawItem : toMap(raw).entrySet() ) {
                 String id = rawItem.getKey();
@@ -613,11 +520,11 @@ public class ObjectConverter implements IConverter {
                         // CompactDict; inject the key
                         rawValue.put(identifierSlot.getLinkMLName(), id);
                     }
-                } else if ( isEligibleForSimpleDict(false) ) {
+                } else if ( klass.isEligibleForSimpleDict(false) ) {
                     // Assume SimpleDict, transform into an Expanded Dict
                     rawValue = new HashMap<>();
                     rawValue.put(identifierSlot.getLinkMLName(), id);
-                    rawValue.put(primarySlot.getLinkMLName(), rawItem.getValue());
+                    rawValue.put(klass.getPrimarySlot().getLinkMLName(), rawItem.getValue());
                 } else {
                     throw new LinkMLValueError(MAP_EXPECTED);
                 }

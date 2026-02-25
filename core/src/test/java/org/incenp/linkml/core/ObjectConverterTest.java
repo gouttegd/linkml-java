@@ -410,17 +410,6 @@ public class ObjectConverterTest {
         roundtrip(coii);
     }
 
-    @Test
-    void testSimpleDictEligibility() {
-        ObjectConverter conv = new ObjectConverter(SimpleDict.class);
-        Assertions.assertTrue(conv.isEligibleForSimpleDict(false));
-        Assertions.assertTrue(conv.isEligibleForSimpleDict(true));
-
-        conv = new ObjectConverter(ExtraSimpleDict.class);
-        Assertions.assertTrue(conv.isEligibleForSimpleDict(false));
-        Assertions.assertFalse(conv.isEligibleForSimpleDict(true));
-    }
-
     private <T> T parse(String file, Class<T> target) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         FileInputStream stream = new FileInputStream(new File("src/test/resources/core/samples/", file));

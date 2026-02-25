@@ -92,13 +92,18 @@ public class SlotTest {
 
     @Test
     void testGetInliningMode() throws LinkMLRuntimeException {
-        Slot noInliningSlot = Slot.getSlot(ContainerOfReferences.class, "multiple");
-        Assertions.assertEquals(InliningMode.NO_INLINING, noInliningSlot.getInliningMode());
+        ClassInfo ci = ClassInfo.get(ContainerOfReferences.class);
+        Assertions.assertEquals(InliningMode.NO_INLINING, ci.getSlot("single").getInliningMode());
+        Assertions.assertEquals(InliningMode.NO_INLINING, ci.getSlot("multiple").getInliningMode());
 
-        Slot inlinedAsDictSlot = Slot.getSlot(ContainerOfInlinedObjects.class, "inlinedAsDict");
-        Assertions.assertEquals(InliningMode.DICT, inlinedAsDictSlot.getInliningMode());
+        ci = ClassInfo.get(ContainerOfInlinedObjects.class);
+        Assertions.assertEquals(InliningMode.DICT, ci.getSlot("singleInlined").getInliningMode());
+        Assertions.assertEquals(InliningMode.LIST, ci.getSlot("inlinedAsList").getInliningMode());
+        Assertions.assertEquals(InliningMode.DICT, ci.getSlot("inlinedAsDict").getInliningMode());
+        Assertions.assertEquals(InliningMode.DICT, ci.getSlot("localSingleInlined").getInliningMode());
+        Assertions.assertEquals(InliningMode.LIST, ci.getSlot("localInlinedAsList").getInliningMode());
+        Assertions.assertEquals(InliningMode.DICT, ci.getSlot("localInlinedAsDict").getInliningMode());
     }
-
 
     void testGetBooleanSlot() throws LinkMLRuntimeException {
         Slot booleanSlot = Slot.getSlot(SimpleClass.class, "baz");
