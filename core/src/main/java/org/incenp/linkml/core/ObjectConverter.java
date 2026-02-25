@@ -64,6 +64,7 @@ public class ObjectConverter implements IConverter {
     private Slot extensionSlot;
     private Slot primarySlot;
     private PrefixDeclarationExtractor prefixExtractor;
+    private boolean identifierIsKey;
 
     /**
      * Creates a new converter for objects of the specified type.
@@ -74,8 +75,9 @@ public class ObjectConverter implements IConverter {
         targetType = klass;
         for ( Slot slot : Slot.getSlots(klass) ) {
             slots.put(slot.getLinkMLName(), slot);
-            if ( slot.isIdentifier() ) {
+            if ( slot.isIdentifier() || slot.isKey() ) {
                 identifierSlot = slot;
+                identifierIsKey = identifierSlot.isIdentifier();
             } else if ( slot.isExtensionStore() ) {
                 extensionSlot = slot;
             } else if ( slot.isTypeDesignator() ) {
@@ -107,11 +109,22 @@ public class ObjectConverter implements IConverter {
     }
 
     /**
-     * Indicates whether this converter converts raw objects into “identifiable
-     * objects”.
+     * Indicates whether this converter converts raw objects into “globally
+     * identifiable objects”.
      * <p>
-     * An “identifiable object” is an instance of a LinkML class that has an
+     * A “globally identifiable object” is an instance of a LinkML class that has an
      * identifier slot.
+     */
+    public boolean hasGlobalIdentifier() {
+        return identifierSlot != null && identifierIsKey;
+    }
+
+    /**
+     * Indicates whether this converter converts raw objects into “identifiable
+     * objects” (whether local or global).
+     * <p>
+     * An “identifiable object” is an instance of a LinkML class that has either an
+     * identifier slot or a key slot.
      */
     public boolean hasIdentifier() {
         return identifierSlot != null;
@@ -266,12 +279,12 @@ public class ObjectConverter implements IConverter {
             }
         }
         String id = null;
-        if ( hasIdentifier() ) {
+        if ( hasGlobalIdentifier() ) {
             Object identifier = raw.get(identifierSlot.getLinkMLName());
             if ( identifier == null ) {
                 throw new LinkMLValueError(String.format(NO_IDENTIFIER, targetType.getName()));
             }
-            id = getIdentifier(identifier, ctx);
+            id = getGlobalIdentifier(identifier, ctx);
         }
         return conv.convert(raw, id, ctx);
     }
@@ -281,7 +294,7 @@ public class ObjectConverter implements IConverter {
      * 
      * @param raw The raw map to convert.
      * @param id  The global identifier of the new object. May be <code>null</code>
-     *            if the object is not an “identifiable” object (it has no
+     *            if the object is not a “ globally identifiable” object (it has no
      *            identifier slot).
      * @param ctx The global converter context.
      * @return The newly created object.
@@ -323,8 +336,8 @@ public class ObjectConverter implements IConverter {
             throws LinkMLRuntimeException {
         if ( slot.isMultivalued() ) {
             List<Object> value = new ArrayList<>();
-            if ( hasIdentifier() && slot.getInliningMode() == InliningMode.NO_INLINING ) {
-                ctx.getObjects(targetType, getIdentifierList(raw, ctx), value);
+            if ( hasGlobalIdentifier() && slot.getInliningMode() == InliningMode.NO_INLINING ) {
+                ctx.getObjects(targetType, getGlobalIdentifierList(raw, ctx), value);
             } else {
                 for ( Object rawItem : normaliseList(raw, slot) ) {
                     value.add(convert(rawItem, ctx));
@@ -333,8 +346,8 @@ public class ObjectConverter implements IConverter {
             slot.setValue(dest, value);
         } else {
             // Single-valued object
-            if ( hasIdentifier() && slot.getInliningMode() == InliningMode.NO_INLINING ) {
-                ctx.getObject(slot, getIdentifier(raw, ctx), dest);
+            if ( hasGlobalIdentifier() && slot.getInliningMode() == InliningMode.NO_INLINING ) {
+                ctx.getObject(slot, getGlobalIdentifier(raw, ctx), dest);
             } else {
                 // Non-identifiable object or inlined identifiable object; in both cases, can
                 // only be expected to be represented as a map
@@ -358,7 +371,7 @@ public class ObjectConverter implements IConverter {
      * @throws LinkMLRuntimeException If any error occurs during the conversion
      *                                attempt.
      */
-    protected String getIdentifier(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
+    protected String getGlobalIdentifier(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
         return ctx.getConverter(identifierSlot).convert(raw, ctx).toString();
     }
 
@@ -378,7 +391,7 @@ public class ObjectConverter implements IConverter {
      *                                attempt. This includes the case where the
      *                                provided raw object is not a list.
      */
-    protected List<String> getIdentifierList(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
+    protected List<String> getGlobalIdentifierList(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
         IConverter conv = ctx.getConverter(identifierSlot);
         ArrayList<String> list = new ArrayList<>();
         for ( Object rawItem : toList(raw) ) {
@@ -399,13 +412,14 @@ public class ObjectConverter implements IConverter {
      * 
      * @param object         The LinkML object to convert.
      * @param withIdentifier If <code>false</code>, the slot for the object’s unique
-     *                       identifier is <em>not</em> serialised; this avoids
-     *                       repeating the identifier when the object is serialised
-     *                       in such a way that the identifier is already provided
-     *                       elsewhere (typically as a dict, yielding what the
-     *                       LinkML documentation calls the “CompactDict”
-     *                       serialisation). This has no effect if the object has no
-     *                       identifier slot.
+     *                       identifier (whether is it local or global) is
+     *                       <em>not</em> serialised; this avoids repeating the
+     *                       identifier when the object is serialised in such a way
+     *                       that the identifier is already provided elsewhere
+     *                       (typically as a dict, yielding what the LinkML
+     *                       documentation calls the “CompactDict” serialisation).
+     *                       This has no effect if the object has no identifier or
+     *                       key slot.
      * @param ctx            The global converter context.
      * @return The map that represents the original LinkML object.
      * @throws LinkMLRuntimeException If the converter cannot convert the given
@@ -419,7 +433,7 @@ public class ObjectConverter implements IConverter {
 
         Map<String, Object> raw = new HashMap<>();
         for ( Slot slot : slots.values() ) {
-            if ( slot.isIdentifier() && !withIdentifier ) {
+            if ( (slot.isIdentifier() || slot.isKey()) && !withIdentifier ) {
                 continue;
             }
 
@@ -451,13 +465,15 @@ public class ObjectConverter implements IConverter {
         if ( slot.isMultivalued() ) {
             List<Object> items = toList(object);
             InliningMode inlining = slot.getInliningMode();
+            // FIXME: Check behaviour regarding identifier/key
             if ( !hasIdentifier() || inlining == InliningMode.LIST ) {
                 List<Object> list = new ArrayList<>();
                 for ( Object item : items ) {
                     list.add(serialise(item, ctx));
                 }
                 return list;
-            } else if ( inlining == InliningMode.DICT || inlining == InliningMode.SIMPLE_DICT ) {
+            } else if ( !hasGlobalIdentifier() || inlining == InliningMode.DICT
+                    || inlining == InliningMode.SIMPLE_DICT ) {
                 boolean simpleDict = isEligibleForSimpleDict(true);
                 Map<Object, Object> map = new HashMap<>();
                 for ( Object item : items ) {
@@ -474,11 +490,11 @@ public class ObjectConverter implements IConverter {
             }
         } else {
             // Single-valued object
-            if ( hasIdentifier() && slot.getInliningMode() == InliningMode.NO_INLINING ) {
+            if ( hasGlobalIdentifier() && slot.getInliningMode() == InliningMode.NO_INLINING ) {
                 return toIdentifier(object, ctx);
             } else {
-                // Non-identifiable object or inlined identifiable object; in both cases, can
-                // only be serialised as a map
+                // Not globally identifiable object or inlined object; in both cases, can only
+                // be serialised as a map
                 return serialise(object, ctx);
             }
         }
@@ -486,6 +502,9 @@ public class ObjectConverter implements IConverter {
 
     /**
      * Gets the unique identifier for the given object.
+     * <p>
+     * The identifier may be a local identifier (key) or a global one (proper
+     * identifier in the LinkML sense).
      * 
      * @param object The object for which to get the identifier.
      * @return The unique identifier for the object.

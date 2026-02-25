@@ -7,3 +7,12 @@ inlinedAsList:
 inlinedAsDict:
   sic3:
     foo: yet another string
+localSingleInlined:
+  foo: a local string
+  id: skc1
+localInlinedAsList:
+  - foo: another local string
+    id: skc2
+localInlinedAsDict:
+  skc3:
+    foo: yet another local string

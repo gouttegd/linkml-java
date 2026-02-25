@@ -44,12 +44,22 @@ import org.incenp.linkml.core.RequirementLevel;
 /**
  * An annotation to indicate that a field is intended to contain a unique
  * identifier for an instance of the class it belongs to.
- * 
+ * <p>
  * Of note, in LinkML an identifier field is necessarily a
  * {@link RequirementLevel#MANDATORY} field.
+ * <p>
+ * The same annotation can also indicate that a field is intended to contain a
+ * <em>local</em> unique identifier – what LinkML calls a <em>key</em>. A key is
+ * similar to a (global) identifier, but (1) it only needs to be unique within
+ * the collection where it appears (instead of within the entire LinkML
+ * context), and (2) consequently it cannot be referenced globally (an object
+ * identified by a key can only be <em>inlined</em>).
+ * <p>
+ * Use <code>isGlobal=false</code> to mark the field as a key. The default is
+ * <code>isGlobal=true</code>, which marks the field as a (global) identifier.
  */
 @Retention(RUNTIME)
 @Target(FIELD)
 public @interface Identifier {
-
+    boolean isGlobal() default true;
 }

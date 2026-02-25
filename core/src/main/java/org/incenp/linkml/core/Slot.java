@@ -118,7 +118,19 @@ public class Slot {
      *         <code>false</code>.
      */
     public boolean isIdentifier() {
-        return field.isAnnotationPresent(Identifier.class);
+        Identifier annot = field.getAnnotation(Identifier.class);
+        return annot != null && annot.isGlobal();
+    }
+
+    /**
+     * Indicates whether the slot holds a key for the class it belongs to.
+     * 
+     * @return <code>true</code> if the slot is a key slot, otherwise
+     *         <code>false</code>.
+     */
+    public boolean isKey() {
+        Identifier annot = field.getAnnotation(Identifier.class);
+        return annot != null && !annot.isGlobal();
     }
 
     /**
@@ -296,12 +308,13 @@ public class Slot {
     }
 
     /**
-     * Finds the slot that holds the identifier for a given LinkML object.
+     * Finds the slot that holds the identifier (local or global) for a given LinkML
+     * object.
      * <p>
      * The “identifier slot” is the slot that is tagged with
-     * <code>identifier: true</code> in its definition (or in the
-     * <code>slot_usage</code> block that overrides the global definition for a
-     * given class). In LinkML Java objects, the identifier slot is tagged with a
+     * <code>identifier: true</code> or <code>key: true</code> in its definition (or
+     * in the <code>slot_usage</code> block that overrides the global definition for
+     * a given class). In LinkML Java objects, the identifier slot is tagged with a
      * dedicated runtime annotation.
      * 
      * @param type The Java class representing the LinML class for which to get the
@@ -333,9 +346,8 @@ public class Slot {
      * a dict entry when using the “SimpleDict” inlining mode. As per the rules set
      * forth in LinkML’s documentation, the primary slot is either:
      * <ul>
-     * <li>the one non-identifier (or more generally, non-<em>key</em>, but we do
-     * not support key slots for the time being) slot, if the class has only one
-     * such slot beyond the identifier slot;
+     * <li>the one non-identifier slot, if the class has only one such slot beyond
+     * the identifier slot;
      * <li>the one <em>mandatory</em> non-identifier slot, if the class has several
      * non-identifier slots but only one marked as mandatory.
      * </ul>

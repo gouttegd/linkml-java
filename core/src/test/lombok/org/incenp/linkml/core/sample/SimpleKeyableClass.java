@@ -7,12 +7,12 @@
  * are met:
  *
  *   (1) Redistributions of source code must retain the above copyright
- *   notice, this list of conditions and the following disclaimer. 
+ *   notice, this list of conditions and the following disclaimer.
  *
  *   (2) Redistributions in binary form must reproduce the above
  *   copyright notice, this list of conditions and the following
  *   disclaimer in the documentation and/or other materials provided
- *   with the distribution.  
+ *   with the distribution.
  *
  *   (3)The name of the author may not be used to endorse or promote
  *   products derived from this software without specific prior written
@@ -33,41 +33,24 @@
 
 package org.incenp.linkml.core.sample;
 
-import java.util.List;
-
-import org.incenp.linkml.core.InliningMode;
-import org.incenp.linkml.core.annotations.Inlining;
+import org.incenp.linkml.core.annotations.Identifier;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 /**
- * An example of a class with slots containing identifiable objects expected to
- * be serialised in inlined form.
+ * An example of a simple class representing locally identifiable objects.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder(toBuilder = true)
 @Data
-public class ContainerOfInlinedObjects {
-    @Inlining(InliningMode.DICT)
-    private SimpleIdentifiableClass singleInlined;
-
-    @Inlining(InliningMode.LIST)
-    private List<SimpleIdentifiableClass> inlinedAsList;
-
-    @Inlining(InliningMode.DICT)
-    private List<SimpleIdentifiableClass> inlinedAsDict;
-
-    @Inlining(InliningMode.DICT)
-    private SimpleKeyableClass localSingleInlined;
-
-    @Inlining(InliningMode.LIST)
-    private List<SimpleKeyableClass> localInlinedAsList;
-
-    @Inlining(InliningMode.DICT)
-    private List<SimpleKeyableClass> localInlinedAsDict;
+@EqualsAndHashCode(callSuper = true)
+public class SimpleKeyableClass extends SimpleClass {
+    @Identifier(isGlobal = false)
+    private String id;
 }

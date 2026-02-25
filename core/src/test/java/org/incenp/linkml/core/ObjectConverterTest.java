@@ -57,6 +57,7 @@ import org.incenp.linkml.core.sample.SampleEnum;
 import org.incenp.linkml.core.sample.SimpleClass;
 import org.incenp.linkml.core.sample.SimpleDict;
 import org.incenp.linkml.core.sample.SimpleIdentifiableClass;
+import org.incenp.linkml.core.sample.SimpleKeyableClass;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -137,7 +138,7 @@ public class ObjectConverterTest {
     }
 
     @Test
-    void testConvertingContainerOfInlinedObjects() throws IOException {
+    void testConvertingContainerOfInlinedObjects() throws IOException, LinkMLRuntimeException {
         ContainerOfInlinedObjects obj = parse("container-of-inlined-objects.yaml", ContainerOfInlinedObjects.class);
 
         Assertions.assertEquals("a string", obj.getSingleInlined().getFoo());
@@ -152,6 +153,25 @@ public class ObjectConverterTest {
         sic = obj.getInlinedAsDict().get(0);
         Assertions.assertEquals("yet another string", sic.getFoo());
         Assertions.assertEquals("sic3", sic.getId());
+
+        Assertions.assertEquals("a local string", obj.getLocalSingleInlined().getFoo());
+        Assertions.assertEquals("skc1", obj.getLocalSingleInlined().getId());
+
+        Assertions.assertEquals(1, obj.getLocalInlinedAsList().size());
+        SimpleKeyableClass skc = obj.getLocalInlinedAsList().get(0);
+        Assertions.assertEquals("another local string", skc.getFoo());
+        Assertions.assertEquals("skc2", skc.getId());
+
+        Assertions.assertEquals(1, obj.getLocalInlinedAsDict().size());
+        skc = obj.getLocalInlinedAsDict().get(0);
+        Assertions.assertEquals("yet another local string", skc.getFoo());
+        Assertions.assertEquals("skc3", skc.getId());
+
+        // Additionally check that no global objects have been created for the locally
+        // identifiable objects
+        Assertions.assertNull(ctx.getObject(SimpleKeyableClass.class, "skc1", false));
+        Assertions.assertNull(ctx.getObject(SimpleKeyableClass.class, "skc2", false));
+        Assertions.assertNull(ctx.getObject(SimpleKeyableClass.class, "skc3", false));
 
         roundtrip(obj);
     }
