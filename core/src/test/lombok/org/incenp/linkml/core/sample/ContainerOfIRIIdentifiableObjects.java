@@ -35,8 +35,7 @@ package org.incenp.linkml.core.sample;
 
 import java.util.List;
 
-import org.incenp.linkml.core.InliningMode;
-import org.incenp.linkml.core.annotations.Inlining;
+import org.incenp.linkml.core.annotations.Inlined;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -55,10 +54,10 @@ import lombok.experimental.SuperBuilder;
 public class ContainerOfIRIIdentifiableObjects {
     private IRISimpleIdentifiableClass singleReference;
     private List<IRISimpleIdentifiableClass> multipleReferences;
-    @Inlining(InliningMode.DICT)
+    @Inlined
     private IRISimpleIdentifiableClass singleInlined;
-    @Inlining(InliningMode.LIST)
+    @Inlined(asList = true)
     private List<IRISimpleIdentifiableClass> multipleInlinedAsList;
-    @Inlining(InliningMode.DICT)
+    @Inlined
     private List<IRISimpleIdentifiableClass> multipleInlinedAsDict;
 }

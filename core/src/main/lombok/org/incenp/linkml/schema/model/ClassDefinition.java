@@ -36,9 +36,8 @@ package org.incenp.linkml.schema.model;
 import java.util.List;
 
 import org.incenp.linkml.core.CurieConverter;
-import org.incenp.linkml.core.InliningMode;
 import org.incenp.linkml.core.annotations.Converter;
-import org.incenp.linkml.core.annotations.Inlining;
+import org.incenp.linkml.core.annotations.Inlined;
 import org.incenp.linkml.core.annotations.SlotName;
 import org.incenp.linkml.schema.ClassDefinitionConverter;
 
@@ -63,10 +62,10 @@ public class ClassDefinition extends Definition {
     private List<SlotDefinition> slots;
 
     @SlotName("slot_usage")
-    @Inlining(InliningMode.DICT)
+    @Inlined
     private List<SlotDefinition> slotUsage;
 
-    @Inlining(InliningMode.DICT)
+    @Inlined
     private List<SlotDefinition> attributes;
 
     @SlotName("class_uri")

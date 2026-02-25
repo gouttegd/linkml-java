@@ -35,8 +35,7 @@ package org.incenp.linkml.core.sample;
 
 import java.util.List;
 
-import org.incenp.linkml.core.InliningMode;
-import org.incenp.linkml.core.annotations.Inlining;
+import org.incenp.linkml.core.annotations.Inlined;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -53,12 +52,12 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @Data
 public class ContainerOfSimpleDicts {
-    @Inlining(InliningMode.SIMPLE_DICT)
+    @Inlined
     private List<SimpleDict> simpleDict;
 
-    @Inlining(InliningMode.SIMPLE_DICT)
+    @Inlined
     private List<ExtraSimpleDict> extraSimpleDict;
 
-    @Inlining(InliningMode.SIMPLE_DICT)
+    @Inlined
     private List<MultivaluedSimpleDict> multivaluedSimpleDict;
 }

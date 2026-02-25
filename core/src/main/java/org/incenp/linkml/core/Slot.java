@@ -44,9 +44,9 @@ import java.util.List;
 import org.incenp.linkml.core.annotations.Converter;
 import org.incenp.linkml.core.annotations.ExtensionHolder;
 import org.incenp.linkml.core.annotations.Identifier;
-import org.incenp.linkml.core.annotations.Inlining;
+import org.incenp.linkml.core.annotations.Inlined;
 import org.incenp.linkml.core.annotations.LinkURI;
-import org.incenp.linkml.core.annotations.Requirement;
+import org.incenp.linkml.core.annotations.Required;
 import org.incenp.linkml.core.annotations.SlotName;
 import org.incenp.linkml.core.annotations.TypeDesignator;
 
@@ -89,8 +89,9 @@ public class Slot {
             throw new LinkMLInternalError(String.format("Missing accessor for slot '%s'", field.getName()), e);
         }
 
-        Inlining inliningAnnotation = field.getAnnotation(Inlining.class);
-        inliningMode = inliningAnnotation != null ? inliningAnnotation.value() : InliningMode.NO_INLINING;
+        Inlined inlinedAnnotation = field.getAnnotation(Inlined.class);
+        inliningMode = inlinedAnnotation != null ? inlinedAnnotation.asList() ? InliningMode.LIST : InliningMode.DICT
+                : InliningMode.NO_INLINING;
     }
 
     /**
@@ -204,11 +205,13 @@ public class Slot {
      * @return A {@link RequirementLevel} value for the slot.
      */
     public RequirementLevel getRequirementLevel() {
-        if ( isIdentifier() ) {
+        if ( isIdentifier() || isKey() ) {
             return RequirementLevel.MANDATORY;
         }
-        Requirement reqAnnotation = field.getAnnotation(Requirement.class);
-        return reqAnnotation != null ? reqAnnotation.value() : RequirementLevel.OPTIONAL;
+        Required reqAnnotation = field.getAnnotation(Required.class);
+        return reqAnnotation != null
+                ? reqAnnotation.isRecommended() ? RequirementLevel.RECOMMENDED : RequirementLevel.MANDATORY
+                : RequirementLevel.OPTIONAL;
     }
 
     /**

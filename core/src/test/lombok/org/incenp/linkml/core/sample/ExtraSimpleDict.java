@@ -33,9 +33,8 @@
 
 package org.incenp.linkml.core.sample;
 
-import org.incenp.linkml.core.RequirementLevel;
 import org.incenp.linkml.core.annotations.Identifier;
-import org.incenp.linkml.core.annotations.Requirement;
+import org.incenp.linkml.core.annotations.Required;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -55,7 +54,7 @@ public class ExtraSimpleDict {
     @Identifier
     private String key;
 
-    @Requirement(RequirementLevel.MANDATORY)
+    @Required
     private String value;
 
     private String extra;

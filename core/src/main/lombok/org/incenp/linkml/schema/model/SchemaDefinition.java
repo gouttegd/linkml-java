@@ -36,11 +36,9 @@ package org.incenp.linkml.schema.model;
 import java.net.URI;
 import java.util.List;
 
-import org.incenp.linkml.core.InliningMode;
-import org.incenp.linkml.core.RequirementLevel;
-import org.incenp.linkml.core.annotations.Inlining;
+import org.incenp.linkml.core.annotations.Inlined;
 import org.incenp.linkml.core.annotations.LinkURI;
-import org.incenp.linkml.core.annotations.Requirement;
+import org.incenp.linkml.core.annotations.Required;
 import org.incenp.linkml.core.annotations.SlotName;
 
 import lombok.AccessLevel;
@@ -60,7 +58,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SchemaDefinition extends Element {
-    @Requirement(RequirementLevel.MANDATORY)
+    @Required
     private URI id;
 
     @LinkURI("http://purl.org/pav/version")
@@ -70,7 +68,7 @@ public class SchemaDefinition extends Element {
     private String license;
 
     @LinkURI("http://www.w3.org/ns/shacl#declare")
-    @Inlining(InliningMode.SIMPLE_DICT)
+    @Inlined
     private List<Prefix> prefixes;
 
     @SlotName("default_prefix")
@@ -81,16 +79,16 @@ public class SchemaDefinition extends Element {
 
     private List<String> imports;
 
-    @Inlining(InliningMode.DICT)
+    @Inlined
     private List<TypeDefinition> types;
 
-    @Inlining(InliningMode.DICT)
+    @Inlined
     private List<EnumDefinition> enums;
 
     @SlotName("slot_definitions")
-    @Inlining(InliningMode.DICT)
+    @Inlined
     private List<SlotDefinition> slotDefinitions;
 
-    @Inlining(InliningMode.DICT)
+    @Inlined
     private List<ClassDefinition> classes;
 }

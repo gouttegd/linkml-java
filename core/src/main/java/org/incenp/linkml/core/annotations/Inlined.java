@@ -39,19 +39,21 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.incenp.linkml.core.InliningMode;
-
 /**
  * An annotation to indicate whether the value(s) of a field should be inlined
  * or not (in serialisations that do support inlining).
- * 
+ * <p>
  * When that annotation is not present and the type (“range”, in LinkML
  * parlance) of a field is a class that defines an {@link Identifier} slot, then
  * only the identifier is serialised (it is assumed that the full value will be
  * serialised in inline form elsewhere).
+ * <p>
+ * When that annotation is present, the slot is expected to be serialised as a
+ * dict by default, unless the <code>asList</code> optional parameter is set to
+ * <code>true</code>.
  */
 @Retention(RUNTIME)
 @Target(FIELD)
-public @interface Inlining {
-    InliningMode value();
+public @interface Inlined {
+    boolean asList() default false;
 }

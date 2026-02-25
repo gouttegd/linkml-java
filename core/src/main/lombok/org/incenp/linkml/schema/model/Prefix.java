@@ -33,10 +33,9 @@
 
 package org.incenp.linkml.schema.model;
 
-import org.incenp.linkml.core.RequirementLevel;
 import org.incenp.linkml.core.annotations.Identifier;
 import org.incenp.linkml.core.annotations.LinkURI;
-import org.incenp.linkml.core.annotations.Requirement;
+import org.incenp.linkml.core.annotations.Required;
 import org.incenp.linkml.core.annotations.SlotName;
 
 import lombok.AccessLevel;
@@ -67,7 +66,7 @@ public class Prefix {
     private String prefixName;
 
     @SlotName("prefix_reference")
-    @Requirement(RequirementLevel.MANDATORY)
+    @Required
     @LinkURI("http://www.w3.org/ns/shacl#namespace")
     private String iriPrefix;
 }

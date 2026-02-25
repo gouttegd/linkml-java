@@ -33,10 +33,9 @@
 
 package org.incenp.linkml.schema.model;
 
-import org.incenp.linkml.core.RequirementLevel;
 import org.incenp.linkml.core.annotations.Identifier;
 import org.incenp.linkml.core.annotations.LinkURI;
-import org.incenp.linkml.core.annotations.Requirement;
+import org.incenp.linkml.core.annotations.Required;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -56,7 +55,7 @@ public abstract class Element {
     @LinkURI("http://www.w3.org/2000/01/rdf-schema#label")
     private String name;
 
-    @Requirement(RequirementLevel.RECOMMENDED)
+    @Required(isRecommended = true)
     @LinkURI("http://www.w3.org/2004/02/skos/core#definition")
     private String description;
 

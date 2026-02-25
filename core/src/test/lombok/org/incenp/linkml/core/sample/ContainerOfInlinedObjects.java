@@ -35,8 +35,7 @@ package org.incenp.linkml.core.sample;
 
 import java.util.List;
 
-import org.incenp.linkml.core.InliningMode;
-import org.incenp.linkml.core.annotations.Inlining;
+import org.incenp.linkml.core.annotations.Inlined;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -53,21 +52,21 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @Data
 public class ContainerOfInlinedObjects {
-    @Inlining(InliningMode.DICT)
+    @Inlined
     private SimpleIdentifiableClass singleInlined;
 
-    @Inlining(InliningMode.LIST)
+    @Inlined(asList = true)
     private List<SimpleIdentifiableClass> inlinedAsList;
 
-    @Inlining(InliningMode.DICT)
+    @Inlined
     private List<SimpleIdentifiableClass> inlinedAsDict;
 
-    @Inlining(InliningMode.DICT)
+    @Inlined
     private SimpleKeyableClass localSingleInlined;
 
-    @Inlining(InliningMode.LIST)
+    @Inlined(asList = true)
     private List<SimpleKeyableClass> localInlinedAsList;
 
-    @Inlining(InliningMode.DICT)
+    @Inlined
     private List<SimpleKeyableClass> localInlinedAsDict;
 }

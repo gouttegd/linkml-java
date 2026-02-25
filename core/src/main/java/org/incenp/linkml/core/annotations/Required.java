@@ -45,11 +45,14 @@ import org.incenp.linkml.core.RequirementLevel;
  * An annotation to indicate whether a given field is optional, recommended, or
  * mandatory.
  * 
- * Any field not annotated with an explicit requirement level is assumed to be
- * {@link RequirementLevel#OPTIONAL}.
+ * Without that annotation, a field is assumed to be
+ * {@link RequirementLevel#OPTIONAL}. With that annotation, the field is
+ * {@link RequirementLevel#MANDATORY}, unless the optional
+ * <code>isRecommended</code> parameter is set to <code> true</code>, in which
+ * case the field is {@link RequirementLevel#RECOMMENDED}.
  */
 @Retention(RUNTIME)
 @Target(FIELD)
-public @interface Requirement {
-    RequirementLevel value();
+public @interface Required {
+    boolean isRecommended() default false;
 }

@@ -33,9 +33,8 @@
 
 package org.incenp.linkml.schema.model;
 
-import org.incenp.linkml.core.RequirementLevel;
 import org.incenp.linkml.core.annotations.LinkURI;
-import org.incenp.linkml.core.annotations.Requirement;
+import org.incenp.linkml.core.annotations.Required;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -51,10 +50,10 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @Data
 public class PermissibleValue {
-    @Requirement(RequirementLevel.MANDATORY)
+    @Required
     private String text;
 
-    @Requirement(RequirementLevel.RECOMMENDED)
+    @Required(isRecommended = true)
     @LinkURI("http://www.w3.org/2004/02/skos/core#definition")
     private String description;
 
