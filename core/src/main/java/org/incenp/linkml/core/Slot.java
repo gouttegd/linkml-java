@@ -66,6 +66,7 @@ public class Slot {
     private Method writeAccessor;
     private Method readAccessor;
     private Class<?> outerType;
+    private InliningMode inlining;
 
     /**
      * Creates a new instance.
@@ -196,22 +197,24 @@ public class Slot {
      * inlined as a list, regardless of whether it has been explicitly marked as
      * such.
      * 
-     * @return The expected inlining mode for the slot, or <code>null</code> if
-     *         inlining is not relevant (if the slot expects a scalar or a list of
-     *         scalars, rather than an object or a list of objects).
+     * @return The expected inlining mode for the slot.
      */
     public InliningMode getInliningMode() {
+        if ( inlining != null ) {
+            return inlining;
+        }
+
         ClassInfo ci = ClassInfo.get(getInnerType());
         if ( ci == null ) {
-            return null; // Inlining is not relevant for scalar types
+            inlining = InliningMode.IRRELEVANT;
         } else if ( !ci.hasIdentifier() ) {
             // No identifier of any kind -- necessarily inlined
-            return isMultivalued() ? InliningMode.LIST : InliningMode.DICT;
+            inlining = isMultivalued() ? InliningMode.LIST : InliningMode.DICT;
         } else if ( !ci.isGloballyUnique() ) {
             // Locally unique object -- necessarily inlined
             if ( !isMultivalued() ) {
                 // Can only be serialised as a dict
-                return InliningMode.DICT;
+                inlining = InliningMode.DICT;
             } else {
                 // Eligible for list and dict inlining
                 Inlined annot = field.getAnnotation(Inlined.class);
@@ -219,22 +222,24 @@ public class Slot {
                     // It's not very clear from the LinkML spec what the default should be in that
                     // case (if neither inlined nor inlined_as_list has been specified in the
                     // schema), but apparently the LinkML validator expects a dict.
-                    return InliningMode.DICT;
+                    inlining = InliningMode.DICT;
                 } else {
-                    return annot.asList() ? InliningMode.LIST : InliningMode.DICT;
+                    inlining = annot.asList() ? InliningMode.LIST : InliningMode.DICT;
                 }
             }
         } else {
             // Globally unique object -- eligible for all forms of serialisation
             Inlined annot = field.getAnnotation(Inlined.class);
             if ( annot == null ) {
-                return InliningMode.NO_INLINING;
+                inlining = InliningMode.NO_INLINING;
             } else if ( isMultivalued() ) {
-                return annot.asList() ? InliningMode.LIST : InliningMode.DICT;
+                inlining = annot.asList() ? InliningMode.LIST : InliningMode.DICT;
             } else {
-                return InliningMode.DICT;
+                inlining = InliningMode.DICT;
             }
         }
+
+        return inlining;
     }
 
     /**

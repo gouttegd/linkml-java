@@ -103,6 +103,9 @@ public class SlotTest {
         Assertions.assertEquals(InliningMode.DICT, ci.getSlot("localSingleInlined").getInliningMode());
         Assertions.assertEquals(InliningMode.LIST, ci.getSlot("localInlinedAsList").getInliningMode());
         Assertions.assertEquals(InliningMode.DICT, ci.getSlot("localInlinedAsDict").getInliningMode());
+
+        ci = ClassInfo.get(SimpleClass.class);
+        Assertions.assertEquals(InliningMode.IRRELEVANT, ci.getSlot("foo").getInliningMode());
     }
 
     void testGetBooleanSlot() throws LinkMLRuntimeException {

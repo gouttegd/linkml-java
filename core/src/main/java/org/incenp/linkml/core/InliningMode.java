@@ -33,15 +33,19 @@
 
 package org.incenp.linkml.core;
 
-import org.incenp.linkml.core.annotations.Identifier;
-
 /**
  * Represents the various modes of “inlining” instances of a class, in
  * serialisations that do support inlining (e.g. JSON, YAML).
  */
 public enum InliningMode {
     /**
-     * Instances are not inlined.
+     * Inlining is not relevant (typically because the type is not even a class).
+     */
+    IRRELEVANT,
+
+    /**
+     * Instances are not inlined, but serialised as references instead. This is only
+     * possible if their class defines a globally unique identifier.
      */
     NO_INLINING,
 
@@ -52,14 +56,7 @@ public enum InliningMode {
 
     /**
      * Instances are inlined as a dictionary. This is only possible if their class
-     * defines an {@link Identifier} field.
+     * defines an identifier (globally or locally unique).
      */
-    DICT,
-
-    /**
-     * Instances are inlined as a “simple” dictionary. This is only possible if (1)
-     * their class defines an {@link Identifier} field and (2) their class has only
-     * one other field beyond the identifier field.
-     */
-    SIMPLE_DICT
+    DICT
 }
