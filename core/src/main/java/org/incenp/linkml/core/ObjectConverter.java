@@ -53,7 +53,6 @@ public class ObjectConverter implements IConverter {
     private final static String LIST_EXPECTED = "Invalid value type, list expected";
     private final static String STRING_EXPECTED = "Invalid value type, string expected";
     private final static String OBJECT_EXPECTED = "Invalid value type, '%s' expected";
-    private final static String CREATE_ERROR = "Cannot create object of type '%s'";
     private final static String NO_IDENTIFIER = "Missing identifier for type '%s'";
     private final static String UNKNOWN_TYPE = "Unknown designated type '%s'";
 
@@ -216,11 +215,7 @@ public class ObjectConverter implements IConverter {
         if ( id != null ) {
             object = ctx.getObject(klass.getType(), id, true);
         } else {
-            try {
-                object = getType().newInstance();
-            } catch ( InstantiationException | IllegalAccessException e ) {
-                throw new LinkMLInternalError(String.format(CREATE_ERROR, getType().getName()), e);
-            }
+            object = klass.newInstance();
         }
         convertTo(raw, object, ctx);
         return object;

@@ -46,11 +46,9 @@ import java.util.Map;
  */
 public class ObjectCache {
 
-    private static final String CREATE_ERROR = "Cannot create global object '%s' of type '%s'";
     private static final String NO_IDENTIFIER = "Missing identifier for type '%s'";
 
     private Map<Class<?>, Map<String, Object>> cache = new HashMap<>();
-    private Map<Class<?>, Slot> slotCache = new HashMap<>();
 
     /**
      * Looks up for an object with the specified name.
@@ -70,7 +68,7 @@ public class ObjectCache {
      *                                be created as needed.
      */
     public <T> T getObject(Class<T> type, String name, boolean create) throws LinkMLRuntimeException {
-        Slot identifierSlot = getIdentifierSlot(type);
+        Slot identifierSlot = ClassInfo.get(type).getIdentifierSlot();
         if ( identifierSlot == null ) {
             throw new LinkMLInternalError(String.format(NO_IDENTIFIER, type.getName()));
         }
@@ -91,12 +89,7 @@ public class ObjectCache {
             return null;
         }
 
-        try {
-            cached = type.newInstance();
-        } catch ( InstantiationException | IllegalAccessException e ) {
-            throw new LinkMLInternalError(String.format(CREATE_ERROR, name, type.getName()), e);
-        }
-
+        cached = ClassInfo.get(type).newInstance();
         identifierSlot.setValue(cached, name);
         typeCache.put(name, cached);
 
@@ -124,18 +117,5 @@ public class ObjectCache {
      */
     public int getSize() {
         return cache.size();
-    }
-
-    private Slot getIdentifierSlot(Class<?> type) {
-        // Finding the identifier slot for a type requires iterating through all the
-        // fields for that type, so we keep a cache of identifier slots by type.
-        Slot slot = slotCache.get(type);
-        if ( slot == null ) {
-            slot = Slot.getIdentifierSlot(type);
-            if ( slot != null ) {
-                slotCache.put(type, slot);
-            }
-        }
-        return slot;
     }
 }

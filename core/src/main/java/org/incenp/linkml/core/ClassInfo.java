@@ -46,6 +46,8 @@ import java.util.Map;
  */
 public class ClassInfo {
 
+    private static final String CREATE_ERROR = "Cannot create global object '%s' of type '%s'";
+
     private static Map<Class<?>, ClassInfo> cache = new HashMap<>();
 
     private Class<?> type;
@@ -226,6 +228,28 @@ public class ClassInfo {
      */
     public Slot getExtensionSlot() {
         return extensionSlot;
+    }
+
+    /**
+     * Creates a new instance of the class.
+     * <p>
+     * This is a convenience method to wrap the exception check that catches
+     * reflection errors.
+     * <p>
+     * Of note, all Java classes representing LinkML classes are expected to have a
+     * no-argument constructor – which is the default behaviour of the Java code
+     * generator in LinkML-Py. This is a general assumption throughout this
+     * LinkML-Java runtime.
+     * 
+     * @return The newly created object.
+     * @throws LinkMLRuntimeException If the object could not be created.
+     */
+    public Object newInstance() throws LinkMLRuntimeException {
+        try {
+            return type.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new LinkMLInternalError(String.format(CREATE_ERROR, type.getName()), e);
+        }
     }
 
     /**
