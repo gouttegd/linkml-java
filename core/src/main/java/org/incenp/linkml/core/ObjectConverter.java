@@ -66,7 +66,7 @@ public class ObjectConverter implements IConverter {
      */
     public ObjectConverter(Class<?> klass) {
         this.klass = ClassInfo.get(klass);
-        prefixExtractor = PrefixDeclarationExtractor.getExtractor(this.klass.getSlots());
+        prefixExtractor = PrefixDeclarationExtractor.getExtractor(this.klass);
     }
 
     @Override

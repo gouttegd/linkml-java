@@ -52,6 +52,7 @@ public class ClassInfo {
 
     private Class<?> type;
     private Map<String, Slot> slots = new HashMap<>();
+    private Map<String, Slot> slotsByURI = new HashMap<>();
     private Slot identifierSlot;
     private Slot designatorSlot;
     private Slot extensionSlot;
@@ -77,6 +78,11 @@ public class ClassInfo {
                 extensionSlot = slot;
             } else if ( slot.isTypeDesignator() ) {
                 designatorSlot = slot;
+            }
+
+            String uri = slot.getLinkedURI();
+            if ( uri != null ) {
+                slotsByURI.put(uri, slot);
             }
         }
         primarySlot = Slot.getPrimaryValueSlot(slots.values());
@@ -181,6 +187,23 @@ public class ClassInfo {
      */
     public Slot getSlot(String name) {
         return slots.get(name);
+    }
+
+    /**
+     * Gets a slot by its associated URI.
+     * <p>
+     * The associated URI is the URI specified with the <code>slot_uri</code> slot
+     * in the defining LinkML schema (or a URI automatically constructed from the
+     * slot name and the schema’s default prefix).
+     * 
+     * @param uri The URI of the desired slot.
+     * @return The corresponding slot, or <code>null</code> if the class either has
+     *         no slot with that URI, or at least no slot <em>annotated</em> with
+     *         the appropriate annotation (this is outside of the control of this
+     *         runtime, and entirely dependent on the code generator).
+     */
+    public Slot getSlotByURI(String uri) {
+        return slotsByURI.get(uri);
     }
 
     /**

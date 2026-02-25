@@ -50,10 +50,10 @@ public class PrefixDeclarationExtractorTest {
 
     @Test
     void testGetPrefixDeclarationExtractor() {
-        PrefixDeclarationExtractor ex = PrefixDeclarationExtractor.getExtractor(SchemaDefinition.class);
+        PrefixDeclarationExtractor ex = PrefixDeclarationExtractor.getExtractor(ClassInfo.get(SchemaDefinition.class));
         Assertions.assertNotNull(ex);
 
-        ex = PrefixDeclarationExtractor.getExtractor(SimpleClass.class);
+        ex = PrefixDeclarationExtractor.getExtractor(ClassInfo.get(SimpleClass.class));
         Assertions.assertNull(ex);
     }
 
@@ -65,7 +65,7 @@ public class PrefixDeclarationExtractorTest {
         Map<String, Object> raw = mapper.readValue(stream, Map.class);
 
         ConverterContext ctx = new ConverterContext();
-        PrefixDeclarationExtractor ex = PrefixDeclarationExtractor.getExtractor(SchemaDefinition.class);
+        PrefixDeclarationExtractor ex = PrefixDeclarationExtractor.getExtractor(ClassInfo.get(SchemaDefinition.class));
         SchemaDefinition sd = new SchemaDefinition();
         Map<String, String> prefixMap = ex.extractPrefixes(raw, sd, ctx);
         Assertions.assertTrue(prefixMap.containsKey("linkml"));

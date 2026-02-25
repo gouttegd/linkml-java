@@ -33,7 +33,6 @@
 
 package org.incenp.linkml.core;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,36 +62,19 @@ public class PrefixDeclarationExtractor {
     private Slot prefixSlot;
 
     /**
-     * Gets a prefix declaration extractor for the specified type.
+     * Gets a prefix declaration extractor (if possible) for the specified LinkML
+     * class.
      * <p>
-     * This method will examine the type to check whether it contains a slot
+     * This method will examine the class to check whether it contains a slot
      * intended to hold prefix declarations.
      * 
-     * @param type The type to check. This should be a class representing a LinkML
-     *             class.
+     * @param slots The object representing the LinkML class to check.
      * @return An extractor that can extract prefix declarations from an instance of
-     *         the given type, or <code>null</code> if the type has no slot for
+     *         the given class, or <code>null</code> if the class has no slot for
      *         prefix declarations.
      */
-    public static PrefixDeclarationExtractor getExtractor(Class<?> type) {
-        return getExtractor(Slot.getSlots(type));
-    }
-
-    /**
-     * Gets a prefix declaration extractor from the given collection of slots.
-     * <p>
-     * This method is similar to {@link #getExtractor(Class)} but takes a list of
-     * slots. It is intended for callers that already have a list of slots for the
-     * type for which they want a prefix declaration extractor.
-     * 
-     * @param slots The slots among which to find a slot intended to hold prefix
-     *              declarations. It is assumed that they all belong to the same
-     *              type.
-     * @return An extractor, or <code>null</code> if none of the slots is intended
-     *         to hold prefix declarations.
-     */
-    public static PrefixDeclarationExtractor getExtractor(Collection<Slot> slots) {
-        for ( Slot slot : slots ) {
+    public static PrefixDeclarationExtractor getExtractor(ClassInfo klass) {
+        for ( Slot slot : klass.getSlots() ) {
             // We assume a slot used for declaring prefix expansions must be (1)
             // multi-valued and (2) inlined, because such a slot would not make much sense
             // otherwise.
@@ -100,24 +82,15 @@ public class PrefixDeclarationExtractor {
                 continue;
             }
 
-            // Also no need to bother if the slot holds a primitive type
-            if ( slot.getInnerType().isPrimitive() ) {
+            ClassInfo ci = ClassInfo.get(slot.getInnerType());
+            if ( ci == null ) {
+                // Not a class, so no chance it can interest us
                 continue;
             }
 
-            Slot nameSlot = null;
-            Slot prefixSlot = null;
-            for ( Slot innerSlot : Slot.getSlots(slot.getInnerType()) ) {
-                String uri = innerSlot.getLinkedURI();
-                if ( uri != null ) {
-                    if ( uri.equals(SHACL_PREFIX) ) {
-                        // Not a mistake. What SHACL calls the prefix is what we call the prefix NAME.
-                        nameSlot = innerSlot;
-                    } else if ( uri.equals(SHACL_NS) ) {
-                        prefixSlot = innerSlot;
-                    }
-                }
-            }
+            // Not a mistake. What SHACL calls the prefix is what we call the prefix NAME.
+            Slot nameSlot = ci.getSlotByURI(SHACL_PREFIX);
+            Slot prefixSlot = ci.getSlotByURI(SHACL_NS);
 
             if ( nameSlot != null && prefixSlot != null ) {
                 PrefixDeclarationExtractor extractor = new PrefixDeclarationExtractor();
