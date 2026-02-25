@@ -473,10 +473,10 @@ public class ObjectConverter implements IConverter {
      * "https://linkml.io/linkml-model/latest/docs/specification/06mapping/#collection-form-normalization">non-repair
      * collection form normalisations</a> described in the LinkML specification.
      * 
-     * @param raw  The raw value to convert.
-     * @param slot The slot for which the value is intended. This is used to compare
-     *             the actual serialisation form with the form expected as per the
-     *             original schema.
+     * @param raw      The raw value to convert.
+     * @param expected The expected inlining mode, according to the slot for which
+     *                 the values are intended.
+     * 
      * @return A list with the raw values. This may be the original value (simply
      *         casted as a list) if it already was a list to begin with, or a new
      *         list transformed from whatever actual serialisation was used.

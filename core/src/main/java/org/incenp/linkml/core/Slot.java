@@ -208,9 +208,9 @@ public class Slot {
      * Indicates how the slot value(s) is(are) inlined.
      * <p>
      * Note that this returns the <em>effectively expected</em> inlining mode, that
-     * takes into account both (1) the presence of the {@link Inlined} annotation on
-     * the field representing the slot, (2) whether the slot is single- or
-     * multi-valued, and (3) the type of the slot.
+     * takes into account (1) the presence of the {@link Inlined} annotation on the
+     * field representing the slot, (2) whether the slot is single- or multi-valued,
+     * and (3) the type of the slot.
      * <p>
      * For example, if a multi-valued slot has for type a class that has no
      * identifier slot of any kind, then the slot is necessarily expected to be
