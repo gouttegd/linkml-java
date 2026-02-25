@@ -109,25 +109,45 @@ public class Slot {
     }
 
     /**
-     * Indicates whether the slot holds an identifier for the class it belongs to.
+     * Indicates whether the slot holds a global identifier for the class it belongs
+     * to.
+     * <p>
+     * In the defining LinkML schema, such a slot is marked with
+     * <code>identifier: true</code>.
      * 
-     * @return <code>true</code> if the slot is an identifier slot, otherwise
+     * @return <code>true</code> if the slot is a global identifier slot, otherwise
      *         <code>false</code>.
      */
-    public boolean isIdentifier() {
+    public boolean isGlobalIdentifier() {
         Identifier annot = field.getAnnotation(Identifier.class);
         return annot != null && annot.isGlobal();
     }
 
     /**
-     * Indicates whether the slot holds a key for the class it belongs to.
+     * Indicates whether the slot holds a local identifier for the class it belongs
+     * to.
+     * <p>
+     * In the defining LinkML schema, such a slot is marked with
+     * <code>key: true</code> (which is why it is sometimes called a <em>key
+     * slot</em>).
      * 
-     * @return <code>true</code> if the slot is a key slot, otherwise
-     *         <code>false</code>.
+     * @return <code>true</code> if the slot is a local identifier (key) slot,
+     *         otherwise <code>false</code>.
      */
-    public boolean isKey() {
+    public boolean isLocalIdentifier() {
         Identifier annot = field.getAnnotation(Identifier.class);
         return annot != null && !annot.isGlobal();
+    }
+
+    /**
+     * Indicates whether the slot holds any kind of identifier (global or local) for
+     * the class it belongs to.
+     * 
+     * @return <code>true</code> if the slot is a global or local identifier slot,
+     *         otherwise <code>false</code>.
+     */
+    public boolean isIdentifier() {
+        return field.isAnnotationPresent(Identifier.class);
     }
 
     /**
@@ -248,7 +268,7 @@ public class Slot {
      * @return A {@link RequirementLevel} value for the slot.
      */
     public RequirementLevel getRequirementLevel() {
-        if ( isIdentifier() || isKey() ) {
+        if ( isGlobalIdentifier() || isLocalIdentifier() ) {
             return RequirementLevel.MANDATORY;
         }
         Required reqAnnotation = field.getAnnotation(Required.class);

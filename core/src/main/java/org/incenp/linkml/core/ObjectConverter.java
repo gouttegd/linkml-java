@@ -335,7 +335,7 @@ public class ObjectConverter implements IConverter {
 
         Map<String, Object> raw = new HashMap<>();
         for ( Slot slot : klass.getSlots() ) {
-            if ( (slot.isIdentifier() || slot.isKey()) && !withIdentifier ) {
+            if ( (slot.isIdentifier()) && !withIdentifier ) {
                 continue;
             }
 

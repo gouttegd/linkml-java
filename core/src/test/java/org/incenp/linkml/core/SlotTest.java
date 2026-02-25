@@ -41,6 +41,7 @@ import org.incenp.linkml.core.sample.ContainerOfSimpleObjects;
 import org.incenp.linkml.core.sample.ExtensibleSimpleClass;
 import org.incenp.linkml.core.sample.SimpleClass;
 import org.incenp.linkml.core.sample.SimpleIdentifiableClass;
+import org.incenp.linkml.core.sample.SimpleKeyableClass;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -74,9 +75,18 @@ public class SlotTest {
     void testIsIdentifier() throws LinkMLRuntimeException {
         Slot identifierSlot = Slot.getSlot(SimpleIdentifiableClass.class, "id");
         Assertions.assertTrue(identifierSlot.isIdentifier());
+        Assertions.assertTrue(identifierSlot.isGlobalIdentifier());
+        Assertions.assertFalse(identifierSlot.isLocalIdentifier());
+
+        identifierSlot = Slot.getSlot(SimpleKeyableClass.class, "id");
+        Assertions.assertTrue(identifierSlot.isIdentifier());
+        Assertions.assertFalse(identifierSlot.isGlobalIdentifier());
+        Assertions.assertTrue(identifierSlot.isLocalIdentifier());
 
         Slot nonIdentifierSlot = Slot.getSlot(SimpleIdentifiableClass.class, "foo");
         Assertions.assertFalse(nonIdentifierSlot.isIdentifier());
+        Assertions.assertFalse(nonIdentifierSlot.isGlobalIdentifier());
+        Assertions.assertFalse(nonIdentifierSlot.isLocalIdentifier());
     }
 
     @Test

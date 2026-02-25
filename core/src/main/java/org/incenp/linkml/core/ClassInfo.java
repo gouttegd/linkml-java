@@ -72,9 +72,9 @@ public class ClassInfo {
         type = klass;
         for ( Slot slot : Slot.getSlots(klass) ) {
             slots.put(slot.getLinkMLName(), slot);
-            if ( slot.isIdentifier() || slot.isKey() ) {
+            if ( slot.isIdentifier() ) {
                 identifierSlot = slot;
-                identifierIsLocal = identifierSlot.isKey();
+                identifierIsLocal = identifierSlot.isLocalIdentifier();
             } else if ( slot.isExtensionStore() ) {
                 extensionSlot = slot;
             } else if ( slot.isTypeDesignator() ) {
