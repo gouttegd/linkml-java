@@ -33,6 +33,9 @@
 
 package org.incenp.linkml.core;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -341,8 +344,11 @@ public class ClassInfo {
      *         <code>false</code>.
      */
     public static boolean isClass(Class<?> type) {
+        // FIXME: At some point we will need a more sustainable way of recognising
+        // classes that represent scalar types...
         if ( type.getSuperclass() == null || type.isEnum() || type == String.class || type == Boolean.class
-                || type == Integer.class || type == Float.class || type == Double.class ) {
+                || type == Integer.class || type == Float.class || type == Double.class
+                || type == ZonedDateTime.class || type == LocalDate.class || type == LocalTime.class ) {
             return false;
         }
         return true;

@@ -36,6 +36,9 @@ package org.incenp.linkml.core;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,6 +87,9 @@ public class ConverterContext {
         converters.put(Float.class, new FloatConverter());
         converters.put(Double.class, new DoubleConverter());
         converters.put(URI.class, new URIConverter());
+        converters.put(ZonedDateTime.class, new DatetimeConverter());
+        converters.put(LocalDate.class, new DateConverter());
+        converters.put(LocalTime.class, new TimeConverter());
 
         // For the primitive types, use the same converters as their boxed counterparts
         converters.put(Boolean.TYPE, converters.get(Boolean.class));

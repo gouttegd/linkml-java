@@ -7,12 +7,12 @@
  * are met:
  *
  *   (1) Redistributions of source code must retain the above copyright
- *   notice, this list of conditions and the following disclaimer. 
+ *   notice, this list of conditions and the following disclaimer.
  *
  *   (2) Redistributions in binary form must reproduce the above
  *   copyright notice, this list of conditions and the following
  *   disclaimer in the documentation and/or other materials provided
- *   with the distribution.  
+ *   with the distribution.
  *
  *   (3)The name of the author may not be used to endorse or promote
  *   products derived from this software without specific prior written
@@ -31,42 +31,41 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core.sample;
+package org.incenp.linkml.core;
 
-import java.net.URI;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
-import java.util.List;
-
-import org.incenp.linkml.core.annotations.LinkURI;
-import org.incenp.linkml.core.annotations.SlotName;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import java.time.format.DateTimeParseException;
 
 /**
- * An example of a simple class containing only scalar fields.
+ * A converter for slots typed as <code>xsd:date</code> (represented as
+ * {@link LocalDate}).
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@SuperBuilder(toBuilder = true)
-@Data
-public class SimpleClass {
-    private String foo;
+public class DateConverter extends ScalarConverterBase {
 
-    @SlotName("the_bar")
-    private URI bar;
+    @Override
+    public Class<?> getType() {
+        return LocalDate.class;
+    }
 
-    @LinkURI("https://example.org/baz")
-    private Boolean baz;
-    private List<String> foos;
-    private SampleEnum type;
+    @Override
+    protected Object convertImpl(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
+        if ( raw instanceof LocalDate ) {
+            return raw;
+        } else {
+            try {
+                return LocalDate.parse(raw.toString());
+            } catch ( DateTimeParseException e ) {
+                throw new LinkMLValueError(String.format("Invalid value, date expected: %s", raw), e);
+            }
+        }
+    }
 
-    private ZonedDateTime datetime;
-    private LocalDate date;
-    private LocalTime time;
+    @Override
+    public Object serialise(Object object, ConverterContext ctx) throws LinkMLRuntimeException {
+        if ( object instanceof LocalDate ) {
+            return object.toString();
+        } else {
+            throw new LinkMLInternalError("Invalid value, date expected");
+        }
+    }
 }

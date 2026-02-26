@@ -36,6 +36,10 @@ package org.incenp.linkml.core;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -77,6 +81,10 @@ public class ObjectConverterTest {
         Assertions.assertTrue(sc.getBaz());
         Assertions.assertEquals("a string in a list", sc.getFoos().get(0));
         Assertions.assertEquals(SampleEnum.FOO, sc.getType());
+
+        Assertions.assertEquals(ZonedDateTime.of(2026, 1, 1, 12, 12, 12, 0, ZoneId.of("Z")), sc.getDatetime());
+        Assertions.assertEquals(LocalDate.of(2026, 1, 1), sc.getDate());
+        Assertions.assertEquals(LocalTime.of(12, 12, 12), sc.getTime());
 
         roundtrip(sc);
     }

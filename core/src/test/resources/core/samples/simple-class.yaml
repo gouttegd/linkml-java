@@ -7,3 +7,6 @@ foos:
 unknown1: unknown string
 unknown2:
   name: unknown dict
+datetime: 2026-01-01T12:12:12Z
+date: 2026-01-01
+time: 12:12:12
