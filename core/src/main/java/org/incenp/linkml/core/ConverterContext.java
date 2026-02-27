@@ -392,6 +392,10 @@ public class ConverterContext {
      */
     public void finalizeAssignments(boolean failOnMissing) throws LinkMLRuntimeException {
         for ( DelayedAssignment da : delayedAssignments ) {
+            if ( da.name == null ) {
+                continue;
+
+            }
             Object value = getObject(da.type, da.name, false);
             if ( value != null ) {
                 da.setValue(value);
@@ -402,7 +406,10 @@ public class ConverterContext {
                 value = getObject(da.type, da.name, true);
                 da.setValue(value);
             }
+            da.name = null;
         }
+
+        delayedAssignments.removeIf(da -> da.name == null);
     }
 
     /*

@@ -72,22 +72,8 @@ and that you have generated code meeting the above requirements, you can
 read an instance of `Foo` from a YAML file as follows:
 
 ```java
-// Parse the YAML file into a generic Map -- nothing LinkML specific
-// here, we just rely on the Jackson library (though any other library
-// that can parse YAML into a Map would do).
-ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-FileInputStream stream = new FileInputStream(new File("foo.yaml"));
-Object raw = mapper.readValue(stream, Map.class);
-
-// LinkML magic starts here.
-// ConverterContext is the main interface to the LinkML runtime. We use
-// it here to convert the raw map into an actual Foo object, and to
-// ensure that forward references to global objects are resolved.
-ConverterContext ctx = new ConverterContext();
-Foo foo = (Foo) ctx.getConverter(Foo.class).convert(raw, ctx);
-ctx.finalizeAssignments();
-
-// Now do whatever you need with the foo object
+YAMLLoader loader = new YAMLLoader();
+Foo foo = loader.loadObject(new File("foo.yaml"), Foo.class);
 ```
 
 To read a _list_ of objects instead (if your LinkML schema does not
@@ -95,26 +81,11 @@ define a top-level object, as for example with the
 [KGCL schema](https://w3id.org/kgcl/)):
 
 ```java
-List<Object> rawList = mapper.readValue(stream, List.class);
-List<Change> kgclChangeset = new ArrayList<>();
-for ( Object rawItem : rawList ) {
-    kgclChangeset.add((Change) ctx.getConverter(Change.class).convert(rawItem, ctx);
-}
-ctx.finalizeAssignments();
-
-// Now do whatever you need with the list of Change objects
+List<Change> kgclChangeset = loader.loadObjects(new File("changes.kgcl"), Change.class);
 ```
 
-To serialise an object back to YAML, we do the opposite – use the
-`ConverterContext` to convert the object into a raw map, that we can
-then give to the Jackson mapper:
-
-```java
-raw = ctx.getConverter(Foo.class).serialise(foo, ctx);
-mapper.writeValue(System.out, raw);
-```
-
-(More documentation will come soon.)
+(More documentation will come soon. Also please note that the interface
+of `YAMLLoader` is not definitive yet.)
 
 Homepage and repository
 -----------------------
