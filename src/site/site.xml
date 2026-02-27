@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.8.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0
+  http://maven.apache.org/xsd/decoration-1.8.0.xsd">
+  <body>
+    <menu name="LinkML-Java" inherit="top">
+      <item name="About" href="index.html" />
+      <item name="Runtime Library" href="linkml-core/index.html" />
+      <item name="API Documentation" href="apidocs/index.html" />
+    </menu>
+    <menu name="Links" inherit="bottom">
+      <item name="Issue tracker" href="https://github.com/gouttegd/linkml-java/issues" />
+      <item name="Current release" href="https://github.com/gouttegd/linkml-java/releases/tag/linkml-java-${this.version}/" />
+    </menu>
+    <footer><![CDATA[Copyright © 2026 Damien Goutte-Gattat]]></footer>
+  </body>
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>1.9</version>
+  </skin>
+</project>
