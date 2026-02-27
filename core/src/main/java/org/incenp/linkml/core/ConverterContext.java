@@ -124,7 +124,8 @@ public class ConverterContext {
      * @param type The type to query.
      * @return The registered converter for the type, or <code>null</code> if no
      *         converter has been registered for that type.
-     * @throws LinkMLInternalError
+     * @throws LinkMLRuntimeException If the type is configured to use a custom
+     *                                converter that could not be instantiated.
      */
     public IConverter getConverter(Class<?> type) throws LinkMLRuntimeException {
         IConverter conv = converters.get(type);
@@ -360,7 +361,7 @@ public class ConverterContext {
      * <p>
      * A delayed assignment is an assignment requested through the
      * {@link #getObject(Slot, String, Object)} or
-     * {@link #getObjects(Slot, List, Object)} methods, which could not be performed
+     * {@link #getObjects(Class, List, List)} methods, which could not be performed
      * at the time that method was called because the requested object was not known
      * to the context yet.
      * <p>

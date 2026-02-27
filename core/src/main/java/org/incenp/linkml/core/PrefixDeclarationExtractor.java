@@ -68,7 +68,7 @@ public class PrefixDeclarationExtractor {
      * This method will examine the class to check whether it contains a slot
      * intended to hold prefix declarations.
      * 
-     * @param slots The object representing the LinkML class to check.
+     * @param klass The object representing the LinkML class to check.
      * @return An extractor that can extract prefix declarations from an instance of
      *         the given class, or <code>null</code> if the class has no slot for
      *         prefix declarations.

@@ -282,8 +282,8 @@ public class ObjectConverter implements IConverter {
      * type.
      * <p>
      * This method does basically the same thing as
-     * {@link #getIdentifier(Object, ConverterContext)} for every raw object in the
-     * provided list.
+     * {@link #getGlobalIdentifier(Object, ConverterContext)} for every raw object
+     * in the provided list.
      * 
      * @param raw The raw object to convert. It is expected to be a list containing
      *            the raw identifiers.
