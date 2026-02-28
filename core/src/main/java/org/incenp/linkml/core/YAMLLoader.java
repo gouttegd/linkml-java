@@ -44,7 +44,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 /**
- * Helper class to load LinkML data instances from YAML files.
+ * Helper class to load or dump LinkML data instances from or to YAML files.
  * <p>
  * For now this is merely a thin wrapper around both Jackson’s ObjectMapper and
  * our own {@link ConverterContext}.
@@ -53,6 +53,20 @@ public class YAMLLoader {
 
     private ConverterContext ctx = new ConverterContext();
     private final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+
+    /**
+     * Gets the LinkML context used by this loader.
+     * <p>
+     * Client code might require access to the context (1) to customise it before
+     * loading anything (e.g. to add externally defined prefixes or set up custom
+     * converters), or (2) after loading something, to get all the prefixes that may
+     * have been found in instance data.
+     * 
+     * @return The underlying LinkML context.
+     */
+    public ConverterContext getContext() {
+        return ctx;
+    }
 
     /**
      * Loads an instance of the specified type from a YAML file.
@@ -99,5 +113,45 @@ public class YAMLLoader {
         ctx.finalizeAssignments();
 
         return cooked;
+    }
+
+    /**
+     * Dumps a LinkML object into a YAML file.
+     * 
+     * @param <T>    The type of the object to dump.
+     * @param file   The file where to dump the object.
+     * @param object The object to dump.
+     * @throws IOException            If any I/O error occurs when attempting to
+     *                                write to the file.
+     * @throws LinkMLRuntimeException If any error occurs when serialising the
+     *                                object to a raw YAML tree (this should not
+     *                                happen if the object is a valid LinkML object
+     *                                in the first place).
+     */
+    public <T> void dumpObject(File file, T object) throws IOException, LinkMLRuntimeException {
+        Object raw = ctx.getConverter(object.getClass()).serialise(object, ctx);
+        mapper.writeValue(file, raw);
+    }
+
+    /**
+     * Dumps a list of LinkML objects into a YAML file.
+     * 
+     * @param <T>     The type of the objects to dump. Of note, each object may be
+     *                of a different subtype of that type.
+     * @param file    The file where to dump the object.
+     * @param objects The objects to dump.
+     * @throws IOException            If any I/O error occurs when attempting to
+     *                                write to the file.
+     * @throws LinkMLRuntimeException If any error occurs when serialising the
+     *                                objects to a raw YAML tree (this should not
+     *                                happen if the object is a valid LinkML object
+     *                                in the first place).
+     */
+    public <T> void dumpObjects(File file, List<T> objects) throws IOException, LinkMLRuntimeException {
+        List<Object> raw = new ArrayList<>();
+        for ( T object : objects ) {
+            raw.add(ctx.getConverter(object.getClass()).serialise(object, ctx));
+        }
+        mapper.writeValue(file, raw);
     }
 }

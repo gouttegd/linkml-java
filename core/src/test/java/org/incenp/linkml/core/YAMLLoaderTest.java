@@ -36,6 +36,8 @@ package org.incenp.linkml.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.incenp.linkml.core.sample.SampleEnum;
@@ -66,5 +68,41 @@ public class YAMLLoaderTest {
 
         Assertions.assertEquals("a string", scs.get(0).getFoo());
         Assertions.assertEquals("another string", scs.get(1).getFoo());
+    }
+
+    @Test
+    void testWritingSimpleClass() throws IOException, LinkMLRuntimeException {
+        SimpleClass sc = new SimpleClass();
+        sc.setFoo("a string");
+        sc.setBar(URI.create("https://example.org/a/URI"));
+        sc.setBaz(false);
+
+        File tmp = new File("src/test/resources/core/samples/simple-class.yaml.out");
+        loader.dumpObject(tmp, sc);
+
+        SimpleClass sc2 = loader.loadObject(tmp, SimpleClass.class);
+        Assertions.assertFalse(sc == sc2);
+        Assertions.assertTrue(sc.equals(sc2));
+
+        tmp.delete();
+    }
+
+    @Test
+    void testWritingListOfSimpleClass() throws IOException, LinkMLRuntimeException {
+        List<SimpleClass> list = new ArrayList<>();
+        SimpleClass sc = new SimpleClass();
+        sc.setFoo("a string");
+        list.add(sc);
+        sc = new SimpleClass();
+        sc.setBar(URI.create("https://example.org/a/URI"));
+        list.add(sc);
+
+        File tmp = new File("src/test/resources/core/samples/simple-class-list.yaml.out");
+        loader.dumpObjects(tmp, list);
+
+        List<SimpleClass> list2 = loader.loadObjects(tmp, SimpleClass.class);
+        Assertions.assertTrue(list.equals(list2));
+
+        tmp.delete();
     }
 }
