@@ -34,6 +34,8 @@
 
 package org.incenp.linkml.core;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +58,7 @@ public class ObjectConverter implements IConverter {
     private final static String OBJECT_EXPECTED = "Invalid value type, '%s' expected";
     private final static String NO_IDENTIFIER = "Missing identifier for type '%s'";
     private final static String UNKNOWN_TYPE = "Unknown designated type '%s'";
+    private final static String INVALID_CLASS_URI = "Missing or invalid class URI for type '%s'";
 
     protected ClassInfo klass;
     private PrefixDeclarationExtractor prefixExtractor;
@@ -162,29 +165,36 @@ public class ObjectConverter implements IConverter {
         ObjectConverter conv = this;
         if ( klass.hasTypeDesignator() ) {
             Slot designatorSlot = klass.getTypeDesignatorSlot();
-            // FIXME: Several issues here.
-            // First, we only supporting referencing a type by name. According to the LinkML
-            // doc, a type designator can also be a URI (or a CURIE), in which case it
-            // refers to the class by its class URI.
-            // Second, we assume that all classes derived from a LinkML schema lives in the
-            // same package. This is not ideal but, if all we have to refer to a class is an
-            // unqualified name, it does not seem like an unreasonable assumption.
-            // Third, LinkML allows the type designator slot to be multivalued, in which
-            // case we should pick “the most specific class” among all the classes listed
-            // (what to do if the list contains several classes at the same inheritance
-            // level is unspecified). Currently we only support the single-valued case.
             Object designator = raw.get(designatorSlot.getLinkMLName());
             if ( designator != null ) {
-                String pkgName = getType().getPackage().getName();
-                String clsName = ctx.getConverter(designatorSlot).convert(designator, ctx).toString();
-                try {
-                    Class<?> designatedType = Class.forName(pkgName + "." + clsName);
-                    conv = (ObjectConverter) ctx.getConverter(designatedType);
-                } catch ( ClassNotFoundException e ) {
-                    // We treat that as a value error because providing a correct name in the class
-                    // designator is the responsibility of whoever produced the data.
-                    throw new LinkMLValueError(String.format(UNKNOWN_TYPE, pkgName));
+                // FIXME: LinkML allows the type designator slot to be multivalued, in which
+                // case we should pick "the most specific class" among the classes listed (what
+                // to do if the list contains several classes at the same inheritance level is
+                // unspecified). Currently we only support the single-valued case.
+                String designatedName = ctx.getConverter(designatorSlot).convert(designator, ctx).toString();
+                Class<?> designatedType = null;
+
+                // First try looking by class URI. This will only work if the designated class
+                // has already been "seen" by the ClassInfo cache.
+                ClassInfo ci = ClassInfo.get(designatedName);
+                if ( ci != null ) {
+                    designatedType = ci.getType();
+                } else {
+                    // No luck, so look up by class name.
+                    // FIXME: We assume that all classes derived from the initial class will live in
+                    // the same Java package. This is not ideal but, if all we have to refer to a
+                    // class is an unqualified name, it is not an unreasonable assumption.
+                    String pkgName = getType().getPackage().getName();
+                    try {
+                        designatedType = Class.forName(pkgName + "." + designatedName);
+                    } catch ( ClassNotFoundException e ) {
+                        // We treat that as a value error because providing a correct name in the class
+                        // designator is the responsibility of whoever produced the data
+                        throw new LinkMLValueError(String.format(UNKNOWN_TYPE, designatedName));
+                    }
                 }
+
+                conv = (ObjectConverter) ctx.getConverter(designatedType);
             }
         }
         String id = null;
@@ -343,7 +353,23 @@ public class ObjectConverter implements IConverter {
             Object slotValue;
             if ( slot.isTypeDesignator() ) {
                 // Ignore whatever may be contained in the slot and use the actual type name
-                slotValue = getType().getSimpleName();
+                if ( slot.getInnerType().equals(URI.class) ) {
+                    // URI-typed designator slot, it requires the class URI
+                    try {
+                        slotValue = new URI(klass.getURI());
+                    } catch ( NullPointerException | URISyntaxException e ) {
+                        throw new LinkMLInternalError(String.format(INVALID_CLASS_URI, getType().getName()));
+                    }
+                } else if ( ctx.getConverter(slot) instanceof CurieConverter ) {
+                    // URI-or-CURIE typed designator slot, also requiring the class URI
+                    if ( klass.getURI() == null ) {
+                        throw new LinkMLInternalError(String.format(INVALID_CLASS_URI, getType().getName()));
+                    }
+                    slotValue = klass.getURI();
+                } else {
+                    // Assume a name-based type designator slot
+                    slotValue = getType().getSimpleName();
+                }
             } else {
                 slotValue = slot.getValue(object);
                 if ( slotValue == null ) {
@@ -368,7 +394,6 @@ public class ObjectConverter implements IConverter {
         InliningMode inlining = slot.getInliningMode();
         if ( slot.isMultivalued() ) {
             List<Object> items = toList(object);
-            // FIXME: Check behaviour regarding identifier/key
             if ( inlining == InliningMode.LIST ) {
                 List<Object> list = new ArrayList<>();
                 for ( Object item : items ) {

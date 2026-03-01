@@ -41,6 +41,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.incenp.linkml.core.annotations.LinkURI;
+
 /**
  * Holds informations about a LinkML class and its corresponding Java class.
  * <p>
@@ -53,6 +55,7 @@ public class ClassInfo {
     private static final String CREATE_ERROR = "Cannot create global object '%s' of type '%s'";
 
     private static Map<Class<?>, ClassInfo> cache = new HashMap<>();
+    private static Map<String, ClassInfo> cacheByURI = new HashMap<>();
 
     private Class<?> type;
     private Map<String, Slot> slots = new HashMap<>();
@@ -63,6 +66,7 @@ public class ClassInfo {
     private Slot primarySlot;
     private boolean identifierIsLocal;
     private boolean primarySlotChecked;
+    private String uri;
 
     /**
      * Creates a new instance from the specified Java class.
@@ -90,6 +94,23 @@ public class ClassInfo {
                 slotsByURI.put(uri, slot);
             }
         }
+
+        LinkURI uriAnnot = klass.getAnnotation(LinkURI.class);
+        if ( uriAnnot != null ) {
+            uri = uriAnnot.value();
+        }
+    }
+
+    /**
+     * Gets the LinkML URI for the class.
+     * <p>
+     * We can only obtain this if the class has been properly annotated with a
+     * {@link LinkURI} annotation during code generation.
+     * 
+     * @return The class’s URI, or <code>null</code> if we don't know its URI.
+     */
+    public String getURI() {
+        return uri;
     }
 
     /**
@@ -333,8 +354,26 @@ public class ClassInfo {
         if ( ci == null && isClass(type) ) {
             ci = new ClassInfo(type);
             cache.put(type, ci);
+            if ( ci.getURI() != null ) {
+                cacheByURI.put(ci.getURI(), ci);
+            }
         }
         return ci;
+    }
+
+    /**
+     * Gets the <code>ClassInfo</code> object for the LinkML class identifier by the
+     * given URI.
+     * <p>
+     * This requires that the <code>ClassInfo</code> object for that class has
+     * already been queried before by the class type using {@link #get(Class)}.
+     * 
+     * @param uri The LinkML URI of the class to lookup.
+     * @return The corresponding <code>ClassInfo</code> object, or <code>null</code>
+     *         if the URI does not correspond to a known LinkML class.
+     */
+    public static ClassInfo get(String uri) {
+        return cacheByURI.get(uri);
     }
 
     /**

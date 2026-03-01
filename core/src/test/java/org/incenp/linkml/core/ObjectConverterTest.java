@@ -37,6 +37,7 @@ package org.incenp.linkml.core;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -44,7 +45,9 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.incenp.linkml.core.sample.BaseCurieSelfDesignatedClass;
 import org.incenp.linkml.core.sample.BaseSelfDesignatedClass;
+import org.incenp.linkml.core.sample.BaseURISelfDesignatedClass;
 import org.incenp.linkml.core.sample.ClassWithCustomConverter;
 import org.incenp.linkml.core.sample.ContainerOfBooleanValues;
 import org.incenp.linkml.core.sample.ContainerOfIRIIdentifiableObjects;
@@ -53,7 +56,9 @@ import org.incenp.linkml.core.sample.ContainerOfIntegerValues;
 import org.incenp.linkml.core.sample.ContainerOfReferences;
 import org.incenp.linkml.core.sample.ContainerOfSimpleDicts;
 import org.incenp.linkml.core.sample.ContainerOfSimpleObjects;
+import org.incenp.linkml.core.sample.DerivedCurieSelfDesignatedClass;
 import org.incenp.linkml.core.sample.DerivedSelfDesignatedClass;
+import org.incenp.linkml.core.sample.DerivedURISelfDesignatedClass;
 import org.incenp.linkml.core.sample.ExtensibleSimpleClass;
 import org.incenp.linkml.core.sample.ExtraSimpleDict;
 import org.incenp.linkml.core.sample.IRISimpleIdentifiableClass;
@@ -355,6 +360,55 @@ public class ObjectConverterTest {
         Map<String, Object> raw = conv.serialise(bsdc, true, ctx);
         Assertions.assertTrue(raw.containsKey("type"));
         Assertions.assertEquals("DerivedSelfDesignatedClass", raw.get("type"));
+    }
+
+    @Test
+    void testURITypeDesignator() throws IOException, LinkMLRuntimeException {
+        String text = "foo: A string\nbar: Another string\ntype: https://example.org/classes/DerivedURISelfDesignatedClass\n";
+        // Make sure the class and its URI is known to ClassInfo
+        ClassInfo.get(DerivedURISelfDesignatedClass.class);
+        BaseURISelfDesignatedClass base = parseString(text, BaseURISelfDesignatedClass.class);
+
+        Assertions.assertInstanceOf(DerivedURISelfDesignatedClass.class, base);
+        DerivedURISelfDesignatedClass derived = (DerivedURISelfDesignatedClass) base;
+        Assertions.assertEquals("A string", derived.getFoo());
+        Assertions.assertEquals("Another string", derived.getBar());
+
+        roundtrip(derived);
+
+        // Try serialising again, but without the type designator; the slot should still
+        // be set in the serialised object
+        derived.setType(null);
+        ObjectConverter conv = (ObjectConverter) ctx.getConverter(derived.getClass());
+        Map<String, Object> raw = conv.serialise(derived, true, ctx);
+        Assertions.assertTrue(raw.containsKey("type"));
+        Assertions.assertEquals(URI.create("https://example.org/classes/DerivedURISelfDesignatedClass"),
+                raw.get("type"));
+    }
+
+    @Test
+    void testCurieTypeDesignator() throws IOException, LinkMLRuntimeException {
+        String text = "foo: A string\nbar: Another string\ntype: EX:DerivedCurieSelfDesignatedClass\n";
+        // Make sure the class and its URI is known to ClassInfo, and that the converter
+        // context knows about the EX prefix
+        ctx.addPrefix("EX", "https://example.org/classes/");
+        ClassInfo.get(DerivedCurieSelfDesignatedClass.class);
+        BaseCurieSelfDesignatedClass base = parseString(text, BaseCurieSelfDesignatedClass.class);
+
+        Assertions.assertInstanceOf(DerivedCurieSelfDesignatedClass.class, base);
+        DerivedCurieSelfDesignatedClass derived = (DerivedCurieSelfDesignatedClass) base;
+        Assertions.assertEquals("A string", derived.getFoo());
+        Assertions.assertEquals("Another string", derived.getBar());
+
+        roundtrip(derived);
+
+        // Try serialising again, but without the type designator; the slot should still
+        // be set in the serialised object
+        derived.setType(null);
+        ObjectConverter conv = (ObjectConverter) ctx.getConverter(derived.getClass());
+        Map<String, Object> raw = conv.serialise(derived, true, ctx);
+        Assertions.assertTrue(raw.containsKey("type"));
+        Assertions.assertEquals("EX:DerivedCurieSelfDesignatedClass", raw.get("type"));
     }
 
     @Test
