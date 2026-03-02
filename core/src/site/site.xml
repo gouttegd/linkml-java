@@ -4,8 +4,9 @@
   xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0
                       http://maven.apache.org/xsd/decoration-1.8.0.xsd">
   <body>
-    <menu name="LinkML-Java runtime library">
+    <menu name="LinkML-Java core runtime library">
       <item name="Introduction" href="index.html" />
+      <item name="Code generation" href="codegen.html" />
     </menu>
   </body>
 </project>
