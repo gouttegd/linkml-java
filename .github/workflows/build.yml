@@ -8,6 +8,9 @@ on:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        java_version: [ '8', '11', '21' ]
 
     runs-on: ubuntu-latest
 
@@ -16,8 +19,8 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
-        java-version: '11'
+        java-version: ${{ matrix.java_version }}
         distribution: 'temurin'
         cache: maven
     - name: Build package
-      run: mvn -B package site
+      run: mvn -B -Dgpg.skip=true verify site
