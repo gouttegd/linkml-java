@@ -52,7 +52,7 @@ import org.incenp.linkml.core.annotations.LinkURI;
  */
 public class ClassInfo {
 
-    private static final String CREATE_ERROR = "Cannot create global object '%s' of type '%s'";
+    private static final String CREATE_ERROR = "Cannot create global object of type '%s'";
 
     private static Map<Class<?>, ClassInfo> cache = new HashMap<>();
     private static Map<String, ClassInfo> cacheByURI = new HashMap<>();
