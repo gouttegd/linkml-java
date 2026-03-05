@@ -177,12 +177,8 @@ public class ScalarConverterBaseTest {
         Assertions.assertEquals(coiv.getBaz().get(0), 123);
         Assertions.assertEquals(coiv.getBaz().get(1), 456);
 
-        try {
-            c.convertForSlot(789, coiv, slot, ctx);
-            Assertions.fail("Exception not thrown for an invalid list value");
-        } catch ( LinkMLRuntimeException e ) {
-            Assertions.assertEquals("Invalid value type, list expected", e.getMessage());
-        }
+        c.convertForSlot(789, coiv, slot, ctx);
+        Assertions.assertEquals(coiv.getBaz().get(0), 789);
     }
 
     @Test

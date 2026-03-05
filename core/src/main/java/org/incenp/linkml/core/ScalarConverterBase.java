@@ -35,6 +35,7 @@
 package org.incenp.linkml.core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -104,15 +105,21 @@ public abstract class ScalarConverterBase implements IConverter {
 
     /**
      * Checks that a raw object is a list, and casts it as such.
+     * <p>
+     * If the object is not in fact a list, it will be turned into a one-element
+     * list. Having a single object where a list is expected is strictly speaking
+     * invalid, but it occurs so frequently in the wild (including within LinkML’s
+     * own meta schema!) that we don’t really have a choice here but to support that
+     * case, even though the LinkML specification considers that as a “Repair
+     * normalization” that implementations only MAY “choose” to support.
      * 
      * @param raw The raw object to cast.
      * @return The input object, cast into a list.
-     * @throws LinkMLRuntimeException If the raw object is not in fact a list.
      */
     @SuppressWarnings("unchecked")
-    protected List<Object> toList(Object raw) throws LinkMLRuntimeException {
+    protected List<Object> toList(Object raw) {
         if ( !(raw instanceof List) ) {
-            throw new LinkMLValueError("Invalid value type, list expected");
+            return Collections.singletonList(raw);
         }
         return (List<Object>) raw;
     }
