@@ -50,15 +50,16 @@ following constraints:
 The general naming rule for accessors is that a slot named _foo_ must
 have a `getFoo()` read accessor and a `setFoo()` write accessor.
 
-Two specific rules apply to boolean-typed slots:
+Two specific rules apply to **required, boolean-typed** slots:
 
 * the read accessor of a boolean-typed slot named _foo_ must be
   `isFoo()`, rather than `getFoo()`;
   
-* if the name of the slot already starts with `is`, then the read
-  accessor is named as the underlying field (for example, if the slot is
-  named `isFoo`, then the read accessor must be `isFoo()`; the write
-  accessor will still be `setIsFoo()` as per the general rule).
+* if the name of the slot already starts with `is` followed by an
+  uppercase letter, that `is` prefix is removed before applying the
+  previous rule (so for example, a slot named `isFoo` must have a read
+  accessor that is also named `isFoo()` and a write accessor that is
+  named `setFoo`, as if the slot had been named simply `Foo`).
   
 Those rules were chosen because they correspond to the behaviour of the
 [Lombok](https://projectlombok.org) annotation processor, which can then
@@ -114,6 +115,60 @@ namespace. They are:
 | Inlined        | Mark a slot as being inlined (as list or as dictionary) |
 | SlotName       | Provide the original name of a slot |
 | Converter      | Indicate that the class or slot requires a custom converter |
+
+Example
+-------
+Here is an example of a class ready to be used with the runtime (import
+declarations omitted for brevity):
+
+```java
+@LinkURI("https://example.org/myschema/classes/MyClass")
+public class MyClass {
+
+    // The unique identifier for objects of that class
+    @Identifier
+    @LinkURI("https://example.org/myschema/slots/id")
+    private String id;
+    
+    // Contains the runtime type of an object (to distinguish between
+    // the various subclasses of MyClass)
+    @TypeDesignator
+    @LinkURI("https://example.org/myschema/slots/type")
+    private String type;
+    
+    // The values of this slot (instances of AnotherClass) are expected
+    // to be inlined (rather than referenced) as a list (rather than as
+    // dictionary)
+    @Inlined(asList = true)
+    @LinkURI("https://example.org/myschema/slots/foos")
+    public List<AnotherClass> foos;
+    
+    // Accessors for all the slots
+    public String getId() {
+        return id;
+    }
+    
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    public String getType() {
+        return type;
+    }
+    
+    public void setType(String type) {
+        this.type = type;
+    }
+    
+    public List<AnotherClass> getFoos() {
+        return foos;
+    }
+    
+    public void setFoos(List<AnotherClass> foos) {
+        this.foos = foos;
+    }
+}
+```
 
 Generating the Java code
 ------------------------
