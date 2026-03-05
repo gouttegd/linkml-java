@@ -34,9 +34,6 @@
 
 package org.incenp.linkml.core;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -351,7 +348,7 @@ public class ClassInfo {
         // reflection, and even I do not do things _that_ dubious), so there should not
         // be any issue here.
         ClassInfo ci = cache.get(type);
-        if ( ci == null && isClass(type) ) {
+        if ( ci == null && ObjectType.get(type) == ObjectType.CLASS ) {
             ci = new ClassInfo(type);
             cache.put(type, ci);
             if ( ci.getURI() != null ) {
@@ -374,23 +371,5 @@ public class ClassInfo {
      */
     public static ClassInfo get(String uri) {
         return cacheByURI.get(uri);
-    }
-
-    /**
-     * Helper method to check that the given Java type can represent a LinkML class.
-     * 
-     * @param type The Java type to check.
-     * @return <code>true</code> if the type is possibly a LinkML class, otherwise
-     *         <code>false</code>.
-     */
-    public static boolean isClass(Class<?> type) {
-        // FIXME: At some point we will need a more sustainable way of recognising
-        // classes that represent scalar types...
-        if ( type.getSuperclass() == null || type.isEnum() || type == String.class || type == Boolean.class
-                || type == Integer.class || type == Float.class || type == Double.class
-                || type == ZonedDateTime.class || type == LocalDate.class || type == LocalTime.class ) {
-            return false;
-        }
-        return true;
     }
 }
