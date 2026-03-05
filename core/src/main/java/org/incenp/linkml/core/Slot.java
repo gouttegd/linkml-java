@@ -471,7 +471,7 @@ public class Slot {
      * named isFoo, in which case the accessor is setFoo (not setIsFoo!).
      */
     private static String getWriteAccessorName(Field field) {
-        String fieldName = field.getName();
+        String fieldName = unmangle(field.getName());
         String noun = null;
         if ( field.getType() == Boolean.TYPE && fieldName.length() > 2 && fieldName.charAt(0) == 'i'
                 && fieldName.charAt(1) == 's'
@@ -490,7 +490,7 @@ public class Slot {
      * named isFoo, then the accessor is also isFoo, not isIsFoo).
      */
     private static String getReadAccessorName(Field field) {
-        String fieldName = field.getName();
+        String fieldName = unmangle(field.getName());
         String verb = null;
         String noun = null;
         if ( field.getType() == Boolean.TYPE ) {
@@ -506,5 +506,19 @@ public class Slot {
             noun = Character.toString(Character.toUpperCase(fieldName.charAt(0))) + fieldName.substring(1);
         }
         return verb + noun;
+    }
+
+    /*
+     * The LinkML-Py code generator will append '_' to a field name if needed to
+     * avoid a clash with a reserved Java keyword. The generated accessors do not
+     * include that underscore, though, so we must remove it from the name, if
+     * present, to be sure to find the accessors for a given slot.
+     */
+    private static String unmangle(String name) {
+        int len = name.length();
+        if ( name.charAt(len - 1) == '_' ) {
+            return name.substring(0, len - 1);
+        }
+        return name;
     }
 }
