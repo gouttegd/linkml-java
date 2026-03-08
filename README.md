@@ -52,7 +52,7 @@ once you have generated the corresponding code, you can read an instance
 of `Foo` from a YAML file as follows:
 
 ```java
-YAMLLoader loader = new YAMLLoader();
+ObjectLoader loader = new ObjectLoader();
 Foo foo = loader.loadObject(new File("foo.yaml"), Foo.class);
 ```
 

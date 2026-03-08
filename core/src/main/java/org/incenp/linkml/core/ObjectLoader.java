@@ -53,7 +53,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
  * For now this is merely a thin wrapper around both Jackson’s ObjectMapper and
  * our own {@link ConverterContext}.
  */
-public class YAMLLoader {
+public class ObjectLoader {
 
     private ConverterContext ctx = new ConverterContext();
     private final ObjectMapper mapper = new ObjectMapper();

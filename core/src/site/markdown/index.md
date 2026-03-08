@@ -41,10 +41,10 @@ Assuming you have a schema that defines a _Foo_ class, you can for
 example load an instance of that class from a YAML file as follows:
 
 ```java
-import org.incenp.linkml.core.YAMLLoader;
+import org.incenp.linkml.core.ObjectLoader;
 import org.incenp.linkml.core LinkMLRuntimeException;
 
-YAMLLoader loader = new YAMLLoader();
+ObjectLoader loader = new ObjectLoader();
 try {
     Foo foo = loader.loadObject(new File("foo.yaml"), Foo.class);
 } catch ( IOException e ) {
@@ -80,4 +80,3 @@ In particular, the LinkML-Java runtime brings support for
 * dereferencing global objects;
 
 * the various forms of [inlining](https://linkml.io/linkml/schemas/inlining.html).
-

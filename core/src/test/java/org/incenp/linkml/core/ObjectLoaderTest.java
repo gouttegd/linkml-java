@@ -45,9 +45,9 @@ import org.incenp.linkml.core.sample.SimpleClass;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class YAMLLoaderTest {
+public class ObjectLoaderTest {
 
-    private YAMLLoader loader = new YAMLLoader();
+    private ObjectLoader loader = new ObjectLoader();
 
     @Test
     void testReadingSimpleClass() throws IOException, LinkMLRuntimeException {
