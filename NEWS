@@ -1,0 +1,8 @@
+Changes in LinkML-Java 0.1.1
+----------------------------
+
+    * Fix error messages when an object cannot be instantiated.
+    * Accept field names with a `_` suffix (which may be appended by the
+      code generator to avoid a name clash with a Java keyword).
+    * Support incorrect use of a scalar where a list is expected.
+    * Add support for JSON.    
