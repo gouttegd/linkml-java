@@ -105,4 +105,21 @@ public class YAMLLoaderTest {
 
         tmp.delete();
     }
+
+    @Test
+    void testWritingSimpleClassAsJSON() throws IOException, LinkMLRuntimeException {
+        SimpleClass sc = new SimpleClass();
+        sc.setFoo("a string");
+        sc.setBar(URI.create("https://example.org/a/URI"));
+        sc.setBaz(false);
+
+        File tmp = new File("src/test/resources/core/samples/simple-class.json.out");
+        loader.dumpObject(tmp, sc, DataFormat.JSON);
+
+        SimpleClass sc2 = loader.loadObject(tmp, SimpleClass.class, DataFormat.JSON);
+        Assertions.assertFalse(sc == sc2);
+        Assertions.assertTrue(sc.equals(sc2));
+
+        tmp.delete();
+    }
 }

@@ -40,11 +40,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 /**
- * Helper class to load or dump LinkML data instances from or to YAML files.
+ * Helper class to load or dump LinkML data instances from or to YAML or JSON
+ * files.
  * <p>
  * For now this is merely a thin wrapper around both Jackson’s ObjectMapper and
  * our own {@link ConverterContext}.
@@ -52,7 +56,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 public class YAMLLoader {
 
     private ConverterContext ctx = new ConverterContext();
-    private final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    private final ObjectMapper mapper = new ObjectMapper();
 
     /**
      * Gets the LinkML context used by this loader.
@@ -82,7 +86,25 @@ public class YAMLLoader {
      *                                type.
      */
     public <T> T loadObject(File file, Class<T> type) throws IOException, LinkMLRuntimeException {
-        Object raw = mapper.readValue(file, Map.class);
+        return loadObject(file, type, DataFormat.YAML);
+    }
+
+    /**
+     * Loads an instance of the specified type from a file.
+     * 
+     * @param <T>    The type of objects to load.
+     * @param file   The file to load the object from.
+     * @param type   The type of object to load.
+     * @param format The expected format of the file.
+     * @return The object that was loaded.
+     * @throws IOException            If any I/O error occurs while attempting to
+     *                                read from the file.
+     * @throws LinkMLRuntimeException If the contents of the file do not match what
+     *                                is expected for an instance of the specified
+     *                                type.
+     */
+    public <T> T loadObject(File file, Class<T> type, DataFormat format) throws IOException, LinkMLRuntimeException {
+        Object raw = getReader(format, false).readValue(file);
 
         Object cooked = ctx.getConverter(type).convert(raw, ctx);
         ctx.finalizeAssignments();
@@ -104,7 +126,26 @@ public class YAMLLoader {
      *                                type.
      */
     public <T> List<T> loadObjects(File file, Class<T> type) throws IOException, LinkMLRuntimeException {
-        List<?> raw = mapper.readValue(file, List.class);
+        return loadObjects(file, type, DataFormat.YAML);
+    }
+
+    /**
+     * Loads a list of instances of the specified type from a file.
+     * 
+     * @param <T>    The type of objects to load.
+     * @param file   The file to load the objects from.
+     * @param type   The type of objects to load.
+     * @param format The expected format of the file.
+     * @return The objects that were loaded.
+     * @throws IOException            If any I/O error occurs when attempting to
+     *                                read from the file.
+     * @throws LinkMLRuntimeException If the contents of the file do not match what
+     *                                is expected for instances of the specified
+     *                                type.
+     */
+    public <T> List<T> loadObjects(File file, Class<T> type, DataFormat format)
+            throws IOException, LinkMLRuntimeException {
+        List<?> raw = getReader(format, true).readValue(file);
 
         List<T> cooked = new ArrayList<>();
         for ( Object rawItem : raw ) {
@@ -130,7 +171,26 @@ public class YAMLLoader {
      */
     public <T> void dumpObject(File file, T object) throws IOException, LinkMLRuntimeException {
         Object raw = ctx.getConverter(object.getClass()).serialise(object, ctx);
-        mapper.writeValue(file, raw);
+        getWriter(DataFormat.YAML, false).writeValue(file, raw);
+    }
+
+    /**
+     * Dumps a LinkML object into a file.
+     * 
+     * @param <T>    The type of the object to dump.
+     * @param file   The file where to dump the object.
+     * @param object The object to dump.
+     * @param format The format to use to serialise the dumped object.
+     * @throws IOException            If any I/O error occurs when attempting to
+     *                                write to the file.
+     * @throws LinkMLRuntimeException If any error occurs when serialising the
+     *                                object to a raw YAML tree (this should not
+     *                                happen if the object is a valid LinkML object
+     *                                in the first place).
+     */
+    public <T> void dumpObject(File file, T object, DataFormat format) throws IOException, LinkMLRuntimeException {
+        Object raw = ctx.getConverter(object.getClass()).serialise(object, ctx);
+        getWriter(format, false).writeValue(file, raw);
     }
 
     /**
@@ -138,7 +198,7 @@ public class YAMLLoader {
      * 
      * @param <T>     The type of the objects to dump. Of note, each object may be
      *                of a different subtype of that type.
-     * @param file    The file where to dump the object.
+     * @param file    The file where to dump the objects.
      * @param objects The objects to dump.
      * @throws IOException            If any I/O error occurs when attempting to
      *                                write to the file.
@@ -148,10 +208,42 @@ public class YAMLLoader {
      *                                in the first place).
      */
     public <T> void dumpObjects(File file, List<T> objects) throws IOException, LinkMLRuntimeException {
+        dumpObjects(file, objects, DataFormat.YAML);
+    }
+
+    /**
+     * Dumps a list of LinkML objects into a file.
+     * 
+     * @param <T>     The type of the objects to dump. Of note, each object may be
+     *                of a different subtype of that type.
+     * @param file    The file where to dump the objects.
+     * @param objects The objects to dump.
+     * @param format  The format to use to serialise the dumped objects.
+     * @throws IOException            If any I/O error occurs when attempting to
+     *                                write to the file.
+     * @throws LinkMLRuntimeException If any error occurs when serialising the
+     *                                objects to a raw YAML tree (this should not
+     *                                happen if the object is a valid LinkML object
+     *                                in the first place).
+     */
+    public <T> void dumpObjects(File file, List<T> objects, DataFormat format)
+            throws IOException, LinkMLRuntimeException {
         List<Object> raw = new ArrayList<>();
         for ( T object : objects ) {
             raw.add(ctx.getConverter(object.getClass()).serialise(object, ctx));
         }
-        mapper.writeValue(file, raw);
+        getWriter(format, true).writeValue(file, raw);
+    }
+
+    private ObjectReader getReader(DataFormat format, boolean list) {
+        JsonFactory factory = format == DataFormat.JSON ? new JsonFactory() : new YAMLFactory();
+        Class<?> type = list ? List.class : Map.class;
+        return mapper.readerFor(type).with(factory);
+    }
+
+    private ObjectWriter getWriter(DataFormat format, boolean list) {
+        JsonFactory factory = format == DataFormat.JSON ? new JsonFactory() : new YAMLFactory();
+        Class<?> type = list ? List.class : Map.class;
+        return mapper.writerFor(type).with(factory);
     }
 }
