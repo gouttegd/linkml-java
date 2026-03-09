@@ -1,0 +1,600 @@
+% Presenting LinkML-Java to the LinkML community
+% © 2026 Damien Goutte-Gattat
+%
+% This work is released under the Creative Commons
+% Attribution-ShareAlike 4.0 International License. To view a copy of
+% this license, visit https://creativecommons.org/licenses/by-sa/4.0/.
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\usepackage{tikz}
+\usepackage{fancyvrb}
+
+\setmainlanguage{english}
+\usetheme{Boadilla}
+\definecolor{gerbigreen}{RGB}{0,152,57}
+\definecolor{gerbidarkgreen}{RGB}{0,146,55}
+\definecolor{gerbilightgreen}{RGB}{212,235,220}
+\usecolortheme[named=gerbidarkgreen]{structure}
+\setbeamertemplate{navigation symbols}{}
+\setbeamercovered{transparent}
+
+\AtBeginSection{
+  \begin{frame}{Outline}{}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+\graphicspath{{imgs/}{svgs/}}
+
+\title[LinkML-Java]{LinkML-Java and LinkML for Java}
+\author{Damien Goutte-Gattat}
+\institute[German BioImaging e.V.]{\includegraphics[width=4cm]{gerbi-logo}}
+\date{LinkML Community Call, March 2026}
+
+\hypersetup{pdfpagemode=UseNone,
+  pdftitle={LinkML-Java},
+  pdfauthor={Damien Goutte-Gattat}}
+
+\begin{document}
+
+% Frontmatter
+
+\mode<beamer>{
+\begin{frame}
+  \titlepage
+\end{frame}
+}
+
+
+% Contents
+
+\section{LinkML at German BioImaging e.V.}
+
+\begin{frame}
+  \frametitle{German BioImaging e.V.}
+
+  \begin{block}{German Society for Microscopy and Image Analysis}
+    ``Representing the interests of German researchers and core
+    facilities involved in microscopy and image data analysis for the
+    life sciences.''
+
+    \begin{itemize}
+      \item Training \& knowledge transfer
+      \item Quality assessment for instruments and facilities
+      \item Outreach
+      \item ...
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{GerBi's Research Software Engineering Unit}
+    Contributing to the imaging software ecosystem.
+
+    Key member of the Open Microscopy Environment (OME) consortium.
+  \end{block}
+
+  \note{Dummy note for now.}
+\end{frame}
+
+\begin{frame}
+  \frametitle{LinkML for bioimaging software}
+
+  LinkML is or will be used in \emph{at least} two major ongoing
+  projects in the bioimaging community.
+
+  \begin{block}{OME's Next Generation File Format, aka OME-Zarr}
+    \begin{itemize}
+      \item An imaging file format designed around the concept of
+        ``chunks'', allowing for the manipulation of extremely large,
+        cloud-stored images
+      \item LinkML likely to be used to define at least part of the OME
+        metadata in OME-Zarr files
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Imaging-PHD (``Persistent Hardware Descriptors'')}
+    \begin{itemize}
+      \item Capturing much more details than previously done about the
+        microscope that was used to acquire an image
+      \item LinkML to be used as the basis for an extensible metadata
+        framework
+    \end{itemize}
+  \end{block}
+
+  Both projects will require support for LinkML in more languages than
+  just Python.
+
+\end{frame}
+
+
+\section{Why do we need a LinkML runtime library for Java?}
+
+\begin{frame}[fragile]
+  \frametitle{Limitations of generated code}
+
+  LinkML(-Py) can already generate Java code from a LinkML schema:
+
+  \begin{columns}
+    \begin{column}{.45\textwidth}
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+classes:
+  Point:
+    attributes:
+      name:
+      x:
+        range: integer
+      y:
+        range: integer
+\end{Verbatim}
+    \end{column}
+    \begin{column}{.45\textwidth}
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+public class Point {
+    String name;
+    int x;
+    int y;
+}
+\end{Verbatim}
+    \end{column}
+  \end{columns}
+
+  \medskip
+  Then we can use any available JSON or YAML library for Java, such as Jackson:
+
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+Point p = mapper.readValue(new File("data.yaml"), Point.class);
+// ...
+mapper.writeValue(new File("data.yaml"), p);
+\end{Verbatim}
+
+  \medskip
+  Isn't that all we need?
+
+  \medskip
+  -- Well, no. This would only work for simple schemas that don't use
+  any LinkML-specific features.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Limitations of generated code: the case of KGCL}
+
+  \begin{columns}[t]
+    \begin{column}{.45\textwidth}
+      KGCL ``change'' classes:
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+classes:
+  Change:
+    slots:
+    - id
+    - type
+  SimpleChange:
+    is_a: Change
+    slots:
+    - old_value
+    - new_value
+  # ...
+\end{Verbatim}
+    (More than 50 subclasses.)
+    \end{column}
+    \begin{column}{.45\textwidth}
+Sample KGCL file:
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+- id: CHANGE:001
+  type: NodeRename
+  old_value: foo
+  new_value: bar
+  about_node: GO:0005635
+- id: CHANGE:002
+  type: NodeObsoletion
+  about_node: GO:0005634
+\end{Verbatim}
+    (A list of \emph{Change} objects of various (and
+    not-known-in-advance) types.)
+    \end{column}
+  \end{columns}
+
+\bigskip
+We want to be able to do something like:
+
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+List<Change> changes = mapper.readValues(new File("data.yaml"), Change.class);
+\end{Verbatim}
+
+But this requires explicit support for \emph{LinkML type designator
+slots}, which the Jackson library obviously cannot have.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Limitations of generated code: the case of LinkML}
+
+  \begin{columns}[t]
+    \begin{column}{.45\textwidth}
+    LinkML model of \emph{ClassDefinition}:
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+classes:
+  ClassDefinition:
+    slots:
+      - slots
+
+slots:
+  slots:
+    range: SlotDefinition
+    multivalued: true
+\end{Verbatim}
+    \end{column}
+    \begin{column}{.45\textwidth}
+    Corresponding Java code:
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+public class ClassDefinition {
+    List<SlotDefinition> slots;
+}
+\end{Verbatim}
+    \end{column}
+  \end{columns}
+
+  \bigskip
+
+  The \emph{slots} slot expects a list of \emph{SlotDefinition} objects
+  but is actually serialised as a list of \emph{slot names}. Correctly
+  parsing that requires knowing that:
+
+  \begin{itemize}
+    \item \emph{SlotDefinition} represents \emph{identifiable objects}
+    (because it has an \emph{identifier slot});
+    \item identifiable objects are serialised as \emph{references} by
+    default (unless the slot holding them is explicitly \emph{inlined}).
+  \end{itemize}
+
+  \medskip
+  Both are LinkML concepts that a generic library like Jackson cannot
+  know about.
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Limitations of generated code: conclusion}
+
+  \begin{block}{}
+    Developers in language \emph{X} need a LinkML runtime library for
+    the same reason than Python developers need
+    \texttt{linkml\_runtime.loaders} and the like: because some LinkML
+    features require more than a mere translation of a LinkML schema
+    into a set of classes.
+  \end{block}
+
+  \bigskip
+  At the very least (to be able to read/write LinkML-defined data), a
+  LinkML runtime library (for any language) must offer support for:
+
+  \begin{itemize}
+    \item type designator slots;
+    \item globally or locally identifiable objects;
+    \item representing objects by reference;
+    \item dealing with the various forms of inlining;
+    \item dealing with prefixes and CURIEs.
+  \end{itemize}
+\end{frame}
+
+\section{Design decisions for the LinkML-Java runtime}
+
+\begin{frame}
+  \frametitle{No availability of the schema at runtime}
+
+  \begin{block}{}
+    The runtime must work solely with the Java code generated from the
+    schema, without requiring the schema itself.
+  \end{block}
+
+  \bigskip
+  (Mostly to avoid a catch-22: given a schema \emph{S}, if we needed the
+  schema to parse instance data of \emph{S}, then we would first need to
+  parse \emph{S} itself --~which, since \emph{S} represents an instance
+  of LinkML's own schema \emph{L}, we would not be able to parse without
+  already having a complete representation of \emph{L}, which we can
+  only obtain by parsing \emph{L}...)
+
+  \bigskip
+  This does not preclude the possibility of future additional features
+  that could be enabled by knowledge of the schema at runtime. But basic
+  loading and dumping of LinkML-defined instance data \emph{must} not
+  require the schema.
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Reliance on Java annotations}
+
+  \begin{block}{}
+    The generated code must provide some critical pieces of information
+    from the schema, in the form of Java annotations.
+  \end{block}
+
+  \bigskip
+  Annotations expected by the LinkML-Java runtime include:
+  \begin{itemize}
+    \item \texttt{@Identifier} to mark the identifier slot;
+    \item \texttt{@TypeDesignator} to mark the type designator slot;
+    \item \texttt{@Inlined} or \texttt{@Inlined(asList=true)} to specify
+    the expected inlining mode
+    \item \texttt{@LinkURI} to indicate the \emph{class\_uri} or the
+    \emph{slot\_uri} (unused for now, but will be used for RDF support
+    in the future).
+  \end{itemize}
+
+  \bigskip
+  Work is in progress to update LinkML(-Py)'s own code generator to
+  automatically produce code that is suitable for consumption by the
+  LinkML-Java runtime.
+\end{frame}
+
+\begin{frame}
+  \frametitle{No ties to a specific YAML/JSON library}
+
+  \begin{block}{}
+    The runtime must ideally be usable with any YAML/JSON parser/writer
+    without requiring a specific one.
+  \end{block}
+
+  \bigskip
+  This is to facilitate integration into existing projects that may
+  already depend on a given YAML/JSON library for other purposes.
+
+  \begin{itemize}
+    \item The runtime mid-level interface works solely with
+    \texttt{Map<String,Object>} objects --~it doesn't matter which
+    parser library (Jackson or anything else) produced the object.
+    \item For convenience, a high-level interface is provided that does
+    specifically use the Jackson library. But its use is entirely
+    optional.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Allow for model-specific customisations}
+
+  \begin{block}{}
+    The default behaviour of the runtime must be customisable as needed
+    to meet additional, non-LinkML-defined requirements.
+  \end{block}
+
+  \bigskip
+  Example with KGCL:
+  \begin{columns}
+    \begin{column}{.35\textwidth}
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+- id: CHANGE:001
+  type: PredicateChange
+  old_value: BFO:0000050
+  old_value_type: curie
+\end{Verbatim}
+    \end{column}
+    \begin{column}{.60\textwidth}\small
+    The \texttt{old\_value} slot is defined as string-typed, but may
+    occasionally contain a CURIE instead, as indicated by the value of
+    the \texttt{old\_value\_type} slot.
+    \end{column}
+  \end{columns}
+  
+  \bigskip
+  This is a KGCL-specific behaviour that is not encoded in KGCL's
+  LinkML-based definition, so it cannot be implemented in a generic
+  LinkML runtime library.
+
+  \bigskip
+  Client code can request the use of a custom converter object to parse
+  \emph{PredicateChange} objects:
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+@Converter(PredicateChangeConverter.class)
+public class PredicateChange { ... }
+\end{Verbatim}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Automatic expansion/contraction of CURIEs}
+
+  \begin{block}{}
+    The runtime must take care of dealing with prefixes and CURIEs so
+    that the client code does not have to.
+  \end{block}
+
+  \bigskip
+  Because life is too short to spend it dealing with CURIEs any more
+  than what is strictly necessary:
+  \begin{itemize}
+    \item CURIEs must be automatically expanded upon parsing;
+    \item they must be automatically contracted upon serialising;
+    \item in-between, client code must be able to forget that they even
+    exist.
+  \end{itemize}
+
+  \bigskip
+  Previous experience with both KGCL and SSSOM convinced me that this is
+  the only sane way of working with CURIEs.
+\end{frame}
+
+\section{What is supported for now?}
+
+\begin{frame}[fragile]
+  \frametitle{Loading from JSON or YAML files}
+
+  High-level interface\\
+  (basically the pendant of LinkML(-Py)'s \texttt{linkml\_runtime.loaders}):
+
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+ObjectLoader loader = new ObjectLoader();
+Point p = loader.loadObject(new File("point-data.yaml"), Point.class);
+List<Change> kgclChangeset = loader.loadObjects(new File("kgcl-data.yaml"), Change.class);
+\end{Verbatim}
+
+  \bigskip
+  Mid-level interface:
+
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+ConverterContext ctx = new ConverterContext();
+Map<String,Object> raw = ...; // generic representation of the data
+                              // as obtained from a YAML/JSON parser
+Point p = ctx.getConverter(Point.class).convert(raw, ctx);
+ctx.finalizeAssignments();
+\end{Verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Dumping to JSON or YAML files}
+
+  High-level interface:
+
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+ObjectLoader loader = new ObjectLoader(); // Yes, ObjectLoader is badly named;
+                                          // it does both loading and dumping
+Point p = ...;
+loader.dumpObject(new File("point-data.yaml"), p);
+List<Change> kgclChangeset = ...;
+loader.dumpObject(new File("kgcl-data.yaml", kgclChangeset);
+\end{Verbatim}
+
+  \bigskip
+  Mid-level interface:
+
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+ConverterContext ctx = new ConverterContext();
+Point p = ...;
+Object raw = ctx.getConverter(Point.class).serialise(p, ctx);
+// Then give the "raw" object to any JSON/YAML write of your liking
+\end{Verbatim}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Type designators}
+
+  \begin{itemize}
+    \item Only mono-valued type designators are supported.
+    \item For String-typed type designators, it is assumed that all the
+    generated classes reside in the same Java package
+      \begin{itemize}
+        \item Not an unreasonable assumption, and that's the behaviour
+        of LinkML(-Py)'s Java code generator
+      \end{itemize}
+    \item For URI-typed type designators:
+      \begin{itemize}
+        \item No limitation/assumption about the Java package (as long
+        as the class is reachable by the current class loader)
+        \item But class URIs cannot be discovered on the fly, each class
+        whose URI may be used in a type designator must be explicitly
+        registered first
+      \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Referencing / inlining}
+
+  \begin{itemize}
+    \item References to global objects are automatically resolved into
+    Java references
+
+    For example, the following:
+
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+my_class_definition.getSlots().get(0)
+\end{Verbatim}
+
+    does not give you merely the \emph{name} of the first slot; it gives
+    you the actual object representing the slot definition, as a (Java)
+    reference ($\sim$ ``pointer'') to wherever that slot is defined.
+
+    \item Only ``non-repair list normalisations'' are implemented
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Support for \texttt{extra\_slots}}
+
+  \begin{itemize}
+    \item Requires an additional \texttt{Map<String,Object>} field
+    explicitly intended to store additional data:
+
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+public class Foo {
+    ...
+    @ExtensionHolder
+    private Map<String, Object> extraSlots;
+}
+\end{Verbatim}
+
+    \item This is because you cannot dynamically add an arbitrary field
+    to a class in Java (as you can do in Python).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{``Dynamic'' enums}
+
+  \begin{itemize}
+    \item Completely unsupported for now!
+    \item Treated as simple strings with no support for checking whether
+    the string represents a permissible value
+  \end{itemize}
+
+\end{frame}
+
+
+\section{What's next?}
+
+\begin{frame}
+  \frametitle{Wishlist}
+
+  \begin{itemize}
+    \item Support for import/export from/to RDF
+    \item Support for dynamic enums
+    \item Allow working with a schema that is only discovered at runtime
+      \begin{itemize}
+        \item With no pre-generated code, just the schema itself
+        \item So that we can at least \emph{validate} data against a
+        model that is not known in advance
+      \end{itemize}
+    \item Generate Java code directly from the LinkML-Java runtime
+      \begin{itemize}
+        \item Instead of having to rely on \texttt{linkml generate java}
+        \item This will allow for easier integration of the code
+        generation step into the build process of a Java project
+        \item Will most likely yield a Maven and/or Gradle plugin
+      \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+
+% Backmatter
+
+\mode<beamer>{
+\begin{frame}[noframenumbering]
+  \frametitle{~}
+\end{frame}
+
+\begin{frame}[noframenumbering]
+  \frametitle{About CURIEs...}
+
+  \begin{center}
+    \includegraphics[scale=.2]{change-my-mind-on-curies}
+  \end{center}
+\end{frame}
+
+\begin{frame}[noframenumbering]
+  \frametitle{About}
+
+  \begin{block}{\includegraphics[scale=.26]{ccbysa}\hspace{.2em}%
+    2026 Damien Goutte-Gattat \texttt{<damien@gerbi-gmb.de>}}
+    This presentation is released under the Creative Commons
+    Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0).
+  \end{block}
+
+  \begin{block}{Revision}\ttfamily\scriptsize
+    \input{revision.tex}
+  \end{block}
+\end{frame}
+}
+
+\end{document}
