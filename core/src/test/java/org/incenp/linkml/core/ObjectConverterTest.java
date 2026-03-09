@@ -412,6 +412,19 @@ public class ObjectConverterTest {
     }
 
     @Test
+    void testUnknownTypeDesignator() throws IOException, LinkMLRuntimeException {
+        String text = "foo: A string\nbaz: Another string\ntype: UnknownDerivedSelfDesignatedClass\n";
+        DerivedSelfDesignatedClass dsdc = parseString(text, DerivedSelfDesignatedClass.class);
+
+        Assertions.assertEquals("A string", dsdc.getFoo());
+        Assertions.assertEquals("UnknownDerivedSelfDesignatedClass", dsdc.getType());
+        Assertions.assertNotNull(dsdc.getExtraSlots());
+        Assertions.assertEquals("Another string", dsdc.getExtraSlots().get("baz"));
+
+        roundtrip(dsdc);
+    }
+
+    @Test
     void testReferenceToIRIIdentifiers() throws IOException, LinkMLRuntimeException {
         ctx.addPrefix("PFX", "https://example.org/");
         String text = "id: PFX:0001\nfoo: A string\n";

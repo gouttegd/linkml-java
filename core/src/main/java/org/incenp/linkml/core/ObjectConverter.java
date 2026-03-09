@@ -57,7 +57,6 @@ public class ObjectConverter implements IConverter {
     private final static String STRING_EXPECTED = "Invalid value type, string expected";
     private final static String OBJECT_EXPECTED = "Invalid value type, '%s' expected";
     private final static String NO_IDENTIFIER = "Missing identifier for type '%s'";
-    private final static String UNKNOWN_TYPE = "Unknown designated type '%s'";
     private final static String INVALID_CLASS_URI = "Missing or invalid class URI for type '%s'";
 
     protected ClassInfo klass;
@@ -188,13 +187,15 @@ public class ObjectConverter implements IConverter {
                     try {
                         designatedType = Class.forName(pkgName + "." + designatedName);
                     } catch ( ClassNotFoundException e ) {
-                        // We treat that as a value error because providing a correct name in the class
-                        // designator is the responsibility of whoever produced the data
-                        throw new LinkMLValueError(String.format(UNKNOWN_TYPE, designatedName));
+                        // Do nothing, simply fallback to the type we were originally expecting. This is
+                        // so an application has a chance to process data that would use an unknown
+                        // subclass (possibly defined by an extension).
                     }
                 }
 
-                conv = (ObjectConverter) ctx.getConverter(designatedType);
+                if ( designatedType != null ) {
+                    conv = (ObjectConverter) ctx.getConverter(designatedType);
+                }
             }
         }
         String id = null;
@@ -350,9 +351,9 @@ public class ObjectConverter implements IConverter {
                 continue;
             }
 
-            Object slotValue;
-            if ( slot.isTypeDesignator() ) {
-                // Ignore whatever may be contained in the slot and use the actual type name
+            Object slotValue = slot.getValue(object);
+            if ( slotValue == null && slot.isTypeDesignator() ) {
+                // Set the slot to the actual type name
                 if ( slot.getInnerType().equals(URI.class) ) {
                     // URI-typed designator slot, it requires the class URI
                     try {
@@ -370,11 +371,9 @@ public class ObjectConverter implements IConverter {
                     // Assume a name-based type designator slot
                     slotValue = getType().getSimpleName();
                 }
-            } else {
-                slotValue = slot.getValue(object);
-                if ( slotValue == null ) {
-                    continue;
-                }
+            } else if ( slotValue == null ) {
+                // Ignore all other empty slots
+                continue;
             }
 
             if ( slot.isExtensionStore() ) {

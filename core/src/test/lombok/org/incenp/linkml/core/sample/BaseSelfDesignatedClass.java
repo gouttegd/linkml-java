@@ -34,6 +34,9 @@
 
 package org.incenp.linkml.core.sample;
 
+import java.util.Map;
+
+import org.incenp.linkml.core.annotations.ExtensionHolder;
 import org.incenp.linkml.core.annotations.TypeDesignator;
 
 import lombok.AccessLevel;
@@ -53,4 +56,6 @@ public class BaseSelfDesignatedClass {
     private String foo;
     @TypeDesignator
     private String type;
+    @ExtensionHolder
+    private Map<String, Object> extraSlots;
 }
