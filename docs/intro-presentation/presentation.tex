@@ -25,7 +25,8 @@
 }
 \graphicspath{{imgs/}{svgs/}}
 
-\title[LinkML-Java]{LinkML-Java and LinkML for Java}
+\title[LinkML-Java]{LinkML-Java: a LinkML runtime library\\
+                    for the Java language}
 \author{Damien Goutte-Gattat}
 \institute[German BioImaging e.V.]{\includegraphics[width=4cm]{gerbi-logo}}
 \date{LinkML Community Call, March 2026}
@@ -65,10 +66,11 @@
     \end{itemize}
   \end{block}
 
-  \begin{block}{GerBi's Research Software Engineering Unit}
-    Contributing to the imaging software ecosystem.
-
-    Key member of the Open Microscopy Environment (OME) consortium.
+  \begin{block}{GerBI's Research Software Engineering Unit}
+    \begin{itemize}
+      \item Contributing to the imaging software ecosystem
+      \item Member of the Open Microscopy Environment (OME) consortium
+    \end{itemize}
   \end{block}
 
   \note{Dummy note for now.}
@@ -83,8 +85,8 @@
   \begin{block}{OME's Next Generation File Format, aka OME-Zarr}
     \begin{itemize}
       \item An imaging file format designed around the concept of
-        ``chunks'', allowing for the manipulation of extremely large,
-        cloud-stored images
+        ``chunks''\\
+        intended for manipulating extremely large, cloud-stored images
       \item LinkML likely to be used to define at least part of the OME
         metadata in OME-Zarr files
     \end{itemize}
@@ -108,7 +110,7 @@
 \section{Why do we need a LinkML runtime library for Java?}
 
 \begin{frame}[fragile]
-  \frametitle{Limitations of generated code}
+  \frametitle{Isn't generated code enough?}
 
   LinkML(-Py) can already generate Java code from a LinkML schema:
 
@@ -137,7 +139,8 @@ public class Point {
   \end{columns}
 
   \medskip
-  Then we can use any available JSON or YAML library for Java, such as Jackson:
+  Then we can read or write instance data using any available JSON or
+  YAML library for Java, such as Jackson:
 
 \begin{Verbatim}[frame=single,fontsize=\scriptsize]
 ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
@@ -187,8 +190,8 @@ Sample KGCL file:
   type: NodeObsoletion
   about_node: GO:0005634
 \end{Verbatim}
-    (A list of \emph{Change} objects of various (and
-    not-known-in-advance) types.)
+    (A list of \emph{Change} objects of various, not-known-in-advance
+    types.)
     \end{column}
   \end{columns}
 
@@ -241,7 +244,8 @@ public class ClassDefinition {
     \item \emph{SlotDefinition} represents \emph{identifiable objects}
     (because it has an \emph{identifier slot});
     \item identifiable objects are serialised as \emph{references} by
-    default (unless the slot holding them is explicitly \emph{inlined}).
+    default (unless the slot holding them is explicitly \emph{inlined},
+    which is not the case of \emph{slots}).
   \end{itemize}
 
   \medskip
@@ -262,8 +266,8 @@ public class ClassDefinition {
   \end{block}
 
   \bigskip
-  At the very least (to be able to read/write LinkML-defined data), a
-  LinkML runtime library (for any language) must offer support for:
+  To be able to read/write LinkML-defined data, a LinkML runtime library
+  for any language must offer support for, at the very least:
 
   \begin{itemize}
     \item type designator slots;
@@ -295,7 +299,7 @@ public class ClassDefinition {
   \bigskip
   This does not preclude the possibility of future additional features
   that could be enabled by knowledge of the schema at runtime. But basic
-  loading and dumping of LinkML-defined instance data \emph{must} not
+  loading and dumping of LinkML-defined instance data \emph{must not}
   require the schema.
 
 \end{frame}
@@ -314,7 +318,7 @@ public class ClassDefinition {
     \item \texttt{@Identifier} to mark the identifier slot;
     \item \texttt{@TypeDesignator} to mark the type designator slot;
     \item \texttt{@Inlined} or \texttt{@Inlined(asList=true)} to specify
-    the expected inlining mode
+    the inlining mode;
     \item \texttt{@LinkURI} to indicate the \emph{class\_uri} or the
     \emph{slot\_uri} (unused for now, but will be used for RDF support
     in the future).
@@ -459,7 +463,7 @@ loader.dumpObject(new File("kgcl-data.yaml", kgclChangeset);
 ConverterContext ctx = new ConverterContext();
 Point p = ...;
 Object raw = ctx.getConverter(Point.class).serialise(p, ctx);
-// Then give the "raw" object to any JSON/YAML write of your liking
+// Then give the "raw" object to any JSON/YAML writer of your liking
 \end{Verbatim}
 
 \end{frame}
@@ -472,13 +476,13 @@ Object raw = ctx.getConverter(Point.class).serialise(p, ctx);
     \item For String-typed type designators, it is assumed that all the
     generated classes reside in the same Java package
       \begin{itemize}
-        \item Not an unreasonable assumption, and that's the behaviour
-        of LinkML(-Py)'s Java code generator
+        \item Not an unreasonable assumption...
+        \item That's already the behaviour of LinkML(-Py)'s Java code generator
       \end{itemize}
     \item For URI-typed type designators:
       \begin{itemize}
-        \item No limitation/assumption about the Java package (as long
-        as the class is reachable by the current class loader)
+        \item No limitation/assumption about the Java package\\
+        (as long as the class is reachable by the current class loader)
         \item But class URIs cannot be discovered on the fly, each class
         whose URI may be used in a type designator must be explicitly
         registered first
