@@ -278,6 +278,39 @@ public class ClassDefinition {
   \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]
+  \frametitle{Alternative to a runtime library?}
+
+  Generated code is not enough? Then let us generate \emph{more} code!
+
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+public class Point {
+    String name;
+    int x;
+    int y;
+
+    public static Point fromJSON(File f) {
+        // All code required to load a Point from a JSON file
+    }
+
+    public void toJSON(File f) {
+        // All code required to dump a Point to a JSON file
+    }
+}
+\end{Verbatim}
+
+  \begin{block}{Not sustainable}
+    \begin{itemize}
+      \item Java code embedded within a Jinja2 template in the middle of
+      a Python project
+      \item A bug in the loading or dumping code? Re-generate everything
+      \item Better to keep the generated code minimal and deport the
+      logic elsewhere
+    \end{itemize}
+  \end{block}
+
+\end{frame}
+
 \section{Design decisions for the LinkML-Java runtime}
 
 \begin{frame}
