@@ -34,8 +34,10 @@
 
 package org.incenp.linkml.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.incenp.linkml.core.annotations.LinkURI;
@@ -57,6 +59,7 @@ public class ClassInfo {
     private Class<?> type;
     private Map<String, Slot> slots = new HashMap<>();
     private Map<String, Slot> slotsByURI = new HashMap<>();
+    private List<ClassInfo> parents = new ArrayList<>();
     private Slot identifierSlot;
     private Slot designatorSlot;
     private Slot extensionSlot;
@@ -96,6 +99,19 @@ public class ClassInfo {
         if ( uriAnnot != null ) {
             uri = uriAnnot.value();
         }
+
+        Class<?> parent = klass;
+        do {
+            parent = parent.getSuperclass();
+            if ( parent != null ) {
+                ClassInfo parentInfo = ClassInfo.get(parent);
+                if ( parentInfo != null ) {
+                    parents.add(parentInfo);
+                } else {
+                    parent = null;
+                }
+            }
+        } while ( parent != null );
     }
 
     /**
@@ -108,6 +124,20 @@ public class ClassInfo {
      */
     public String getURI() {
         return uri;
+    }
+
+    /**
+     * Gets the name of the class.
+     * <p>
+     * Note that this may not be the original name of the class as defined in the
+     * LinkML schema – the name may have been transformed into a “PascalCase” form
+     * (e.g. <code>mapping set</code> would be transformed into
+     * <code>MappingSet</code>).
+     * 
+     * @return The class name.
+     */
+    public String getName() {
+        return type.getSimpleName();
     }
 
     /**
@@ -308,6 +338,19 @@ public class ClassInfo {
      */
     public Slot getExtensionSlot() {
         return extensionSlot;
+    }
+
+    /**
+     * Gets all the superclasses of this class.
+     * 
+     * @return The list of superclasses. The list is ordered from the closest parent
+     *         (the immediate superclass) to the farthest one. It only includes
+     *         classes that represent LinkML classes (i.e., it does not include
+     *         {@link Object}). The list may be empty if the class has no
+     *         superclass.
+     */
+    public List<ClassInfo> getParents() {
+        return parents;
     }
 
     /**

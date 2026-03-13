@@ -34,6 +34,7 @@
 
 package org.incenp.linkml.core;
 
+import org.incenp.linkml.core.sample.ExtendedIdentifiableClass;
 import org.incenp.linkml.core.sample.ExtraSimpleDict;
 import org.incenp.linkml.core.sample.SimpleClass;
 import org.incenp.linkml.core.sample.SimpleDict;
@@ -93,5 +94,20 @@ public class ClassInfoTest {
 
         Assertions.assertFalse(ClassInfo.get(SimpleClass.class).isEligibleForSimpleDict(false));
         Assertions.assertFalse(ClassInfo.get(SimpleIdentifiableClass.class).isEligibleForSimpleDict(false));
+    }
+
+    @Test
+    void testGetParents() {
+        ClassInfo ci = ClassInfo.get(ExtendedIdentifiableClass.class);
+        Assertions.assertEquals(2, ci.getParents().size());
+        Assertions.assertEquals("SimpleIdentifiableClass", ci.getParents().get(0).getName());
+        Assertions.assertEquals("SimpleClass", ci.getParents().get(1).getName());
+
+        ci = ClassInfo.get(SimpleIdentifiableClass.class);
+        Assertions.assertEquals(1, ci.getParents().size());
+        Assertions.assertEquals("SimpleClass", ci.getParents().get(0).getName());
+
+        ci = ClassInfo.get(SimpleClass.class);
+        Assertions.assertTrue(ci.getParents().isEmpty());
     }
 }
