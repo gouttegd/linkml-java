@@ -189,6 +189,17 @@ public class Slot {
     }
 
     /**
+     * Indicates whether the slot is expected to hold CURIEs.
+     * 
+     * @return <code>true</code> if the slot is expected to hold CURIE(s), otherwise
+     *         <code>false</code>.
+     */
+    public boolean isCurieTyped() {
+        Class<?> customConverter = getCustomConverter();
+        return customConverter != null && customConverter.equals(CurieConverter.class);
+    }
+
+    /**
      * Gets the type of the slot.
      * <p>
      * For single-valued slot, this is the same as the type of the underlying Java
