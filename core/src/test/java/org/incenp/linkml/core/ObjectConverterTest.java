@@ -43,9 +43,11 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.incenp.linkml.core.sample.BaseCurieSelfDesignatedClass;
+import org.incenp.linkml.core.sample.BaseMultiSelfDesignatedClass;
 import org.incenp.linkml.core.sample.BaseSelfDesignatedClass;
 import org.incenp.linkml.core.sample.BaseURISelfDesignatedClass;
 import org.incenp.linkml.core.sample.ClassWithCustomConverter;
@@ -57,6 +59,7 @@ import org.incenp.linkml.core.sample.ContainerOfReferences;
 import org.incenp.linkml.core.sample.ContainerOfSimpleDicts;
 import org.incenp.linkml.core.sample.ContainerOfSimpleObjects;
 import org.incenp.linkml.core.sample.DerivedCurieSelfDesignatedClass;
+import org.incenp.linkml.core.sample.DerivedMultiSelfDesignatedClass;
 import org.incenp.linkml.core.sample.DerivedSelfDesignatedClass;
 import org.incenp.linkml.core.sample.DerivedURISelfDesignatedClass;
 import org.incenp.linkml.core.sample.ExtensibleSimpleClass;
@@ -422,6 +425,33 @@ public class ObjectConverterTest {
         Assertions.assertEquals("Another string", dsdc.getExtraSlots().get("baz"));
 
         roundtrip(dsdc);
+    }
+
+    @Test
+    void testMultivaluedTypeDesignator() throws IOException, LinkMLRuntimeException {
+        String text = "foo: A string\nbar: Another string\ntype:\n - BaseMultiSelfDesignatedClass\n - DerivedMultiSelfDesignatedClass\n";
+        BaseMultiSelfDesignatedClass bmsdc = parseString(text, BaseMultiSelfDesignatedClass.class);
+
+        Assertions.assertInstanceOf(DerivedMultiSelfDesignatedClass.class, bmsdc);
+        DerivedMultiSelfDesignatedClass derived = (DerivedMultiSelfDesignatedClass) bmsdc;
+        Assertions.assertEquals("A string", derived.getFoo());
+        Assertions.assertEquals("Another string", derived.getBar());
+
+        roundtrip(derived);
+
+        // Try serialising again, but without the type designator; the slot should still
+        // be set in the serialised object
+        derived.setType(null);
+        ObjectConverter conv = (ObjectConverter) ctx.getConverter(derived.getClass());
+        Map<String, Object> raw = conv.serialise(derived, true, ctx);
+        Object rawType = raw.get("type");
+        Assertions.assertNotNull(rawType);
+        Assertions.assertInstanceOf(List.class, rawType);
+        @SuppressWarnings("unchecked")
+        List<String> types = (List<String>) rawType;
+        Assertions.assertEquals(2, types.size());
+        Assertions.assertEquals("BaseMultiSelfDesignatedClass", types.get(0));
+        Assertions.assertEquals("DerivedMultiSelfDesignatedClass", types.get(1));
     }
 
     @Test

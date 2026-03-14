@@ -34,8 +34,6 @@
 
 package org.incenp.linkml.core;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +55,6 @@ public class ObjectConverter implements IConverter {
     private final static String STRING_EXPECTED = "Invalid value type, string expected";
     private final static String OBJECT_EXPECTED = "Invalid value type, '%s' expected";
     private final static String NO_IDENTIFIER = "Missing identifier for type '%s'";
-    private final static String INVALID_CLASS_URI = "Missing or invalid class URI for type '%s'";
 
     protected ClassInfo klass;
     private PrefixDeclarationExtractor prefixExtractor;
@@ -166,35 +163,23 @@ public class ObjectConverter implements IConverter {
             Slot designatorSlot = klass.getTypeDesignatorSlot();
             Object designator = raw.get(designatorSlot.getLinkMLName());
             if ( designator != null ) {
-                // FIXME: LinkML allows the type designator slot to be multivalued, in which
-                // case we should pick "the most specific class" among the classes listed (what
-                // to do if the list contains several classes at the same inheritance level is
-                // unspecified). Currently we only support the single-valued case.
-                String designatedName = ctx.getConverter(designatorSlot).convert(designator, ctx).toString();
-                Class<?> designatedType = null;
+                TypeDesignatorResolver resolver = new TypeDesignatorResolver();
+                IConverter designatorConverter = ctx.getConverter(designatorSlot);
+                ClassInfo designatedClass = null;
 
-                // First try looking by class URI. This will only work if the designated class
-                // has already been "seen" by the ClassInfo cache.
-                ClassInfo ci = ClassInfo.get(designatedName);
-                if ( ci != null ) {
-                    designatedType = ci.getType();
-                } else {
-                    // No luck, so look up by class name.
-                    // FIXME: We assume that all classes derived from the initial class will live in
-                    // the same Java package. This is not ideal but, if all we have to refer to a
-                    // class is an unqualified name, it is not an unreasonable assumption.
-                    String pkgName = getType().getPackage().getName();
-                    try {
-                        designatedType = Class.forName(pkgName + "." + designatedName);
-                    } catch ( ClassNotFoundException e ) {
-                        // Do nothing, simply fallback to the type we were originally expecting. This is
-                        // so an application has a chance to process data that would use an unknown
-                        // subclass (possibly defined by an extension).
+                if ( designatorSlot.isMultivalued() ) {
+                    ArrayList<String> designatorNames = new ArrayList<>();
+                    for ( Object rawDesignator : toList(designator) ) {
+                        designatorNames.add(designatorConverter.convert(rawDesignator, ctx).toString());
                     }
+                    designatedClass = resolver.resolve(designatorNames, klass);
+                } else {
+                    String designatedName = designatorConverter.convert(designator, ctx).toString();
+                    designatedClass = resolver.resolve(designatedName, klass);
                 }
 
-                if ( designatedType != null ) {
-                    conv = (ObjectConverter) ctx.getConverter(designatedType);
+                if ( designatedClass != null ) {
+                    conv = (ObjectConverter) ctx.getConverter(designatedClass.getType());
                 }
             }
         }
@@ -354,22 +339,11 @@ public class ObjectConverter implements IConverter {
             Object slotValue = slot.getValue(object);
             if ( slotValue == null && slot.isTypeDesignator() ) {
                 // Set the slot to the actual type name
-                if ( slot.getInnerType().equals(URI.class) ) {
-                    // URI-typed designator slot, it requires the class URI
-                    try {
-                        slotValue = new URI(klass.getURI());
-                    } catch ( NullPointerException | URISyntaxException e ) {
-                        throw new LinkMLInternalError(String.format(INVALID_CLASS_URI, getType().getName()));
-                    }
-                } else if ( ctx.getConverter(slot) instanceof CurieConverter ) {
-                    // URI-or-CURIE typed designator slot, also requiring the class URI
-                    if ( klass.getURI() == null ) {
-                        throw new LinkMLInternalError(String.format(INVALID_CLASS_URI, getType().getName()));
-                    }
-                    slotValue = klass.getURI();
+                TypeDesignatorResolver resolver = new TypeDesignatorResolver();
+                if ( slot.isMultivalued() ) {
+                    slotValue = resolver.getDesignators(klass);
                 } else {
-                    // Assume a name-based type designator slot
-                    slotValue = getType().getSimpleName();
+                    slotValue = resolver.getDesignator(klass);
                 }
             } else if ( slotValue == null ) {
                 // Ignore all other empty slots
