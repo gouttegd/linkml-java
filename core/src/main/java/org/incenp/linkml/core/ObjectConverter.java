@@ -169,7 +169,7 @@ public class ObjectConverter implements IConverter {
 
                 if ( designatorSlot.isMultivalued() ) {
                     ArrayList<String> designatorNames = new ArrayList<>();
-                    for ( Object rawDesignator : toList(designator) ) {
+                    for ( Object rawDesignator : toList(designator, true) ) {
                         designatorNames.add(designatorConverter.convert(rawDesignator, ctx).toString());
                     }
                     designatedClass = resolver.resolve(designatorNames, klass);
@@ -293,7 +293,7 @@ public class ObjectConverter implements IConverter {
     protected List<String> getGlobalIdentifierList(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
         IConverter conv = ctx.getConverter(klass.getIdentifierSlot());
         ArrayList<String> list = new ArrayList<>();
-        for ( Object rawItem : toList(raw) ) {
+        for ( Object rawItem : toList(raw, true) ) {
             list.add(conv.convert(rawItem, ctx).toString());
         }
         return list;
@@ -366,7 +366,7 @@ public class ObjectConverter implements IConverter {
     public Object serialiseForSlot(Object object, Slot slot, ConverterContext ctx) throws LinkMLRuntimeException {
         InliningMode inlining = slot.getInliningMode();
         if ( slot.isMultivalued() ) {
-            List<Object> items = toList(object);
+            List<Object> items = toList(object, false);
             if ( inlining == InliningMode.LIST ) {
                 List<Object> list = new ArrayList<>();
                 for ( Object item : items ) {
@@ -445,18 +445,33 @@ public class ObjectConverter implements IConverter {
     }
 
     /**
-     * Checks that a raw object is a list, and casts it as such.
+     * Turns a raw object into a list.
+     * <p>
+     * This checks that the given object is a list, and casts it as such. If it is
+     * not a list, then an exception is thrown, unless the <code>wrap</code>
+     * argument is set to <code>true</code>, in which case the value is wrapped into
+     * a single item list.
      * 
      * @param value The raw object to cast.
-     * @return The input object, cast into a list.
-     * @throws LinkMLRuntimeException If the raw object is not in fact a list.
+     * @param wrap  If <code>true</code> and <code>value</code> is not a list, then
+     *              return a newly created list containing only the value.
+     * @return The input object as a list.
+     * @throws LinkMLRuntimeException If the raw object is not in fact a list and
+     *                                <code>wrap</code> is <code>false</code>.
      */
     @SuppressWarnings("unchecked")
-    protected List<Object> toList(Object value) throws LinkMLRuntimeException {
+    protected List<Object> toList(Object value, boolean wrap) throws LinkMLRuntimeException {
         if ( !(value instanceof List) ) {
-            throw new LinkMLValueError(LIST_EXPECTED);
+            if ( wrap ) {
+                List<Object> l = new ArrayList<>();
+                l.add(value);
+                return l;
+            } else {
+                throw new LinkMLValueError(LIST_EXPECTED);
+            }
+        } else {
+            return (List<Object>) value;
         }
-        return (List<Object>) value;
     }
 
     /**

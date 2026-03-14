@@ -217,6 +217,15 @@ public class ObjectConverterTest {
     }
 
     @Test
+    void testScalarAsSingleItemList() throws IOException, LinkMLRuntimeException {
+        String text = "multiple: sic2\n";
+        ContainerOfReferences cor = parseString(text, ContainerOfReferences.class);
+        ctx.finalizeAssignments();
+
+        Assertions.assertEquals("sic2", cor.getMultiple().get(0).getId());
+    }
+
+    @Test
     void testConvertingContainerOfReferences() throws IOException {
         // First read the inlined objects
         ContainerOfInlinedObjects coi = parse("container-of-inlined-objects.yaml", ContainerOfInlinedObjects.class);
@@ -452,6 +461,20 @@ public class ObjectConverterTest {
         Assertions.assertEquals(2, types.size());
         Assertions.assertEquals("BaseMultiSelfDesignatedClass", types.get(0));
         Assertions.assertEquals("DerivedMultiSelfDesignatedClass", types.get(1));
+    }
+
+    @Test
+    void testSingleMultivaluedTypeDesignator() throws IOException {
+        // Slot is multivalued but is here provided with a scalar value
+        String text = "foo: A string\nbar: Another string\ntype: DerivedMultiSelfDesignatedClass\n";
+        BaseMultiSelfDesignatedClass bmsdc = parseString(text, BaseMultiSelfDesignatedClass.class);
+
+        Assertions.assertInstanceOf(DerivedMultiSelfDesignatedClass.class, bmsdc);
+        DerivedMultiSelfDesignatedClass derived = (DerivedMultiSelfDesignatedClass) bmsdc;
+        Assertions.assertEquals("A string", derived.getFoo());
+        Assertions.assertEquals("Another string", derived.getBar());
+
+        roundtrip(derived);
     }
 
     @Test
