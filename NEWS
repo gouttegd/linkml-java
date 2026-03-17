@@ -1,3 +1,11 @@
+Changes in LinkML-Java 0.1.2
+----------------------------
+
+    * Support multivalued type designators.
+    * Silently accept unknown designated types.
+    * Accept a single identifier when a list of identifiers is expected.
+
+
 Changes in LinkML-Java 0.1.1
 ----------------------------
 
