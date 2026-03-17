@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.incenp</groupId>
   <artifactId>linkml-java</artifactId>
-  <version>0.1.2-SNAPSHOT</version>
+  <version>0.1.2</version>
   <packaging>pom</packaging>
 
   <name>LinkML-Java</name>
@@ -30,7 +30,7 @@
     <connection>scm:git:https://github.com/gouttegd/linkml-java.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/gouttegd/linkml-java.git</developerConnection>
     <url>https://github.com/gouttegd/linkml-java</url>
-    <tag>HEAD</tag>
+    <tag>linkml-java-0.1.2</tag>
   </scm>
 
   <issueManagement>
