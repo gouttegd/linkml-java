@@ -73,7 +73,19 @@
     \end{itemize}
   \end{block}
 
-  \note{Dummy note for now.}
+  \note{First a quick introduction to German BioImaging, since it is the
+  first time we are presenting at a LinkML Community Call.
+
+  German BioImaging, or GerBI, is the German scientific society for
+  microscopy and image analysis, whose purpose is to support the use of
+  bioimaging techniques throughout Germany.
+
+  That remit includes contributing to the imaging software ecosystem,
+  through our Research Software Engineering Unit, to which I belong.
+  That unit is notably a member of the Open Microscopy Environment
+  consortium, which is responsible for the development of several key
+  software in bioimaging, such as the OMERO server and clients and the
+  BioFormats library.}
 \end{frame}
 
 \begin{frame}
@@ -104,6 +116,23 @@
   Both projects will require support for LinkML in more languages than
   just Python.
 
+  \note{Among the projects that GerBI's RSE Unit is working on, at least
+  two are using or will soon use LinkML.
+
+  OME-Zarr, which is a new imaging file format that is especially
+  intended to represent and manipulate extremely large images; LinkML
+  will be used to define the model and format of at least some of the
+  imaging metadata in OME-Zarr files.
+
+  And Imaging-PHD, a related project aiming at defining a new imaging
+  metadata model that would allow to capture much more details about the
+  hardware that was used to acquire an image, compared to our present
+  models. The new model will be formally defined as a LinkML schema.
+
+  Both of those projects will require the ability to seamlessly work
+  with LinkML-defined instance data in more languages than just Python,
+  which led us to start the LinkML-Java runtime library as a preliminary
+  step.}
 \end{frame}
 
 
@@ -152,9 +181,28 @@ mapper.writeValue(new File("data.yaml"), p);
   \medskip
   Isn't that all we need?
 
+  \visible<2>{
   \medskip
   -- Well, no. This would only work for simple schemas that don't use
   any LinkML-specific features.
+  }
+
+  \note<1>{First, why do we even need a runtime library for LinkML?
+
+  Using LinkML-Py, we can already generate Java classes that represent a
+  LinkML model. With that, we should be able to use a standard JSON or
+  YAML library to easily deserialise a JSON or YAML file into an
+  instance of the Java class that represents a LinkML class, and then
+  manipulate that object as any other Java object.
+
+  So we should already have everything we need, right?
+
+  No. Using a standard, non-LinkML-aware library would work, but only
+  with the most simple schemas --~not simple in the sense that they
+  don't contain a lot of classes, but in the sense that they don't use
+  any LinkML-specific features.
+
+  I'll show you two real-world examples.}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -195,15 +243,39 @@ Sample KGCL file:
     \end{column}
   \end{columns}
 
-\bigskip
-We want to be able to do something like:
+  \bigskip
+  We want to be able to do something like:
 
 \begin{Verbatim}[frame=single,fontsize=\scriptsize]
 List<Change> changes = mapper.readValues(new File("data.yaml"), Change.class);
 \end{Verbatim}
 
-But this requires explicit support for \emph{LinkML type designator
-slots}, which the Jackson library obviously cannot have.
+  But this requires explicit support for \emph{LinkML type designator
+  slots}, which the Jackson library obviously cannot have.
+
+  \note{The first example is the Knowledge Graph Change Language (KGCL),
+  a LinkML model that describes edit operations on a knowledge graph or
+  ontology. It does so by having more than 50 classes that each
+  represent a specific type of editing operation (renaming a node,
+  replacing a predicate, adding a synonym, etc.); all those classes are
+  grouped under a generic \emph{Change} class.
+
+  A typical KGCL file would contain one or several instances of any of
+  those classes, but crucially, we don't know in advance the exact type
+  of each of those instances --~we only know that they will be instances
+  of some subclasses of \emph{Change}. The exact subclass has to be
+  discovered at runtime by looking at the value of the \emph{type} slot,
+  which has been defined in the KGCL model as the \emph{type designator}
+  for the \emph{Change} class. For example, we know that the first
+  change here is an instance of \emph{NodeRename}, because that's what
+  the \emph{type} slot tells us.
+
+  But a generic YAML deserialisation library does not know what a type
+  designator slot is. If you ask it to deserialise that file as a list
+  of \emph{Change} objects, it will predictably expect to find instances
+  of \emph{Change} --~and so, for example, it will not know what to do
+  with the \emph{old\_value} and \emph{new\_value} slots, which do not
+  exists in the top-level \emph{Change} class.}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -252,6 +324,28 @@ public class ClassDefinition {
   Both are LinkML concepts that a generic library like Jackson cannot
   know about.
 
+  \note{The second example is LinkML's own meta-schema. A class
+  definition in LinkML contains, among other things, a slot called
+  \emph{slots}, which is expected to contain the list of slot
+  definitions used by the class. This is rendered in Java,
+  unsurprisingly, as a \emph{ClassDefinition} class with a field typed
+  as a list of \emph{SlotDefinition}.
+
+  But in the YAML representation of a LinkML schema, the content of the
+  \emph{slots} slot is serialised, not as a list of SlotDefinition
+  objects, but as a list of \emph{names}, each name being a reference to
+  the actual SlotDefinition which is stored elsewhere in the YAML file.
+
+  This is completely normal, because (1) a SlotDefinition is a globally
+  identifiable object (because it has an identifier slot), and (2) the
+  \emph{slots} slot is not defined as being \emph{inlined}, so its
+  values are serialised by references instead. This is standard LinkML
+  behaviour.
+
+  But again, a non-LinkML-aware library would know nothing about that,
+  and would error out when trying to deserialise a ClassDefinition
+  because a list of names (a list of strings) is not the same thing as a
+  list of SlotDefinition objects.}
 \end{frame}
 
 \begin{frame}
@@ -276,6 +370,31 @@ public class ClassDefinition {
     \item dealing with the various forms of inlining;
     \item dealing with prefixes and CURIEs.
   \end{itemize}
+
+  \note{Overall, working with LinkML-defined instance data in Java, or I
+  would argue in any other language, requires support from a runtime
+  library for the same reason than Python developers have a
+  linkml-runtime package: because merely translating a LinkML schema
+  into a set of classes (or whatever can be used to represent classes in
+  your target language) is not enough to support all LinkML features.
+
+  In particular, developers need explicit support for at least the
+  following features, which I believe represent the minimal feature set
+  to work with LinkML data:
+
+  -- the notion of type designator slots;
+
+  -- the notion of globally or locally identifiable objects (objects with
+  an identifier or key slot);
+
+  -- the fact that globally identifiable objects can be serialised as mere
+  references, rather than inlined;
+
+  -- the various forms of list or dict inlining;
+
+  -- and I would add to that, support for not having to explicitly deal
+  with CURIES.}
+
 \end{frame}
 
 \begin{frame}[fragile]
@@ -291,7 +410,7 @@ public class Point {
 
     public static Point fromJSON(File f) {
         // All code required to load a Point from a JSON file
-    }
+    }a
 
     public void toJSON(File f) {
         // All code required to dump a Point to a JSON file
@@ -301,13 +420,36 @@ public class Point {
 
   \begin{block}{Not sustainable}
     \begin{itemize}
-      \item Java code embedded within a Jinja2 template in the middle of
-      a Python project
+      \item Java code embedded within a Jinja2 template within a Python project
       \item A bug in the loading or dumping code? Re-generate everything
       \item Better to keep the generated code minimal and deport the
       logic elsewhere
     \end{itemize}
   \end{block}
+
+  \note{So the code currently generated by LinkML's Java code generator
+  is not enough. Couldn't we get away with that solely by making the
+  generator produce more code, rather than having to use a runtime
+  library?
+
+  Yes, we \emph{could} amend the generator so that, instead of producing
+  simple classes that are nothing more than data holders, it produces
+  classes with additional methods providing all the logic needed to,
+  minimally, load and dump instance data. Those methods would contain
+  all the code needed to deal with the minimal set of features I
+  mentioned on the previous slide.
+
+  That would be possible, but I'd argue that it would not be
+  \emph{practical} and in effect would be unsustainable. If only because
+  we would have to develop, maintain, and debug Java code that is
+  embedded within Jinja2 templates which are themselves in the middle of
+  a pure Python project. As someone who is already maintaining an
+  unrelated project that involves a lot of code embedded within Jinja2
+  templates, I can tell you that this is a nightmarish perspective.
+
+  I believe it is much better to keep the generated code as simple as
+  possible, and deport most if not all of the logic needed to work with
+  it elsewhere --~in a runtime library.}
 
 \end{frame}
 
@@ -322,12 +464,20 @@ public class Point {
   \end{block}
 
   \bigskip
-  (Mostly to avoid a catch-22: given a schema \emph{S}, if we needed the
-  schema to parse instance data of \emph{S}, then we would first need to
-  parse \emph{S} itself --~which, since \emph{S} represents an instance
-  of LinkML's own schema \emph{L}, we would not be able to parse without
-  already having a complete representation of \emph{L}, which we can
-  only obtain by parsing \emph{L}...)
+  {\scriptsize
+  (Mostly to avoid a catch-22: If knowledge of a schema $S$ is needed
+  at runtime to read instance data $S_d$
+
+  \begin{itemize}
+    \item then before we can read $S_d$ we must first read $S$;
+    \item since $S$ is an instance of LinkML's own meta-schema $L$,
+      then before we can read $S$ we must first read $L$;
+    \item since $L$ is an instance of $L$, then before we can read $L$
+      we must first read $L$.
+  \end{itemize}
+
+  \rightarrow\hspace{.5em} We must be able to read instance data of a
+  schema without having to read the schema first. $\qed$)}
 
   \bigskip
   This does not preclude the possibility of future additional features
@@ -335,9 +485,24 @@ public class Point {
   loading and dumping of LinkML-defined instance data \emph{must not}
   require the schema.
 
+  \note{The first, and arguably the most important, decision is that the
+  runtime must not require the schema itself in order to be able to read
+  or write instance data. It must be able to work with nothing more than
+  the code that was generated from the schema, without the schema
+  itself.
+
+  This makes bootstrapping easier because it dispenses us from having to
+  develop a full-blown custom LinkML parser when all we want to do at
+  first is to parse instance of a schema --~we're not interested in the
+  schema itself, at least not at this stage.
+
+  In the future, the library will probably offer additional features
+  that may require runtime knowledge of the schema. But the basic
+  features of loading and dumping LinkML-defined instances data must be
+  doable without such knowledge.}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Reliance on Java annotations}
 
   \begin{block}{}
@@ -346,21 +511,45 @@ public class Point {
   \end{block}
 
   \bigskip
-  Annotations expected by the LinkML-Java runtime include:
-  \begin{itemize}
-    \item \texttt{@Identifier} to mark the identifier slot;
-    \item \texttt{@TypeDesignator} to mark the type designator slot;
-    \item \texttt{@Inlined} or \texttt{@Inlined(asList=true)} to specify
-    the inlining mode;
-    \item \texttt{@LinkURI} to indicate the \emph{class\_uri} or the
-    \emph{slot\_uri} (unused for now, but will be used for RDF support
-    in the future).
-  \end{itemize}
+\begin{Verbatim}[frame=single,fontsize=\scriptsize]
+@LinkURI("https://example.org/myschema/MyClass")
+public class MyClass {
+    @Identifier
+    private String id;
+
+    @TypeDesignator
+    private String type;
+
+    @Inlined(asList = true)
+    private List<AnotherClass> foos;
+}
+\end{Verbatim}
 
   \bigskip
   Work is in progress to update LinkML(-Py)'s own code generator to
   automatically produce code that is suitable for consumption by the
   LinkML-Java runtime.
+
+  \note<1>{The second decision is a direct consequence of the first: since
+  we do not have the schema at runtime, we must rely on the generated
+  code to provide us with all the informations we need to be able to
+  read or write instance data.
+
+  The generated code already tells us what are the slots and their
+  ranges within a class, but we also need to know, for example:
+
+  -- which slot is the identifier or key slot, if any;
+
+  -- which slot is the type designator slot, if any;
+
+  -- whether a slot is expected to be inlined, and if so in which form;
+
+  -- the URI associated to a class or a slot;
+
+  and a few other things. This is done through a set of dedicated Java
+  annotations, to be added to the generated code. Part of my work of the
+  previous weeks has been to amend LinkML's Java code generator so that
+  it could automatically inject those annotations.}
 \end{frame}
 
 \begin{frame}
@@ -383,6 +572,20 @@ public class Point {
     specifically use the Jackson library. But its use is entirely
     optional.
   \end{itemize}
+
+  \note{A somewhat less important decision: the runtime must not depend
+  on a specific JSON/YAML library.
+
+  The runtime is expected to be used by several existing projects in the
+  bioimaging community --~projects that may already have a JSON/YAML
+  parser among their dependencies, and I don't want to force them to use
+  another parser just to work with LinkML data.
+
+  For that, the runtime does not work with JSON or YAML files directly.
+  The typical workflow for data loading, for example, is that you would
+  first parse the JSON or YAML file into a generic Java Map structure
+  (using any parser you want), and then you pass the map to the runtime
+  --~at which point it does not matter which parser produced it.}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -418,11 +621,26 @@ public class Point {
 
   \bigskip
   Client code can request the use of a custom converter object to parse
-  \emph{PredicateChange} objects:
+  \emph{SimpleChange} objects:
 \begin{Verbatim}[frame=single,fontsize=\scriptsize]
-@Converter(PredicateChangeConverter.class)
-public class PredicateChange { ... }
+@Converter(MyCustomSimpleChangeConverter.class)
+public class SimpleChange { ... }
 \end{Verbatim}
+
+  \note{Next, the runtime must be flexible enough to accomodate the
+  specific needs of some models --~including needs that are not
+  themselves defined in their schemas but are expressed elsewhere.
+
+  KGCL again provides us with an example. The \emph{old\_value} slot in
+  the SimpleChange class is nominally defined as string-typed, but in
+  fact it has a variable type --~sometimes a string, sometimes a CURIE;
+  the exact type being indicated by the \emph{old\_value\_type} slot.
+
+  The loading code in the runtime would not know about that, since this
+  is a KGCL-specific behaviour that is not encoded in the model. So we
+  must be able to request the use of a custom converter object,
+  specifically intended to process instances of \emph{SimpleChange},
+  where we can implement the desired behaviour.}
 \end{frame}
 
 \begin{frame}
@@ -446,6 +664,19 @@ public class PredicateChange { ... }
   \bigskip
   Previous experience with both KGCL and SSSOM convinced me that this is
   the only sane way of working with CURIEs.
+
+  \note{Lastly, the runtime must allow the developer to completely
+  forget that CURIEs even exist, by taking care of automatically
+  expanding them into IRIs upon parsing and automatically contracting
+  them back into CURIEs upon serialising.
+
+  This is arguably less important in the big scheme of things, but I
+  personally consider that a critical, must-have feature. As a user of
+  the runtime, I do not want to have to deal with CURIEs --~that should
+  be the runtime's job.
+
+  CURIEs are a serialisation detail and should never appear in the core
+  logic of an application.}
 \end{frame}
 
 \section{What is supported for now?}
@@ -473,6 +704,24 @@ Point p = ctx.getConverter(Point.class).convert(raw, ctx);
 ctx.finalizeAssignments();
 \end{Verbatim}
 
+  \note{So what you can do, currently, with the initial version of the
+  LinkML-Java runtime?
+
+  Mainly, you can load and dump LinkML instance data from and to JSON or
+  YAML files.
+
+  For loading, you have a high-level interface that abstracts away all
+  the LinkML details, and that can be used roughly in a similar way to
+  the loaders object in the LinkML Python runtime, in that you just give
+  the loader (1) the file you want to read and (2) the type of object
+  you want to deserialise, and it will do everything for you.
+
+  What I call the ``mid-level interface'' can be used if (1) you want to
+  work with data that have already been read from files and put in
+  memory, and/or (2) if you need finer control about what the runtime
+  will do --~this will obviously require more familiarity with the
+  inner workings of the runtime, which will be explained in its
+  documentation but that I will not detail here.}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -498,14 +747,13 @@ Point p = ...;
 Object raw = ctx.getConverter(Point.class).serialise(p, ctx);
 // Then give the "raw" object to any JSON/YAML writer of your liking
 \end{Verbatim}
-
 \end{frame}
 
 \begin{frame}
   \frametitle{Type designators}
 
   \begin{itemize}
-    \item Only mono-valued type designators are supported.
+    \item Multi-valued type designators are supported.
     \item For String-typed type designators, it is assumed that all the
     generated classes reside in the same Java package
       \begin{itemize}
@@ -521,6 +769,25 @@ Object raw = ctx.getConverter(Point.class).serialise(p, ctx);
         registered first
       \end{itemize}
   \end{itemize}
+
+  \note{A few things to be aware of.
+
+  First, about type designators. LinkML-Java currently supports both
+  single- and multi-valued type designators. However there are some
+  limitations.
+
+  If the type designator is a string, it will only work if the
+  designated class is in the same Java package as the base
+  class--~which should not be too much of a limitation as the current
+  behaviour of the Java code generator is to put all the code in a
+  single package anyway.
+
+  If the type designator is a URI, then the designated class can live
+  anywhere, but the runtime will only recognise it if it has been
+  explicitly registered first.
+
+  Those limitations may be lifted in future versions, though I do not
+  consider that a priority for the time being.}
 
 \end{frame}
 
@@ -544,6 +811,28 @@ my_class_definition.getSlots().get(0)
     \item Only ``non-repair list normalisations'' are implemented
   \end{itemize}
 
+  \note{About referencing, the most important thing to be aware of is
+  that the runtime will automatically resolve LinkML references --~when
+  a slot contain a name pointing to another object~-- into Java
+  references.
+
+  For example, if you are working with LinkML's own meta-schema and you
+  have loaded a ClassDefinition objects: what you will find in the
+  \emph{slots} slot (which you can access through the \emph{getSlots()}
+  accessor) will not be the names of the slot, as it would be in Python.
+  Instead it will give you directly a Java reference (what in C++ we
+  would call a ``pointer'') to the actual SlotDefinition object.
+
+  This is because (1) it is more convenient (I believe resolving those
+  references is completely within the remit of a LinkML runtime) and (2)
+  because Java's strict typing rules actually do not give us a choice
+  here. It would not be possible to store slot names (that is, strings)
+  into a field intended to store SlotDefinition objects.
+
+  About inlining, the runtime only supports what the LinkML spec calls
+  ``non-repair'' normalisations. Mostly, this means that if a slot is
+  expected to be serialised as a inlined list, it will be an error if it
+  is actually serialised as an inlined dict, and the other way round.}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -564,6 +853,20 @@ public class Foo {
     \item This is because you cannot dynamically add an arbitrary field
     to a class in Java (as you can do in Python).
   \end{itemize}
+
+  \note{The runtime does support the presence of ``extra slots'' --~that
+  is, JSON/YAML keys that do not correspond to a declared slot or
+  attribute for the class that is being deserialised~--, but this
+  requires that, during code generation, an additional field be added
+  specifically to store the values of such slots.
+
+  If that extra field is present and labelled with an
+  \emph{ExtensionHolder} annotation, then any extra slot will be stored
+  in that field --~and upon serialisation they will be written back as
+  additional keys as they were originally found.
+
+  Otherwise, the loader will simply silently ignore any extra slot it
+  may find.}
 \end{frame}
 
 \begin{frame}
@@ -575,6 +878,14 @@ public class Foo {
     the string represents a permissible value
   \end{itemize}
 
+  \note{Lastly, a quick note about LinkML's dynamic enumerations. Simply
+  put, they are completely unsupported for now.
+
+  This is because, as of now I am still unsure about the best way to do
+  that. One thing that is clear is that they will not be represented as
+  actual Java enums --~the values of a Java enumeration must necessarily
+  be known at compile time, which is by design incompatible with the
+  very idea of dynamic enums.}
 \end{frame}
 
 
@@ -601,6 +912,26 @@ public class Foo {
       \end{itemize}
   \end{itemize}
 
+  \note{What to expect in future versions?
+
+  There are still a lot to implement, and the roadmap for future
+  versions is not fixed yet, but RDF support --~that is, the ability to
+  import or export data from or to RDF, instead of JSON or YAML files~--
+  will definitely be there at some point, as well as at least some
+  support for dynamic enums.
+
+  Longer term, the runtime will also allow to work with a completely
+  unknown schema that is only discovered at runtime, without requiring
+  that code had been pre-generated specifically for that schema.
+
+  Once the runtime can do that, then it will most likely at some point
+  include its own code generator, which will make it much easier to
+  integrate the code generation step into the build process of a typical
+  Java project --~this will probably take the form of a Maven plugin.
+  The idea being that you can just add this plugin to your Maven
+  configuration, point it to the LinkML schema you want to work with in
+  your project, and the plugin will automatically generate the code in
+  the early phases of the Maven lifecycle.}
 \end{frame}
 
 
