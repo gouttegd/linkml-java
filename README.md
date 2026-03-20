@@ -70,6 +70,11 @@ The project is currently located at
 <https://incenp.org/dvlpt/linkml-java/>. The source code is available in
 a Git repository at <https://github.com/gouttegd/linkml-java>.
 
+Acknowledgements
+----------------
+Work on LinkML-Java is funded by NSF grant [#2513921](https://www.nsf.gov/awardsearch/show-award/?AWD_ID=2513921)
+(“Frameworks-Imaging-PHD”).
+
 Copying
 -------
 LinkML-Java is distributed under the terms of the 3-clause BSD license.
