@@ -1,11 +1,11 @@
-simpleDict:
+simple_dict:
   key1:
     key: key1
     value: value1
-extraSimpleDict:
+extra_simple_dict:
   key2:
     value: value2
-multivaluedSimpleDict:
+multivalued_simple_dict:
   key3:
     key: key3
     values:

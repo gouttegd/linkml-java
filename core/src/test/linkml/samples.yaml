@@ -1,0 +1,332 @@
+title: LinkML-Java Core Library test classes
+name: samples
+id: https://incenp.org/dvlpt/linkml-java/tests/samples
+
+description: >-
+  This model defines various classes that are intended to test the
+  core library of the LinkML-Java runtime.
+license: https://spdx.org/licenses/BSD-3-Clause.html
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  rt: https://incenp.org/dvlpt/linkml-java/tests/samples#
+
+default_prefix: rt
+default_range: string
+
+imports:
+  - linkml:types
+
+classes:
+
+  SimpleClass:
+    description: >-
+      An example of a simple class containing only scalar fields.
+    attributes:
+      foo:
+      the_bar:
+        range: uri
+      baz:
+        range: boolean
+      foos:
+        multivalued: true
+      type:
+        range: SampleEnum
+      datetime:
+        range: datetime
+      date:
+        range: date
+      time:
+        range: time
+
+  SimpleIdentifiableClass:
+    description: >-
+      An example of a simple class representing uniquely identifiable objects.
+    is_a: SimpleClass
+    attributes:
+      id:
+        identifier: true
+
+  ExtendedIdentifiableClass:
+    description: >-
+      An example of a class derived from a class that represents uniquely
+      identifiable objects.
+    is_a: SimpleIdentifiableClass
+    attributes:
+      another_foo:
+
+  IRISimpleIdentifiableClass:
+    description: >-
+      An example of a simple class representing uniquely identifiable objects,
+      where the identifier is a `uriOrCurie`.
+    is_a: SimpleClass
+    attributes:
+      id:
+        range: uriorcurie
+        identifier: true
+
+  ExtensibleSimpleClass:
+    description: >-
+      An example of a class that can accept unknown properties (“extensions”
+      “extra slots”).
+    is_a: SimpleClass
+    extra_slots:
+      allowed: true
+
+  SimpleKeyableClass:
+    description: >-
+      An example of a simple class representing locally identifiable objects.
+    is_a: SimpleClass
+    attributes:
+      id:
+        key: true
+
+  SimpleDict:
+    description: >-
+      An example of a class that is eligible for inlining as a “SimpleDict”
+      (only one additional slot beyond the identifier slot).
+    attributes:
+      key:
+        identifier: true
+      value:
+
+  ExtraSimpleDict:
+    description: >-
+      An example of a class that is eligible for inlining as a “SimpleDict”
+      (only one required slot beyond the identifier slot).
+    attributes:
+      key:
+        identifier: true
+      value:
+        required: true
+      extra:
+
+  MultivaluedSimpleDict:
+    description: >-
+      An example of a class that is eligible for inlining as a “SimpleDict”
+      (only one additional slot beyond the identifier slot), where the primary
+      slot is multivalued.
+    attributes:
+      key:
+        identifier: true
+      values:
+        multivalued: true
+
+  ClassWithCustomConverter:
+    description: >-
+      An example of a class using slots that will require custom converters.
+    attributes:
+      uri:
+        range: uriorcurie
+      uris:
+        range: uriorcurie
+        multivalued: true
+
+  BaseSelfDesignatedClass:
+    description: >-
+      An example of a class that has a type designator slot.
+    attributes:
+      foo:
+      type:
+        designates_type: true
+    extra_slots:
+      allowed: true
+
+  DerivedSelfDesignatedClass:
+    description: >-
+      An example of a class that derives from a class with a type designator
+      slot.
+    is_a: BaseSelfDesignatedClass
+    attributes:
+      bar:
+
+  BaseURISelfDesignatedClass:
+    description: >-
+      An example of a class that has a URI-typed type designator slot.
+    attributes:
+      foo:
+      type:
+        range: uri
+        designates_type: true
+
+  DerivedURISelfDesignatedClass:
+    description: >-
+      An example of a class that derives from a class with a URI-typed type
+      designator slot.
+    is_a: BaseURISelfDesignatedClass
+    attributes:
+      bar:
+
+  BaseCurieSelfDesignatedClass:
+    description: >-
+      An example of a class that has a Curie-typed type designator slot.
+    attributes:
+      foo:
+      type:
+        range: uriorcurie
+        designates_type: true
+
+  DerivedCurieSelfDesignatedClass:
+    description: >-
+      An example of a class that derives from a class with a Curie-typed type
+      designator slot.
+    is_a: BaseCurieSelfDesignatedClass
+    attributes:
+      bar:
+
+  BaseMultiSelfDesignatedClass:
+    description: >-
+      An example of a class that has a multivalued type designator slot.
+    attributes:
+      foo:
+      type:
+        designates_type: true
+        multivalued: true
+    extra_slots:
+      allowed: true
+
+  DerivedMultiSelfDesignatedClass:
+    description: >-
+      An example of a class that derives from a class with a multivalued type
+      designator slot.
+    is_a: BaseMultiSelfDesignatedClass
+    attributes:
+      bar:
+
+  ContainerOfBooleanValues:
+    description: >-
+      An example of a class containing boolean slots – some required, some not.
+    attributes:
+      primitive_foo:
+        range: boolean
+        required: true
+      primitive_bar:
+        range: boolean
+        required: true
+      primitive_baz:
+        range: boolean
+        required: true
+      foo:
+        range: boolean
+      bar:
+        range: boolean
+      baz:
+        range: boolean
+
+  ContainerOfIntegerValues:
+    description: >-
+      An example of a class with single- and multi-valued integer slots.
+    attributes:
+      foo:
+        range: integer
+        required: true
+      bar:
+        range: integer
+      baz:
+        range: integer
+        multivalued: true
+
+  ContainerOfSimpleObjects:
+    description: >-
+      An example of a class with slots containing non-identifiable objects
+      (necessarily expected to be serialised in inlined form).
+    attributes:
+      single:
+        range: SimpleClass
+      multiple:
+        range: SimpleClass
+        multivalued: true
+
+  ContainerOfReferences:
+    description: >-
+      An example of a class with slots containing identifiable objects expected
+      to be serialised as global references.
+    attributes:
+      single:
+        range: SimpleIdentifiableClass
+      multiple:
+        range: SimpleIdentifiableClass
+        multivalued: true
+
+  ContainerOfIRIIdentifiableObjects:
+    description: >-
+      An example of a class with slots containing identifiable objects whose
+      identifier slot is expected to be an IRI.
+    attributes:
+      single_reference:
+        range: IRISimpleIdentifiableClass
+      multiple_references:
+        range: IRISimpleIdentifiableClass
+        multivalued: true
+      single_inlined:
+        range: IRISimpleIdentifiableClass
+        inlined: true
+      multiple_inlined_as_list:
+        range: IRISimpleIdentifiableClass
+        multivalued: true
+        inlined: true
+        inlined_as_list: true
+      multiple_inlined_as_dict:
+        range: IRISimpleIdentifiableClass
+        multivalued: true
+        inlined: true
+        inlined_as_list: false
+
+  ContainerOfInlinedObjects:
+    description: >-
+      An example of a class with slots containing identifiable objects expected
+      to be serialised in inline form.
+    attributes:
+      single_inlined:
+        range: SimpleIdentifiableClass
+        inlined: true
+      inlined_as_list:
+        range: SimpleIdentifiableClass
+        multivalued: true
+        inlined: true
+        inlined_as_list: true
+      inlined_as_dict:
+        range: SimpleIdentifiableClass
+        multivalued: true
+        inlined: true
+        inlined_as_list: false
+      local_single_inlined:
+        range: SimpleKeyableClass
+        inlined: true
+      local_inlined_as_list:
+        range: SimpleKeyableClass
+        multivalued: true
+        inlined: true
+        inlined_as_list: true
+      local_inlined_as_dict:
+        range: SimpleKeyableClass
+        multivalued: true
+        inlined: true
+        inlined_as_list: false
+
+  ContainerOfSimpleDicts:
+    description: >-
+      An example of a class with multi-valued slots whose values are expected
+      to be inlined as “SimpleDict”.
+    attributes:
+      simple_dict:
+        range: SimpleDict
+        multivalued: true
+        inlined: true
+      extra_simple_dict:
+        range: ExtraSimpleDict
+        multivalued: true
+        inlined: true
+      multivalued_simple_dict:
+        range: MultivaluedSimpleDict
+        multivalued: true
+        inlined: true
+
+
+enums:
+
+  SampleEnum:
+    permissible_values:
+      foo:
+      bar:
+      baz:

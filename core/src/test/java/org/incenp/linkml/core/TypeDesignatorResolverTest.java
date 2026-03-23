@@ -48,6 +48,8 @@ import org.junit.jupiter.api.Test;
 
 public class TypeDesignatorResolverTest {
 
+    private final static String TEST_NS = "https://incenp.org/dvlpt/linkml-java/tests/samples#";
+
     TypeDesignatorResolver resolver = new TypeDesignatorResolver();
 
     @Test
@@ -66,7 +68,7 @@ public class TypeDesignatorResolverTest {
     @Test
     void testResolveSingleURIDesignator() {
         ClassInfo base = ClassInfo.get(BaseURISelfDesignatedClass.class);
-        ClassInfo resolved = resolver.resolve("https://example.org/classes/DerivedURISelfDesignatedClass", base);
+        ClassInfo resolved = resolver.resolve(TEST_NS + "DerivedURISelfDesignatedClass", base);
         Assertions.assertEquals(resolved, ClassInfo.get(DerivedURISelfDesignatedClass.class));
     }
 
@@ -120,13 +122,13 @@ public class TypeDesignatorResolverTest {
 
     @Test
     void testGetSimpleURIDesignator() throws LinkMLRuntimeException {
-        Assertions.assertEquals(URI.create("https://example.org/classes/DerivedURISelfDesignatedClass"),
+        Assertions.assertEquals(URI.create(TEST_NS + "DerivedURISelfDesignatedClass"),
                 resolver.getDesignator(ClassInfo.get(DerivedURISelfDesignatedClass.class)));
     }
 
     @Test
     void testGetSimpleCurieDesignator() throws LinkMLRuntimeException {
-        Assertions.assertEquals("https://example.org/classes/DerivedCurieSelfDesignatedClass",
+        Assertions.assertEquals(TEST_NS + "DerivedCurieSelfDesignatedClass",
                 resolver.getDesignator(ClassInfo.get(DerivedCurieSelfDesignatedClass.class)));
     }
 

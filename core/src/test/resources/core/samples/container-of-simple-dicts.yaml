@@ -1,7 +1,7 @@
-simpleDict:
+simple_dict:
   key1: value1
-extraSimpleDict:
+extra_simple_dict:
   key2: value2
-multivaluedSimpleDict:
+multivalued_simple_dict:
   key3:
     - value3

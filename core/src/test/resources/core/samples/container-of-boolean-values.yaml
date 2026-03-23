@@ -1,4 +1,4 @@
 foo: true
 bar: false
-primitiveFoo: true
-primitiveBar: false
+primitive_foo: true
+primitive_bar: false

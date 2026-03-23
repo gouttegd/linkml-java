@@ -48,6 +48,8 @@ import org.junit.jupiter.api.Test;
 
 public class SlotTest {
 
+    private final static String TEST_NS = "https://incenp.org/dvlpt/linkml-java/tests/samples#";
+
     @Test
     void testMultivalued() throws LinkMLRuntimeException {
         Slot singleValuedSlot = Slot.getSlot(SimpleClass.class, "foo");
@@ -62,14 +64,14 @@ public class SlotTest {
         Slot sameNameSlot = Slot.getSlot(SimpleClass.class, "foo");
         Assertions.assertEquals("foo", sameNameSlot.getLinkMLName());
 
-        Slot diffNameSlot = Slot.getSlot(SimpleClass.class, "bar");
+        Slot diffNameSlot = Slot.getSlot(SimpleClass.class, "theBar");
         Assertions.assertEquals("the_bar", diffNameSlot.getLinkMLName());
     }
 
     @Test
     void testGetLinkURI() throws LinkMLRuntimeException {
         Slot bazSlot = Slot.getSlot(SimpleClass.class, "baz");
-        Assertions.assertEquals("https://example.org/baz", bazSlot.getLinkedURI());
+        Assertions.assertEquals(TEST_NS + "baz", bazSlot.getLinkedURI());
     }
 
     @Test
@@ -106,12 +108,12 @@ public class SlotTest {
         Assertions.assertEquals(InliningMode.NO_INLINING, ci.getSlot("multiple").getInliningMode());
 
         ci = ClassInfo.get(ContainerOfInlinedObjects.class);
-        Assertions.assertEquals(InliningMode.DICT, ci.getSlot("singleInlined").getInliningMode());
-        Assertions.assertEquals(InliningMode.LIST, ci.getSlot("inlinedAsList").getInliningMode());
-        Assertions.assertEquals(InliningMode.DICT, ci.getSlot("inlinedAsDict").getInliningMode());
-        Assertions.assertEquals(InliningMode.DICT, ci.getSlot("localSingleInlined").getInliningMode());
-        Assertions.assertEquals(InliningMode.LIST, ci.getSlot("localInlinedAsList").getInliningMode());
-        Assertions.assertEquals(InliningMode.DICT, ci.getSlot("localInlinedAsDict").getInliningMode());
+        Assertions.assertEquals(InliningMode.DICT, ci.getSlot("single_inlined").getInliningMode());
+        Assertions.assertEquals(InliningMode.LIST, ci.getSlot("inlined_as_list").getInliningMode());
+        Assertions.assertEquals(InliningMode.DICT, ci.getSlot("inlined_as_dict").getInliningMode());
+        Assertions.assertEquals(InliningMode.DICT, ci.getSlot("local_single_inlined").getInliningMode());
+        Assertions.assertEquals(InliningMode.LIST, ci.getSlot("local_inlined_as_list").getInliningMode());
+        Assertions.assertEquals(InliningMode.DICT, ci.getSlot("local_inlined_as_dict").getInliningMode());
 
         ci = ClassInfo.get(SimpleClass.class);
         Assertions.assertEquals(InliningMode.IRRELEVANT, ci.getSlot("foo").getInliningMode());

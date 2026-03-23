@@ -79,6 +79,8 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 public class ObjectConverterTest {
 
+    private final static String TEST_NS = "https://incenp.org/dvlpt/linkml-java/tests/samples#";
+
     private ConverterContext ctx = new ConverterContext();
 
     @Test
@@ -86,7 +88,7 @@ public class ObjectConverterTest {
         SimpleClass sc = parse("simple-class.yaml", SimpleClass.class);
 
         Assertions.assertEquals("a string", sc.getFoo());
-        Assertions.assertEquals("https://example.org/a/URI", sc.getBar().toString());
+        Assertions.assertEquals("https://example.org/a/URI", sc.getTheBar().toString());
         Assertions.assertTrue(sc.getBaz());
         Assertions.assertEquals("a string in a list", sc.getFoos().get(0));
         Assertions.assertEquals(SampleEnum.FOO, sc.getType());
@@ -103,13 +105,13 @@ public class ObjectConverterTest {
         ExtensibleSimpleClass esc = parse("simple-class.yaml", ExtensibleSimpleClass.class);
 
         Assertions.assertEquals("a string", esc.getFoo());
-        Assertions.assertNotNull(esc.getExtensions());
+        Assertions.assertNotNull(esc.getExtraSlots());
 
-        Object unknown1 = esc.getExtensions().get("unknown1");
+        Object unknown1 = esc.getExtraSlots().get("unknown1");
         Assertions.assertNotNull(unknown1);
         Assertions.assertEquals("unknown string", unknown1);
 
-        Object unknown2 = esc.getExtensions().get("unknown2");
+        Object unknown2 = esc.getExtraSlots().get("unknown2");
         Assertions.assertNotNull(unknown2);
         Assertions.assertInstanceOf(Map.class, unknown2);
 
@@ -142,13 +144,13 @@ public class ObjectConverterTest {
         ContainerOfSimpleObjects obj = parse("container-of-simple-objects.yaml", ContainerOfSimpleObjects.class);
 
         Assertions.assertEquals("a string", obj.getSingle().getFoo());
-        Assertions.assertEquals("https://example.org/a/URI", obj.getSingle().getBar().toString());
+        Assertions.assertEquals("https://example.org/a/URI", obj.getSingle().getTheBar().toString());
         Assertions.assertFalse(obj.getSingle().getBaz());
 
         Assertions.assertEquals(1, obj.getMultiple().size());
         SimpleClass sc = obj.getMultiple().get(0);
         Assertions.assertEquals("another string", sc.getFoo());
-        Assertions.assertEquals("https://example.org/another/URI", sc.getBar().toString());
+        Assertions.assertEquals("https://example.org/another/URI", sc.getTheBar().toString());
         Assertions.assertTrue(sc.getBaz());
 
         roundtrip(obj);
@@ -303,7 +305,7 @@ public class ObjectConverterTest {
         ObjectConverter conv = (ObjectConverter) ctx.getConverter(ContainerOfInlinedObjects.class);
         Map<String, Object> raw = conv.serialise(coi, false, ctx);
         @SuppressWarnings("unchecked")
-        Map<String, Object> inlinedAsDict = (Map<String, Object>) raw.get("inlinedAsDict");
+        Map<String, Object> inlinedAsDict = (Map<String, Object>) raw.get("inlined_as_dict");
         Assertions.assertFalse(inlinedAsDict.containsKey("id"));
         Assertions.assertEquals(coi, conv.convert(raw, ctx));
     }
@@ -376,7 +378,7 @@ public class ObjectConverterTest {
 
     @Test
     void testURITypeDesignator() throws IOException, LinkMLRuntimeException {
-        String text = "foo: A string\nbar: Another string\ntype: https://example.org/classes/DerivedURISelfDesignatedClass\n";
+        String text = "foo: A string\nbar: Another string\ntype: " + TEST_NS + "DerivedURISelfDesignatedClass\n";
         // Make sure the class and its URI is known to ClassInfo
         ClassInfo.get(DerivedURISelfDesignatedClass.class);
         BaseURISelfDesignatedClass base = parseString(text, BaseURISelfDesignatedClass.class);
@@ -394,8 +396,7 @@ public class ObjectConverterTest {
         ObjectConverter conv = (ObjectConverter) ctx.getConverter(derived.getClass());
         Map<String, Object> raw = conv.serialise(derived, true, ctx);
         Assertions.assertTrue(raw.containsKey("type"));
-        Assertions.assertEquals(URI.create("https://example.org/classes/DerivedURISelfDesignatedClass"),
-                raw.get("type"));
+        Assertions.assertEquals(URI.create(TEST_NS + "DerivedURISelfDesignatedClass"), raw.get("type"));
     }
 
     @Test
@@ -403,7 +404,7 @@ public class ObjectConverterTest {
         String text = "foo: A string\nbar: Another string\ntype: EX:DerivedCurieSelfDesignatedClass\n";
         // Make sure the class and its URI is known to ClassInfo, and that the converter
         // context knows about the EX prefix
-        ctx.addPrefix("EX", "https://example.org/classes/");
+        ctx.addPrefix("EX", TEST_NS);
         ClassInfo.get(DerivedCurieSelfDesignatedClass.class);
         BaseCurieSelfDesignatedClass base = parseString(text, BaseCurieSelfDesignatedClass.class);
 
@@ -486,14 +487,14 @@ public class ObjectConverterTest {
         Assertions.assertEquals("A string", isic.getFoo());
         Assertions.assertEquals("https://example.org/0001", isic.getId());
 
-        text = "singleReference: PFX:0001";
+        text = "single_reference: PFX:0001";
         ContainerOfIRIIdentifiableObjects coii = parseString(text, ContainerOfIRIIdentifiableObjects.class);
         Assertions.assertTrue(isic == coii.getSingleReference());
 
         // Test that the identifiers are shortened back upon serialisation
         ObjectConverter conv = (ObjectConverter) ctx.getConverter(ContainerOfIRIIdentifiableObjects.class);
         Map<String, Object> raw = conv.serialise(coii, false, ctx);
-        Assertions.assertEquals("PFX:0001", raw.get("singleReference"));
+        Assertions.assertEquals("PFX:0001", raw.get("single_reference"));
         conv = (ObjectConverter) ctx.getConverter(IRISimpleIdentifiableClass.class);
         raw = conv.serialise(isic, true, ctx);
         Assertions.assertEquals("PFX:0001", raw.get("id"));
@@ -512,14 +513,14 @@ public class ObjectConverterTest {
         ctx = new ConverterContext();
         ctx.addPrefix("PFX", "https://example.org/");
         isic = parseString("id: PFX:0003\nfoo: A string", IRISimpleIdentifiableClass.class);
-        coii = parseString("multipleReferences:\n  - PFX:0003\n", ContainerOfIRIIdentifiableObjects.class);
+        coii = parseString("multiple_references:\n  - PFX:0003\n", ContainerOfIRIIdentifiableObjects.class);
         Assertions.assertEquals("https://example.org/0003", isic.getId());
         Assertions.assertTrue(isic == coii.getMultipleReferences().get(0));
 
         // Multi-valued slots with forward references
         ctx = new ConverterContext();
         ctx.addPrefix("PFX", "https://example.org");
-        coii = parseString("multipleReferences:\n  - PFX:0004\n", ContainerOfIRIIdentifiableObjects.class);
+        coii = parseString("multiple_references:\n  - PFX:0004\n", ContainerOfIRIIdentifiableObjects.class);
         isic = parseString("id: PFX:0004\nfoo: A string", IRISimpleIdentifiableClass.class);
         Assertions.assertTrue(coii.getMultipleReferences().isEmpty());
         ctx.finalizeAssignments();
@@ -529,11 +530,11 @@ public class ObjectConverterTest {
     @Test
     void testInliningWithIRIIdentifiers() throws IOException {
         ctx.addPrefix("PFX", "https://example.org/");
-        ContainerOfIRIIdentifiableObjects coii = parseString("multipleInlinedAsList:\n  - id: PFX:0001\n",
+        ContainerOfIRIIdentifiableObjects coii = parseString("multiple_inlined_as_list:\n  - id: PFX:0001\n",
                 ContainerOfIRIIdentifiableObjects.class);
         Assertions.assertEquals("https://example.org/0001", coii.getMultipleInlinedAsList().get(0).getId());
 
-        coii = parseString("multipleInlinedAsDict:\n  PFX:0002:\n    foo: A string\n",
+        coii = parseString("multiple_inlined_as_dict:\n  PFX:0002:\n    foo: A string\n",
                 ContainerOfIRIIdentifiableObjects.class);
         Assertions.assertEquals("https://example.org/0002", coii.getMultipleInlinedAsDict().get(0).getId());
         roundtrip(coii);

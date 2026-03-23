@@ -55,7 +55,7 @@ public class ObjectLoaderTest {
                 SimpleClass.class);
 
         Assertions.assertEquals("a string", sc.getFoo());
-        Assertions.assertEquals("https://example.org/a/URI", sc.getBar().toString());
+        Assertions.assertEquals("https://example.org/a/URI", sc.getTheBar().toString());
         Assertions.assertTrue(sc.getBaz());
         Assertions.assertEquals("a string in a list", sc.getFoos().get(0));
         Assertions.assertEquals(SampleEnum.FOO, sc.getType());
@@ -74,7 +74,7 @@ public class ObjectLoaderTest {
     void testWritingSimpleClass() throws IOException, LinkMLRuntimeException {
         SimpleClass sc = new SimpleClass();
         sc.setFoo("a string");
-        sc.setBar(URI.create("https://example.org/a/URI"));
+        sc.setTheBar(URI.create("https://example.org/a/URI"));
         sc.setBaz(false);
 
         File tmp = new File("src/test/resources/core/samples/simple-class.yaml.out");
@@ -94,7 +94,7 @@ public class ObjectLoaderTest {
         sc.setFoo("a string");
         list.add(sc);
         sc = new SimpleClass();
-        sc.setBar(URI.create("https://example.org/a/URI"));
+        sc.setTheBar(URI.create("https://example.org/a/URI"));
         list.add(sc);
 
         File tmp = new File("src/test/resources/core/samples/simple-class-list.yaml.out");
@@ -110,7 +110,7 @@ public class ObjectLoaderTest {
     void testWritingSimpleClassAsJSON() throws IOException, LinkMLRuntimeException {
         SimpleClass sc = new SimpleClass();
         sc.setFoo("a string");
-        sc.setBar(URI.create("https://example.org/a/URI"));
+        sc.setTheBar(URI.create("https://example.org/a/URI"));
         sc.setBaz(false);
 
         File tmp = new File("src/test/resources/core/samples/simple-class.json.out");

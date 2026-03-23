@@ -1,18 +1,18 @@
-singleInlined:
+single_inlined:
   foo: a string
   id: sic1
-inlinedAsList:
+inlined_as_list:
   - foo: another string
     id: sic2
-inlinedAsDict:
+inlined_as_dict:
   sic3:
     foo: yet another string
-localSingleInlined:
+local_single_inlined:
   foo: a local string
   id: skc1
-localInlinedAsList:
+local_inlined_as_list:
   - foo: another local string
     id: skc2
-localInlinedAsDict:
+local_inlined_as_dict:
   skc3:
     foo: yet another local string
