@@ -75,7 +75,7 @@ public class SchemaDocumentTest {
             Assertions.assertEquals(3, organismClass.getAttributes().size());
             SlotDefinition idSlot = doc.getAttribute(organismClass.getName(), "id");
             SlotDefinition hasParentSlot = doc.getAttribute(organismClass.getName(), "has_parent");
-            Assertions.assertTrue(idSlot.getIsIdentifier());
+            Assertions.assertTrue(idSlot.getIdentifier());
             Assertions.assertEquals(organismClass, hasParentSlot.getRange());
             Assertions.assertNull(hasParentSlot.getMultivalued());
             Assertions.assertNull(hasParentSlot.getInlined());
@@ -102,7 +102,6 @@ public class SchemaDocumentTest {
         Assertions.assertNotNull(idSlot);
         SlotDefinition idSlotUsage = doc.getSlotUsage("Organism", "id");
         Assertions.assertNotNull(idSlotUsage);
-        Assertions.assertEquals(idSlot, idSlotUsage.getGlobalSlot());
     }
 
     @Test
@@ -119,8 +118,8 @@ public class SchemaDocumentTest {
         Assertions.assertEquals(1, schemaDoc.getRootSchema().getPrefixes().size());
 
         Prefix pfx = schemaDoc.getRootSchema().getPrefixes().get(0);
-        Assertions.assertEquals("linkml", pfx.getPrefixName());
-        Assertions.assertEquals("https://w3id.org/linkml/", pfx.getIriPrefix());
+        Assertions.assertEquals("linkml", pfx.getPrefixPrefix());
+        Assertions.assertEquals("https://w3id.org/linkml/", pfx.getPrefixReference().toString());
     }
 
     @Test
@@ -135,7 +134,7 @@ public class SchemaDocumentTest {
 
         Assertions.assertNotNull(schemaDoc.getRootSchema().getImports());
         Assertions.assertEquals(1, schemaDoc.getRootSchema().getImports().size());
-        Assertions.assertEquals("linkml:types", schemaDoc.getRootSchema().getImports().get(0));
+        Assertions.assertEquals("https://w3id.org/linkml/types", schemaDoc.getRootSchema().getImports().get(0));
     }
 
     @Test

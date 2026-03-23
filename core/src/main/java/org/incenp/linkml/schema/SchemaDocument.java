@@ -264,7 +264,7 @@ public class SchemaDocument {
         importedSources.add(source);
         if ( schema.getImports() != null ) {
             for ( String importName : schema.getImports() ) {
-                ISchemaSource importSource = resolveImport(importName, schema, source.getBase(), ctx);
+                ISchemaSource importSource = resolveImport(importName, schema, source.getBase());
                 if ( !importedSources.contains(importSource) ) {
                     SchemaDefinition importedSchema = parseSchema(importSource, mapper, ctx);
                     importedSchemas.add(importedSchema);
@@ -312,23 +312,19 @@ public class SchemaDocument {
         return schema;
     }
 
-    private ISchemaSource resolveImport(String name, SchemaDefinition schema, String base, ConverterContext ctx)
+    private ISchemaSource resolveImport(String name, SchemaDefinition schema, String base)
             throws InvalidSchemaException {
-        String extName = name + ".yaml";
-        if ( !extName.contains(":") ) {
+        name += ".yaml";
+        if ( !name.contains(":") ) {
             // Local file, relative to the directory containing the importing schema
             if ( base != null ) {
-                return new FileSchemaSource(base + File.separator + extName);
+                return new FileSchemaSource(base + File.separator + name);
             } else {
-                return new FileSchemaSource(extName);
+                return new FileSchemaSource(name);
             }
         }
 
-        String resolved = ctx.resolve(extName);
-        if ( resolved == extName ) {
-            throw new InvalidSchemaException(String.format(UNRESOLVABLE_IMPORT, name));
-        }
-        if ( resolved.equals(TYPES_SCHEMA) ) {
+        if ( name.equals(TYPES_SCHEMA) ) {
             // Redirect the standard linkml:types schema to the embedded version. That
             // schema is expected to be imported in virtually all LinkML schemas, so we
             // don't want to have to always fetch it from a remote server.
@@ -336,7 +332,7 @@ public class SchemaDocument {
             return new EmbeddedSchemaSource("types.yaml");
         }
         try {
-            return new URLSchemaSource(resolved);
+            return new URLSchemaSource(name);
         } catch ( MalformedURLException e ) {
             throw new InvalidSchemaException(String.format(UNRESOLVABLE_IMPORT, name), e);
         }

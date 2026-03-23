@@ -41,7 +41,6 @@ import java.util.Map;
 import org.incenp.linkml.core.ConverterContext;
 import org.incenp.linkml.core.LinkMLRuntimeException;
 import org.incenp.linkml.core.ObjectConverter;
-import org.incenp.linkml.core.Slot;
 import org.incenp.linkml.schema.model.ClassDefinition;
 import org.incenp.linkml.schema.model.SlotDefinition;
 
@@ -94,13 +93,6 @@ public class ClassDefinitionConverter extends ObjectConverter {
         Object slotUsages = rawMap.remove("slot_usage");
         if ( slotUsages != null ) {
             def.setSlotUsage(convertLocalSlotDefinitions(toMap(slotUsages), ctx));
-
-            // Additionally inject on each slot usage a reference pointing to the global
-            // slot that is being refined, for convenience.
-            Slot globalSlot = Slot.getSlot(SlotDefinition.class, "globalSlot");
-            for ( SlotDefinition sd : def.getSlotUsage() ) {
-                ctx.getObject(globalSlot, sd.getName(), sd);
-            }
         }
 
         super.convertTo(rawMap, dest, ctx);
