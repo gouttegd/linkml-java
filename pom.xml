@@ -68,6 +68,7 @@
 
   <modules>
     <module>core</module>
+    <module>ext</module>
   </modules>
 
   <build>

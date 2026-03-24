@@ -35,7 +35,7 @@ def cli(linkml_model_repo):
         print("Skipping LinkML meta model generation")
         return
 
-    output_dir = ROOT / "core/src/main/java/org/incenp/linkml/schema/model"
+    output_dir = ROOT / "ext/src/main/java/org/incenp/linkml/schema/model"
     cleanup_dir(output_dir)
     for schema in ["annotations", "extensions", "mappings", "meta", "types", "units"]:
         model_dir = linkml_model_repo / "linkml_model/model/schema"

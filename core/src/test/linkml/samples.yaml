@@ -322,6 +322,26 @@ classes:
         multivalued: true
         inlined: true
 
+  PrefixDeclaration:
+    description: >-
+      An example of a class that can be used to declare IRI prefixes.
+    attributes:
+      name:
+        key: true
+        slot_uri: "http://www.w3.org/ns/shacl#prefix"
+      prefix:
+        range: uri
+        slot_uri: "http://www.w3.org/ns/shacl#namespace"
+
+  PrefixDeclarationHolder:
+    description: >-
+      An example of a class that has one member intended to declare prefixes.
+    attributes:
+      prefixes:
+        range: PrefixDeclaration
+        multivalued: true
+      foo:
+
 
 enums:
 

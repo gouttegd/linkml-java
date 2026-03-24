@@ -34,13 +34,11 @@
 
 package org.incenp.linkml.core;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
 
+import org.incenp.linkml.core.sample.PrefixDeclarationHolder;
 import org.incenp.linkml.core.sample.SimpleClass;
-import org.incenp.linkml.schema.model.SchemaDefinition;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -51,7 +49,8 @@ public class PrefixDeclarationExtractorTest {
 
     @Test
     void testGetPrefixDeclarationExtractor() {
-        PrefixDeclarationExtractor ex = PrefixDeclarationExtractor.getExtractor(ClassInfo.get(SchemaDefinition.class));
+        PrefixDeclarationExtractor ex = PrefixDeclarationExtractor
+                .getExtractor(ClassInfo.get(PrefixDeclarationHolder.class));
         Assertions.assertNotNull(ex);
 
         ex = PrefixDeclarationExtractor.getExtractor(ClassInfo.get(SimpleClass.class));
@@ -60,16 +59,17 @@ public class PrefixDeclarationExtractorTest {
 
     @Test
     void testExtractPrefixes() throws IOException, LinkMLRuntimeException {
+        String text = "foo: A string\nprefixes:\n  ex: https://example.org/\n";
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        FileInputStream stream = new FileInputStream(new File("src/test/resources/schemas/organism.yaml"));
         @SuppressWarnings("unchecked")
-        Map<String, Object> raw = mapper.readValue(stream, Map.class);
+        Map<String, Object> raw = mapper.readValue(text, Map.class);
 
         ConverterContext ctx = new ConverterContext();
-        PrefixDeclarationExtractor ex = PrefixDeclarationExtractor.getExtractor(ClassInfo.get(SchemaDefinition.class));
-        SchemaDefinition sd = new SchemaDefinition();
+        PrefixDeclarationExtractor ex = PrefixDeclarationExtractor
+                .getExtractor(ClassInfo.get(PrefixDeclarationHolder.class));
+        PrefixDeclarationHolder sd = new PrefixDeclarationHolder();
         Map<String, String> prefixMap = ex.extractPrefixes(raw, sd, ctx);
-        Assertions.assertTrue(prefixMap.containsKey("linkml"));
-        Assertions.assertEquals("https://w3id.org/linkml/", prefixMap.get("linkml"));
+        Assertions.assertTrue(prefixMap.containsKey("ex"));
+        Assertions.assertEquals("https://example.org/", prefixMap.get("ex"));
     }
 }
