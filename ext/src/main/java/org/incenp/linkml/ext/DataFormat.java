@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.ext;
 
 /**
  * The serialisation formats supported by the YAMLLoader class.

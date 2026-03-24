@@ -32,16 +32,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.ext;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.incenp.linkml.core.sample.SampleEnum;
-import org.incenp.linkml.core.sample.SimpleClass;
+import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.schema.model.ClassDefinition;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -51,56 +50,58 @@ public class ObjectLoaderTest {
 
     @Test
     void testReadingSimpleClass() throws IOException, LinkMLRuntimeException {
-        SimpleClass sc = loader.loadObject(new File("src/test/resources/core/samples/simple-class.yaml"),
-                SimpleClass.class);
+        ClassDefinition cd = loader.loadObject(new File("src/test/resources/ext/samples/class-definition.yaml"),
+                ClassDefinition.class);
 
-        Assertions.assertEquals("a string", sc.getFoo());
-        Assertions.assertEquals("https://example.org/a/URI", sc.getTheBar().toString());
-        Assertions.assertTrue(sc.getBaz());
-        Assertions.assertEquals("a string in a list", sc.getFoos().get(0));
-        Assertions.assertEquals(SampleEnum.FOO, sc.getType());
+        Assertions.assertEquals("a string", cd.getAlias());
+        Assertions.assertEquals("https://example.org/a/URI", cd.getClassUri());
+        Assertions.assertTrue(cd.getTreeRoot());
     }
 
     @Test
     void testReadingListOfSimpleClass() throws IOException, LinkMLRuntimeException {
-        List<SimpleClass> scs = loader.loadObjects(new File("src/test/resources/core/samples/simple-class-list.yaml"),
-                SimpleClass.class);
+        List<ClassDefinition> cds = loader
+                .loadObjects(new File("src/test/resources/ext/samples/class-definition-list.yaml"),
+                        ClassDefinition.class);
 
-        Assertions.assertEquals("a string", scs.get(0).getFoo());
-        Assertions.assertEquals("another string", scs.get(1).getFoo());
+        Assertions.assertEquals("a string", cds.get(0).getAlias());
+        Assertions.assertEquals("another string", cds.get(1).getAlias());
     }
 
     @Test
     void testWritingSimpleClass() throws IOException, LinkMLRuntimeException {
-        SimpleClass sc = new SimpleClass();
-        sc.setFoo("a string");
-        sc.setTheBar(URI.create("https://example.org/a/URI"));
-        sc.setBaz(false);
+        ClassDefinition cd = new ClassDefinition();
+        cd.setName("SimpleClass");
+        cd.setAlias("a string");
+        cd.setClassUri("https://example.org/a/URI");
+        cd.setTreeRoot(false);
 
-        File tmp = new File("src/test/resources/core/samples/simple-class.yaml.out");
-        loader.dumpObject(tmp, sc);
+        File tmp = new File("src/test/resources/ext/samples/class-definition.yaml.out");
+        loader.dumpObject(tmp, cd);
 
-        SimpleClass sc2 = loader.loadObject(tmp, SimpleClass.class);
-        Assertions.assertFalse(sc == sc2);
-        Assertions.assertTrue(sc.equals(sc2));
+        ClassDefinition cd2 = loader.loadObject(tmp, ClassDefinition.class);
+        Assertions.assertFalse(cd == cd2);
+        Assertions.assertTrue(cd.equals(cd2));
 
         tmp.delete();
     }
 
     @Test
     void testWritingListOfSimpleClass() throws IOException, LinkMLRuntimeException {
-        List<SimpleClass> list = new ArrayList<>();
-        SimpleClass sc = new SimpleClass();
-        sc.setFoo("a string");
-        list.add(sc);
-        sc = new SimpleClass();
-        sc.setTheBar(URI.create("https://example.org/a/URI"));
-        list.add(sc);
+        List<ClassDefinition> list = new ArrayList<>();
+        ClassDefinition cd = new ClassDefinition();
+        cd.setName("SimpleClass");
+        cd.setAlias("a string");
+        list.add(cd);
+        cd = new ClassDefinition();
+        cd.setName("AnotherClass");
+        cd.setClassUri("https://example.org/a/URI");
+        list.add(cd);
 
-        File tmp = new File("src/test/resources/core/samples/simple-class-list.yaml.out");
+        File tmp = new File("src/test/resources/ext/samples/class-definition-list.yaml.out");
         loader.dumpObjects(tmp, list);
 
-        List<SimpleClass> list2 = loader.loadObjects(tmp, SimpleClass.class);
+        List<ClassDefinition> list2 = loader.loadObjects(tmp, ClassDefinition.class);
         Assertions.assertTrue(list.equals(list2));
 
         tmp.delete();
@@ -108,17 +109,18 @@ public class ObjectLoaderTest {
 
     @Test
     void testWritingSimpleClassAsJSON() throws IOException, LinkMLRuntimeException {
-        SimpleClass sc = new SimpleClass();
-        sc.setFoo("a string");
-        sc.setTheBar(URI.create("https://example.org/a/URI"));
-        sc.setBaz(false);
+        ClassDefinition cd = new ClassDefinition();
+        cd.setName("SimpleClass");
+        cd.setAlias("a string");
+        cd.setClassUri("https://example.org/a/URI");
+        cd.setTreeRoot(false);
 
-        File tmp = new File("src/test/resources/core/samples/simple-class.json.out");
-        loader.dumpObject(tmp, sc, DataFormat.JSON);
+        File tmp = new File("src/test/resources/ext/samples/class-definition.json.out");
+        loader.dumpObject(tmp, cd, DataFormat.JSON);
 
-        SimpleClass sc2 = loader.loadObject(tmp, SimpleClass.class, DataFormat.JSON);
-        Assertions.assertFalse(sc == sc2);
-        Assertions.assertTrue(sc.equals(sc2));
+        ClassDefinition cd2 = loader.loadObject(tmp, ClassDefinition.class, DataFormat.JSON);
+        Assertions.assertFalse(cd == cd2);
+        Assertions.assertTrue(cd.equals(cd2));
 
         tmp.delete();
     }

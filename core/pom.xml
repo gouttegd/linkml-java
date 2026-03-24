@@ -9,23 +9,19 @@
   <artifactId>linkml-core</artifactId>
   
   <name>LinkML Core Library</name>
-  <description>LinkML runtime library for Java</description>
+  <description>LinkML core runtime library for Java</description>
 
   <dependencies>
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-yaml</artifactId>
-      <version>2.21.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-      <version>2.21</version>
-    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>2.0.17</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+      <version>2.21.1</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   

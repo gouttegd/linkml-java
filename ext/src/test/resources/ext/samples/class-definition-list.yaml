@@ -1,0 +1,6 @@
+- name: SimpleClass
+  alias: a string
+  class_uri: "https://example.org/a/URI"
+  tree_root: true
+- name: AnotherClass
+  alias: another string

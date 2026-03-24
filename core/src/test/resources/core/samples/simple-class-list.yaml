@@ -1,5 +1,0 @@
-- foo: a string
-  the_bar: https://example.org/a/URI
-  baz: true
-- foo: another string
-  the_bar: https://example.org/another/URI
