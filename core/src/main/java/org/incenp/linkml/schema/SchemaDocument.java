@@ -36,7 +36,6 @@ package org.incenp.linkml.schema;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -63,10 +62,8 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
  */
 public class SchemaDocument {
 
-    private final static String TYPES_SCHEMA = "https://w3id.org/linkml/types.yaml";
     private final static String INVALID_YAML = "Cannot read YAML document";
     private final static String INVALID_LINKML = "Cannot parse schema from YAML document";
-    private final static String UNRESOLVABLE_IMPORT = "Cannot resolve import name '%s'";
 
     private SchemaDefinition rootSchema;
     private List<SchemaDefinition> importedSchemas = new ArrayList<>();
@@ -78,6 +75,8 @@ public class SchemaDocument {
     private Map<String, Map<String, SlotDefinition>> allAttributes = new HashMap<>();
     private Map<String, Map<String, SlotDefinition>> allSlotUsages = new HashMap<>();
 
+    private ISchemaResolver importResolver;
+
     /**
      * Creates a new instance from the specified file.
      * 
@@ -86,6 +85,39 @@ public class SchemaDocument {
      * @throws InvalidSchemaException If the file is not a valid schema.
      */
     public SchemaDocument(File source) throws IOException, InvalidSchemaException {
+        importResolver = new DefaultSchemaResolver();
+        rootSchema = parseSchema(new FileSchemaSource(source));
+    }
+
+    /**
+     * Creates a new instance from the specified file, using a custom import
+     * resolver.
+     * 
+     * @param source         The source file from which to parse the LinkML schema.
+     * @param importResolver The resolver to use to resolve import names into schema
+     *                       source objects.
+     * @throws IOException            If we cannot read the specified file.
+     * @throws InvalidSchemaException If the file is not a valid schema.
+     */
+    public SchemaDocument(File source, ISchemaResolver importResolver) throws IOException, InvalidSchemaException {
+        this.importResolver = importResolver;
+        rootSchema = parseSchema(new FileSchemaSource(source));
+    }
+
+    /**
+     * Creates a new instance from the specified source, using a custom import
+     * resolver.
+     * 
+     * @param source         The source location from which to obtain the LinkML
+     *                       schema.
+     * @param importResolver The resolver to use to resolve import names into schema
+     *                       source objects.
+     * @throws IOException            If we cannot read the specified file.
+     * @throws InvalidSchemaException If the file is not a valid schema.
+     */
+    public SchemaDocument(ISchemaSource source, ISchemaResolver importResolver)
+            throws IOException, InvalidSchemaException {
+        this.importResolver = importResolver;
         rootSchema = parseSchema(source);
     }
 
@@ -225,13 +257,13 @@ public class SchemaDocument {
     }
 
     // The entry point for the actual parsing code
-    private SchemaDefinition parseSchema(File file)
+    private SchemaDefinition parseSchema(ISchemaSource source)
             throws IOException, InvalidSchemaException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         ConverterContext ctx = new ConverterContext();
 
         // Parse the top-level schema and all its imports recursively
-        SchemaDefinition schema = parseSchema(new FileSchemaSource(file), mapper, ctx);
+        SchemaDefinition schema = parseSchema(source, mapper, ctx);
 
         try {
             // All schemas have been read, so we can resolve all references
@@ -264,7 +296,7 @@ public class SchemaDocument {
         importedSources.add(source);
         if ( schema.getImports() != null ) {
             for ( String importName : schema.getImports() ) {
-                ISchemaSource importSource = resolveImport(importName, schema, source.getBase());
+                ISchemaSource importSource = importResolver.resolve(importName + ".yaml", source.getBase());
                 if ( !importedSources.contains(importSource) ) {
                     SchemaDefinition importedSchema = parseSchema(importSource, mapper, ctx);
                     importedSchemas.add(importedSchema);
@@ -310,31 +342,5 @@ public class SchemaDocument {
         }
 
         return schema;
-    }
-
-    private ISchemaSource resolveImport(String name, SchemaDefinition schema, String base)
-            throws InvalidSchemaException {
-        name += ".yaml";
-        if ( !name.contains(":") ) {
-            // Local file, relative to the directory containing the importing schema
-            if ( base != null ) {
-                return new FileSchemaSource(base + File.separator + name);
-            } else {
-                return new FileSchemaSource(name);
-            }
-        }
-
-        if ( name.equals(TYPES_SCHEMA) ) {
-            // Redirect the standard linkml:types schema to the embedded version. That
-            // schema is expected to be imported in virtually all LinkML schemas, so we
-            // don't want to have to always fetch it from a remote server.
-            // FIXME: We should probably provide a way to override this behaviour.
-            return new EmbeddedSchemaSource("types.yaml");
-        }
-        try {
-            return new URLSchemaSource(name);
-        } catch ( MalformedURLException e ) {
-            throw new InvalidSchemaException(String.format(UNRESOLVABLE_IMPORT, name), e);
-        }
     }
 }
