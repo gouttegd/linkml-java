@@ -36,6 +36,7 @@ package org.incenp.linkml.schema;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 
 /**
  * The schema resolver that implements the default behaviour for resolving
@@ -73,7 +74,7 @@ public class DefaultSchemaResolver implements ISchemaResolver {
         }
         try {
             return new URLSchemaSource(name);
-        } catch ( MalformedURLException e ) {
+        } catch ( URISyntaxException | MalformedURLException e ) {
             throw new InvalidSchemaException(String.format(UNRESOLVABLE_SCHEMA, name), e);
         }
     }

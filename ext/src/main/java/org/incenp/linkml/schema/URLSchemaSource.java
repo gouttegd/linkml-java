@@ -37,6 +37,8 @@ package org.incenp.linkml.schema;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
@@ -47,8 +49,8 @@ public class URLSchemaSource implements ISchemaSource {
     private URL url;
     private InputStream stream;
 
-    public URLSchemaSource(String url) throws MalformedURLException {
-        this.url = new URL(url);
+    public URLSchemaSource(String url) throws URISyntaxException, MalformedURLException {
+        this.url = new URI(url).toURL();
     }
 
     @Override
