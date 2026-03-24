@@ -5,11 +5,17 @@ This is LinkML-Java, a project intended to support the use of the
 [Linked Data Modeling Language](https://linkml.io/) (LinkML) in Java
 programs and software libraries.
 
-Currently, the project consists of a [runtime library](linkml-core/index.html)
-aiming to provide for Java developers what the (Python) `linkml-runtime`
-package (referred to throughout this documentation as “LinkML-Py” or
-“the LinkML-Py runtime”) provides for Python developers, especially for
-working with **LinkML-defined instance data**.
+Currently, the project consists of a runtime library aimimg to provide
+for Java developers what the (Python) `linkml-runtime` package (referred
+to throughout this documentation as “LinkML-Py” or “the LinkML-Py
+runtime”) provides for Python developers, especially for working with
+**LinkML-defined instance data**.
+
+The runtime library is split in two components: the [core runtime
+library](linkml-core/index.html), which provides the most fundamental
+features with minimal dependencies, and the [extended
+library](linkml-ext/index.html), which provides additional features and
+a higher level interface at the price of additional dependencies.
 
 
 Homepage and repository

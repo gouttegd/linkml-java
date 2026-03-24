@@ -6,7 +6,8 @@
   <body>
     <menu name="LinkML-Java" inherit="top">
       <item name="About" href="index.html" />
-      <item name="Runtime Library" href="linkml-core/index.html" />
+      <item name="Core Runtime Library" href="linkml-core/index.html" />
+      <item name="Extended Library" href="linkml-ext/index.html" />
       <item name="API Documentation" href="apidocs/index.html" />
     </menu>
     <menu name="Links" inherit="bottom">

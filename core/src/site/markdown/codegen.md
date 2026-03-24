@@ -177,7 +177,16 @@ code generator, that will automatically produce code ready to work with
 the runtime. But for the time being, we are dependent on the Java code
 generator provided by the LinkML project itself.
 
-LinkML-Java developers are actively working with the LinkML project to
-amend the Java code generator so that it produces code meeting all the
-requirements of the LinkML-Java runtime. This is still a work in
-progress, so for now it is necessary to use custom Jinja2 templates.
+LinkML-Java developers are actively working with the upstream LinkML
+project to ensure that LinkML-Py’s code generator can produce code
+meeting all the requirements of the LinkML-Java runtime. This is done
+through a dedicated “template variant” called `org.incenp.linkml`, whose
+use can be requested on the command line as follows:
+
+```sh
+$ linkml generate java --template-variant org.incenp.linkml ...
+```
+
+Of note, currently this requires a development version of LinkML-Py, as
+the amendments to the Java code generator have not been part of a
+released LinkML-Py version yet.
