@@ -342,6 +342,22 @@ classes:
         multivalued: true
       foo:
 
+  Anything:
+    description: >-
+      The class that "takes the role of linkml:Any"
+    class_uri: linkml:Any
+
+  ContainerOfAny:
+    description: >-
+      An example of a class that has a slot with a range set to linkml:Any.
+    attributes:
+      foo:
+      misc:
+        range: Anything
+      several_misc:
+        range: Anything
+        multivalued: true
+
 
 enums:
 

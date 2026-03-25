@@ -98,6 +98,9 @@ public class ConverterContext {
         converters.put(Float.TYPE, converters.get(Float.class));
         converters.put(Double.TYPE, converters.get(Double.class));
 
+        // We need a special "converter" for Object-typed fields (which represent slots
+        // whose range is set to the linkml:Any class).
+        converters.put(Object.class, new TransparentConverter());
     }
 
     /**

@@ -51,6 +51,7 @@ import org.incenp.linkml.core.sample.BaseMultiSelfDesignatedClass;
 import org.incenp.linkml.core.sample.BaseSelfDesignatedClass;
 import org.incenp.linkml.core.sample.BaseURISelfDesignatedClass;
 import org.incenp.linkml.core.sample.ClassWithCustomConverter;
+import org.incenp.linkml.core.sample.ContainerOfAny;
 import org.incenp.linkml.core.sample.ContainerOfBooleanValues;
 import org.incenp.linkml.core.sample.ContainerOfIRIIdentifiableObjects;
 import org.incenp.linkml.core.sample.ContainerOfInlinedObjects;
@@ -538,6 +539,20 @@ public class ObjectConverterTest {
                 ContainerOfIRIIdentifiableObjects.class);
         Assertions.assertEquals("https://example.org/0002", coii.getMultipleInlinedAsDict().get(0).getId());
         roundtrip(coii);
+    }
+
+    @Test
+    void testHandlingLinkMLAny() throws IOException {
+        String text = "foo: A string\nmisc:\n  what: a dictionary\n  why: because\n"
+                + "several_misc:\n  - what: a dictionary in a list\n";
+        ContainerOfAny coa = parseString(text, ContainerOfAny.class);
+        Assertions.assertEquals("A string", coa.getFoo());
+        Assertions.assertNotNull(coa.getMisc());
+        Assertions.assertInstanceOf(Map.class, coa.getMisc());
+        Assertions.assertNotNull(coa.getSeveralMisc());
+        Assertions.assertEquals(1, coa.getSeveralMisc().size());
+        Assertions.assertInstanceOf(Map.class, coa.getSeveralMisc().get(0));
+        roundtrip(coa);
     }
 
     private <T> T parse(String file, Class<T> target) throws IOException {
