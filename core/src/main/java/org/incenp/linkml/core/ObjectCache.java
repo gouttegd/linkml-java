@@ -48,6 +48,7 @@ import java.util.Map;
 public class ObjectCache {
 
     private static final String NO_IDENTIFIER = "Missing identifier for type '%s'";
+    private static final String TYPE_ERROR = "Expected type '%s' for object '%s', found '%s'";
 
     private Map<Class<?>, Map<String, Object>> cache = new HashMap<>();
 
@@ -60,13 +61,14 @@ public class ObjectCache {
      * @param create If <code>true</code>, the object will be created and added to
      *               the cache if it did not already exist.
      * @return The object that was in the cache or have been newly created, or
-     *         <code>null</code> if (1) the object that was in the cache was not of
-     *         the expected type, or (2) the object was not in the cache and
+     *         <code>null</code> if the object was not in the cache and
      *         <code>create</code> is <code>false</code>.
      * @throws LinkMLRuntimeException If the specified type of object is not one
      *                                that can be cached (because it has no
-     *                                identifier slot), or if the object could not
-     *                                be created as needed.
+     *                                identifier slot), if another object with an
+     *                                incompatible type already exists in the cache,
+     *                                or if the object could not be created as
+     *                                needed.
      */
     public <T> T getObject(Class<T> type, String name, boolean create) throws LinkMLRuntimeException {
         Slot identifierSlot = ClassInfo.get(type).getIdentifierSlot();
@@ -83,7 +85,11 @@ public class ObjectCache {
 
         Object cached = typeCache.get(name);
         if ( cached != null ) {
-            return type.isInstance(cached) ? type.cast(cached) : null;
+            if ( type.isInstance(cached) ) {
+                return type.cast(cached);
+            }
+            throw new LinkMLInternalError(
+                    String.format(TYPE_ERROR, type.getSimpleName(), name, cached.getClass().getSimpleName()));
         }
 
         if ( !create ) {

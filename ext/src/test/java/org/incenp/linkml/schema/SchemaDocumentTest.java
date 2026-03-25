@@ -217,7 +217,8 @@ public class SchemaDocumentTest {
         } catch ( IOException e ) {
             Assertions.fail("Unexpected exception");
         } catch ( InvalidSchemaException e ) {
-            Assertions.assertEquals("Cannot dereference 'Organism': no such object", e.getCause().getMessage());
+            Assertions.assertEquals("Expected type 'SlotDefinition' for object 'Organism', found 'ClassDefinition'",
+                    e.getCause().getMessage());
         }
     }
 }

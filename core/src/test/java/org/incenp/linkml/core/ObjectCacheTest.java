@@ -76,6 +76,18 @@ public class ObjectCacheTest {
     }
 
     @Test
+    void testErrorIfConflictingTypeOnObjectCreation() throws LinkMLRuntimeException {
+        ObjectCache cache = new ObjectCache();
+        cache.getObject(SimpleIdentifiableClass.class, "sic1", true);
+
+        try {
+            cache.getObject(ExtendedIdentifiableClass.class, "sic1", true);
+            Assertions.fail("Exception not thrown for conflicting type on object creation");
+        } catch ( LinkMLRuntimeException e ) {
+        }
+    }
+
+    @Test
     void testCachingByType() throws LinkMLRuntimeException {
         ObjectCache cache = new ObjectCache();
         SimpleIdentifiableClass sic1 = cache.getObject(SimpleIdentifiableClass.class, "id1", true);
