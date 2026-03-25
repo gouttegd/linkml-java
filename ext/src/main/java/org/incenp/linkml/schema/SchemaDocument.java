@@ -261,6 +261,7 @@ public class SchemaDocument {
             throws IOException, InvalidSchemaException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         ConverterContext ctx = new ConverterContext();
+        ctx.addConverter(new SchemaDefinitionConverter());
 
         // Parse the top-level schema and all its imports recursively
         SchemaDefinition schema = parseSchema(source, mapper, ctx);
