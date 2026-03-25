@@ -36,6 +36,7 @@ package org.incenp.linkml.schema;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.incenp.linkml.schema.model.ClassDefinition;
 import org.incenp.linkml.schema.model.Prefix;
@@ -220,5 +221,39 @@ public class SchemaDocumentTest {
             Assertions.assertEquals("Expected type 'SlotDefinition' for object 'Organism', found 'ClassDefinition'",
                     e.getCause().getMessage());
         }
+    }
+
+    @Test
+    void testReadLinkMLMetaSchema() {
+        SchemaDocument doc = null;
+        try {
+            doc = new SchemaDocument(new File("src/main/resources/schemas/linkml/meta.yaml"));
+        } catch ( IOException e ) {
+            Assertions.fail("Unexpected exception", e);
+        } catch ( InvalidSchemaException e ) {
+            Assertions.fail("Cannot read LinkML meta-schema", e);
+        }
+
+        Assertions.assertEquals(5, doc.getImports().size());
+
+        HashMap<String, SlotDefinition> slots = new HashMap<>();
+        for ( SlotDefinition sd : doc.getAllSlots() ) {
+            slots.put(sd.getName(), sd);
+        }
+        HashMap<String, ClassDefinition> classes = new HashMap<>();
+        for ( ClassDefinition cd : doc.getAllClasses() ) {
+            classes.put(cd.getName(), cd);
+        }
+
+        SlotDefinition annotationSlot = slots.get("annotations");
+        Assertions.assertNotNull(annotationSlot);
+        Assertions.assertEquals("extensions", annotationSlot.getIsA().getName());
+        Assertions.assertEquals("annotatable", annotationSlot.getDomain().getName());
+        Assertions.assertTrue(annotationSlot.getMultivalued());
+
+        ClassDefinition annotatableClass = classes.get("annotatable");
+        Assertions.assertNotNull(annotatableClass);
+        Assertions.assertTrue(annotatableClass.getMixin());
+        Assertions.assertTrue(annotationSlot.getDomain() == annotatableClass);
     }
 }
