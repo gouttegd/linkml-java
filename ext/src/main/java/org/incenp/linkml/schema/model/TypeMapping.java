@@ -23,13 +23,11 @@ import org.incenp.linkml.core.CurieConverter;
 public class TypeMapping {
 
     @Identifier(isGlobal = false)
-    @SlotName("framework_key")
     @LinkURI("https://w3id.org/linkml/framework_key")
-    private String frameworkKey;
+    private String framework;
 
-    @SlotName("mapped_type")
     @LinkURI("https://w3id.org/linkml/mapped_type")
-    private TypeDefinition mappedType;
+    private TypeDefinition type;
 
     @SlotName("string_serialization")
     @LinkURI("https://w3id.org/linkml/string_serialization")
@@ -96,12 +94,12 @@ public class TypeMapping {
     @LinkURI("http://www.w3.org/2000/01/rdf-schema#seeAlso")
     private List<String> seeAlso;
 
-    @SlotName("deprecated element has exact replacement")
+    @SlotName("deprecated_element_has_exact_replacement")
     @Converter(CurieConverter.class)
     @LinkURI("https://w3id.org/linkml/deprecated_element_has_exact_replacement")
     private String deprecatedElementHasExactReplacement;
 
-    @SlotName("deprecated element has possible replacement")
+    @SlotName("deprecated_element_has_possible_replacement")
     @Converter(CurieConverter.class)
     @LinkURI("https://w3id.org/linkml/deprecated_element_has_possible_replacement")
     private String deprecatedElementHasPossibleReplacement;
@@ -118,27 +116,27 @@ public class TypeMapping {
     @LinkURI("http://www.w3.org/2004/02/skos/core#mappingRelation")
     private List<String> mappings;
 
-    @SlotName("exact mappings")
+    @SlotName("exact_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#exactMatch")
     private List<String> exactMappings;
 
-    @SlotName("close mappings")
+    @SlotName("close_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#closeMatch")
     private List<String> closeMappings;
 
-    @SlotName("related mappings")
+    @SlotName("related_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#relatedMatch")
     private List<String> relatedMappings;
 
-    @SlotName("narrow mappings")
+    @SlotName("narrow_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#narrowMatch")
     private List<String> narrowMappings;
 
-    @SlotName("broad mappings")
+    @SlotName("broad_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#broadMatch")
     private List<String> broadMappings;
@@ -179,20 +177,20 @@ public class TypeMapping {
     @LinkURI("http://schema.org/keywords")
     private List<String> keywords;
 
-    public void setFrameworkKey(String frameworkKey) {
-        this.frameworkKey = frameworkKey;
+    public void setFramework(String framework) {
+        this.framework = framework;
     }
 
-    public String getFrameworkKey() {
-        return this.frameworkKey;
+    public String getFramework() {
+        return this.framework;
     }
 
-    public void setMappedType(TypeDefinition mappedType) {
-        this.mappedType = mappedType;
+    public void setType(TypeDefinition type) {
+        this.type = type;
     }
 
-    public TypeDefinition getMappedType() {
-        return this.mappedType;
+    public TypeDefinition getType() {
+        return this.type;
     }
 
     public void setStringSerialization(String stringSerialization) {
@@ -625,7 +623,7 @@ public class TypeMapping {
 
     @Override
     public String toString() {
-        return "TypeMapping(framework_key=" + this.getFrameworkKey() + ")";
+        return "TypeMapping(framework=" + this.getFramework() + ")";
     }
 
     @Override
@@ -634,12 +632,12 @@ public class TypeMapping {
         if ( !(o instanceof TypeMapping) ) return false;
         final TypeMapping other = (TypeMapping) o;
         if ( !other.canEqual((Object) this)) return false;
-        final Object this$frameworkKey = this.getFrameworkKey();
-        final Object other$frameworkKey = other.getFrameworkKey();
-        if ( this$frameworkKey == null ? other$frameworkKey != null : !this$frameworkKey.equals(other$frameworkKey)) return false;
-        final Object this$mappedType = this.getMappedType();
-        final Object other$mappedType = other.getMappedType();
-        if ( this$mappedType == null ? other$mappedType != null : !this$mappedType.equals(other$mappedType)) return false;
+        final Object this$framework = this.getFramework();
+        final Object other$framework = other.getFramework();
+        if ( this$framework == null ? other$framework != null : !this$framework.equals(other$framework)) return false;
+        final Object this$type = this.getType();
+        final Object other$type = other.getType();
+        if ( this$type == null ? other$type != null : !this$type.equals(other$type)) return false;
         final Object this$stringSerialization = this.getStringSerialization();
         final Object other$stringSerialization = other.getStringSerialization();
         if ( this$stringSerialization == null ? other$stringSerialization != null : !this$stringSerialization.equals(other$stringSerialization)) return false;
@@ -759,10 +757,10 @@ public class TypeMapping {
     public int hashCode() {
         final int PRIME = 59;
         int result = 1;
-        final Object $frameworkKey = this.getFrameworkKey();
-        result = result * PRIME + ($frameworkKey == null ? 43 : $frameworkKey.hashCode());
-        final Object $mappedType = this.getMappedType();
-        result = result * PRIME + ($mappedType == null ? 43 : $mappedType.hashCode());
+        final Object $framework = this.getFramework();
+        result = result * PRIME + ($framework == null ? 43 : $framework.hashCode());
+        final Object $type = this.getType();
+        result = result * PRIME + ($type == null ? 43 : $type.hashCode());
         final Object $stringSerialization = this.getStringSerialization();
         result = result * PRIME + ($stringSerialization == null ? 43 : $stringSerialization.hashCode());
         final Object $extensions = this.getExtensions();

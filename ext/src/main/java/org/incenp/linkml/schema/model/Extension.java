@@ -23,35 +23,33 @@ import org.incenp.linkml.core.CurieConverter;
 public class Extension {
 
     @Identifier(isGlobal = false)
-    @SlotName("extension_tag")
     @Required
     @Converter(CurieConverter.class)
     @LinkURI("https://w3id.org/linkml/extension_tag")
-    private String extensionTag;
+    private String tag;
 
-    @SlotName("extension_value")
     @Required
     @LinkURI("https://w3id.org/linkml/extension_value")
-    private Object extensionValue;
+    private Object value;
 
     @Inlined
     @LinkURI("https://w3id.org/linkml/extensions")
     private List<Extension> extensions;
 
-    public void setExtensionTag(String extensionTag) {
-        this.extensionTag = extensionTag;
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
-    public String getExtensionTag() {
-        return this.extensionTag;
+    public String getTag() {
+        return this.tag;
     }
 
-    public void setExtensionValue(Object extensionValue) {
-        this.extensionValue = extensionValue;
+    public void setValue(Object value) {
+        this.value = value;
     }
 
-    public Object getExtensionValue() {
-        return this.extensionValue;
+    public Object getValue() {
+        return this.value;
     }
 
     public void setExtensions(List<Extension> extensions) {
@@ -71,7 +69,7 @@ public class Extension {
 
     @Override
     public String toString() {
-        return "Extension(extension_tag=" + this.getExtensionTag() + ")";
+        return "Extension(tag=" + this.getTag() + ")";
     }
 
     @Override
@@ -80,12 +78,12 @@ public class Extension {
         if ( !(o instanceof Extension) ) return false;
         final Extension other = (Extension) o;
         if ( !other.canEqual((Object) this)) return false;
-        final Object this$extensionTag = this.getExtensionTag();
-        final Object other$extensionTag = other.getExtensionTag();
-        if ( this$extensionTag == null ? other$extensionTag != null : !this$extensionTag.equals(other$extensionTag)) return false;
-        final Object this$extensionValue = this.getExtensionValue();
-        final Object other$extensionValue = other.getExtensionValue();
-        if ( this$extensionValue == null ? other$extensionValue != null : !this$extensionValue.equals(other$extensionValue)) return false;
+        final Object this$tag = this.getTag();
+        final Object other$tag = other.getTag();
+        if ( this$tag == null ? other$tag != null : !this$tag.equals(other$tag)) return false;
+        final Object this$value = this.getValue();
+        final Object other$value = other.getValue();
+        if ( this$value == null ? other$value != null : !this$value.equals(other$value)) return false;
         final Object this$extensions = this.getExtensions();
         final Object other$extensions = other.getExtensions();
         if ( this$extensions == null ? other$extensions != null : !this$extensions.equals(other$extensions)) return false;
@@ -100,10 +98,10 @@ public class Extension {
     public int hashCode() {
         final int PRIME = 59;
         int result = 1;
-        final Object $extensionTag = this.getExtensionTag();
-        result = result * PRIME + ($extensionTag == null ? 43 : $extensionTag.hashCode());
-        final Object $extensionValue = this.getExtensionValue();
-        result = result * PRIME + ($extensionValue == null ? 43 : $extensionValue.hashCode());
+        final Object $tag = this.getTag();
+        result = result * PRIME + ($tag == null ? 43 : $tag.hashCode());
+        final Object $value = this.getValue();
+        result = result * PRIME + ($value == null ? 43 : $value.hashCode());
         final Object $extensions = this.getExtensions();
         result = result * PRIME + ($extensions == null ? 43 : $extensions.hashCode());
         return result;

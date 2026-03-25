@@ -27,18 +27,16 @@ public class StructuredAlias {
     @LinkURI("http://www.w3.org/2008/05/skos-xl#literalForm")
     private String literalForm;
 
-    @SlotName("alias_predicate")
     @Required(isRecommended = true)
     @LinkURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate")
-    private AliasPredicateEnum aliasPredicate;
+    private AliasPredicateEnum predicate;
 
     @Converter(CurieConverter.class)
     @LinkURI("http://purl.org/dc/terms/subject")
     private List<String> categories;
 
-    @SlotName("alias_contexts")
     @LinkURI("https://w3id.org/linkml/alias_contexts")
-    private List<URI> aliasContexts;
+    private List<URI> contexts;
 
     @Inlined
     @LinkURI("https://w3id.org/linkml/extensions")
@@ -101,12 +99,12 @@ public class StructuredAlias {
     @LinkURI("http://www.w3.org/2000/01/rdf-schema#seeAlso")
     private List<String> seeAlso;
 
-    @SlotName("deprecated element has exact replacement")
+    @SlotName("deprecated_element_has_exact_replacement")
     @Converter(CurieConverter.class)
     @LinkURI("https://w3id.org/linkml/deprecated_element_has_exact_replacement")
     private String deprecatedElementHasExactReplacement;
 
-    @SlotName("deprecated element has possible replacement")
+    @SlotName("deprecated_element_has_possible_replacement")
     @Converter(CurieConverter.class)
     @LinkURI("https://w3id.org/linkml/deprecated_element_has_possible_replacement")
     private String deprecatedElementHasPossibleReplacement;
@@ -123,27 +121,27 @@ public class StructuredAlias {
     @LinkURI("http://www.w3.org/2004/02/skos/core#mappingRelation")
     private List<String> mappings;
 
-    @SlotName("exact mappings")
+    @SlotName("exact_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#exactMatch")
     private List<String> exactMappings;
 
-    @SlotName("close mappings")
+    @SlotName("close_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#closeMatch")
     private List<String> closeMappings;
 
-    @SlotName("related mappings")
+    @SlotName("related_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#relatedMatch")
     private List<String> relatedMappings;
 
-    @SlotName("narrow mappings")
+    @SlotName("narrow_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#narrowMatch")
     private List<String> narrowMappings;
 
-    @SlotName("broad mappings")
+    @SlotName("broad_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#broadMatch")
     private List<String> broadMappings;
@@ -188,12 +186,12 @@ public class StructuredAlias {
         return this.literalForm;
     }
 
-    public void setAliasPredicate(AliasPredicateEnum aliasPredicate) {
-        this.aliasPredicate = aliasPredicate;
+    public void setPredicate(AliasPredicateEnum predicate) {
+        this.predicate = predicate;
     }
 
-    public AliasPredicateEnum getAliasPredicate() {
-        return this.aliasPredicate;
+    public AliasPredicateEnum getPredicate() {
+        return this.predicate;
     }
 
     public void setCategories(List<String> categories) {
@@ -211,19 +209,19 @@ public class StructuredAlias {
         return this.categories;
     }
 
-    public void setAliasContexts(List<URI> aliasContexts) {
-        this.aliasContexts = aliasContexts;
+    public void setContexts(List<URI> contexts) {
+        this.contexts = contexts;
     }
 
-    public List<URI> getAliasContexts() {
-        return this.aliasContexts;
+    public List<URI> getContexts() {
+        return this.contexts;
     }
 
-    public List<URI> getAliasContexts(boolean set) {
-        if ( this.aliasContexts == null && set ) {
-            this.aliasContexts = new ArrayList<>();
+    public List<URI> getContexts(boolean set) {
+        if ( this.contexts == null && set ) {
+            this.contexts = new ArrayList<>();
         }
-        return this.aliasContexts;
+        return this.contexts;
     }
 
     public void setExtensions(List<Extension> extensions) {
@@ -641,8 +639,8 @@ public class StructuredAlias {
             sb.append(o);
             sb.append(",");
         }
-        if ( (o = this.getAliasPredicate()) != null ) {
-            sb.append("alias_predicate=");
+        if ( (o = this.getPredicate()) != null ) {
+            sb.append("predicate=");
             sb.append(o);
             sb.append(",");
         }
@@ -651,8 +649,8 @@ public class StructuredAlias {
             sb.append(o);
             sb.append(",");
         }
-        if ( (o = this.getAliasContexts()) != null ) {
-            sb.append("alias_contexts=");
+        if ( (o = this.getContexts()) != null ) {
+            sb.append("contexts=");
             sb.append(o);
             sb.append(",");
         }
@@ -737,12 +735,12 @@ public class StructuredAlias {
             sb.append(",");
         }
         if ( (o = this.getDeprecatedElementHasExactReplacement()) != null ) {
-            sb.append("deprecated element has exact replacement=");
+            sb.append("deprecated_element_has_exact_replacement=");
             sb.append(o);
             sb.append(",");
         }
         if ( (o = this.getDeprecatedElementHasPossibleReplacement()) != null ) {
-            sb.append("deprecated element has possible replacement=");
+            sb.append("deprecated_element_has_possible_replacement=");
             sb.append(o);
             sb.append(",");
         }
@@ -762,27 +760,27 @@ public class StructuredAlias {
             sb.append(",");
         }
         if ( (o = this.getExactMappings()) != null ) {
-            sb.append("exact mappings=");
+            sb.append("exact_mappings=");
             sb.append(o);
             sb.append(",");
         }
         if ( (o = this.getCloseMappings()) != null ) {
-            sb.append("close mappings=");
+            sb.append("close_mappings=");
             sb.append(o);
             sb.append(",");
         }
         if ( (o = this.getRelatedMappings()) != null ) {
-            sb.append("related mappings=");
+            sb.append("related_mappings=");
             sb.append(o);
             sb.append(",");
         }
         if ( (o = this.getNarrowMappings()) != null ) {
-            sb.append("narrow mappings=");
+            sb.append("narrow_mappings=");
             sb.append(o);
             sb.append(",");
         }
         if ( (o = this.getBroadMappings()) != null ) {
-            sb.append("broad mappings=");
+            sb.append("broad_mappings=");
             sb.append(o);
             sb.append(",");
         }
@@ -839,15 +837,15 @@ public class StructuredAlias {
         final Object this$literalForm = this.getLiteralForm();
         final Object other$literalForm = other.getLiteralForm();
         if ( this$literalForm == null ? other$literalForm != null : !this$literalForm.equals(other$literalForm)) return false;
-        final Object this$aliasPredicate = this.getAliasPredicate();
-        final Object other$aliasPredicate = other.getAliasPredicate();
-        if ( this$aliasPredicate == null ? other$aliasPredicate != null : !this$aliasPredicate.equals(other$aliasPredicate)) return false;
+        final Object this$predicate = this.getPredicate();
+        final Object other$predicate = other.getPredicate();
+        if ( this$predicate == null ? other$predicate != null : !this$predicate.equals(other$predicate)) return false;
         final Object this$categories = this.getCategories();
         final Object other$categories = other.getCategories();
         if ( this$categories == null ? other$categories != null : !this$categories.equals(other$categories)) return false;
-        final Object this$aliasContexts = this.getAliasContexts();
-        final Object other$aliasContexts = other.getAliasContexts();
-        if ( this$aliasContexts == null ? other$aliasContexts != null : !this$aliasContexts.equals(other$aliasContexts)) return false;
+        final Object this$contexts = this.getContexts();
+        final Object other$contexts = other.getContexts();
+        if ( this$contexts == null ? other$contexts != null : !this$contexts.equals(other$contexts)) return false;
         final Object this$extensions = this.getExtensions();
         final Object other$extensions = other.getExtensions();
         if ( this$extensions == null ? other$extensions != null : !this$extensions.equals(other$extensions)) return false;
@@ -963,12 +961,12 @@ public class StructuredAlias {
         int result = 1;
         final Object $literalForm = this.getLiteralForm();
         result = result * PRIME + ($literalForm == null ? 43 : $literalForm.hashCode());
-        final Object $aliasPredicate = this.getAliasPredicate();
-        result = result * PRIME + ($aliasPredicate == null ? 43 : $aliasPredicate.hashCode());
+        final Object $predicate = this.getPredicate();
+        result = result * PRIME + ($predicate == null ? 43 : $predicate.hashCode());
         final Object $categories = this.getCategories();
         result = result * PRIME + ($categories == null ? 43 : $categories.hashCode());
-        final Object $aliasContexts = this.getAliasContexts();
-        result = result * PRIME + ($aliasContexts == null ? 43 : $aliasContexts.hashCode());
+        final Object $contexts = this.getContexts();
+        result = result * PRIME + ($contexts == null ? 43 : $contexts.hashCode());
         final Object $extensions = this.getExtensions();
         result = result * PRIME + ($extensions == null ? 43 : $extensions.hashCode());
         final Object $annotations = this.getAnnotations();

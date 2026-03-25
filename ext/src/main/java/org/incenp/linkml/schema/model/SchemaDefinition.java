@@ -68,10 +68,9 @@ public class SchemaDefinition extends Element {
     @LinkURI("https://w3id.org/linkml/enums")
     private List<EnumDefinition> enums;
 
-    @SlotName("slot_definitions")
     @Inlined
     @LinkURI("https://w3id.org/linkml/slot_definitions")
-    private List<SlotDefinition> slotDefinitions;
+    private List<SlotDefinition> slots;
 
     @Inlined
     @LinkURI("https://w3id.org/linkml/classes")
@@ -254,19 +253,19 @@ public class SchemaDefinition extends Element {
         return this.enums;
     }
 
-    public void setSlotDefinitions(List<SlotDefinition> slotDefinitions) {
-        this.slotDefinitions = slotDefinitions;
+    public void setSlots(List<SlotDefinition> slots) {
+        this.slots = slots;
     }
 
-    public List<SlotDefinition> getSlotDefinitions() {
-        return this.slotDefinitions;
+    public List<SlotDefinition> getSlots() {
+        return this.slots;
     }
 
-    public List<SlotDefinition> getSlotDefinitions(boolean set) {
-        if ( this.slotDefinitions == null && set ) {
-            this.slotDefinitions = new ArrayList<>();
+    public List<SlotDefinition> getSlots(boolean set) {
+        if ( this.slots == null && set ) {
+            this.slots = new ArrayList<>();
         }
-        return this.slotDefinitions;
+        return this.slots;
     }
 
     public void setClasses(List<ClassDefinition> classes) {
@@ -411,9 +410,9 @@ public class SchemaDefinition extends Element {
         final Object this$enums = this.getEnums();
         final Object other$enums = other.getEnums();
         if ( this$enums == null ? other$enums != null : !this$enums.equals(other$enums)) return false;
-        final Object this$slotDefinitions = this.getSlotDefinitions();
-        final Object other$slotDefinitions = other.getSlotDefinitions();
-        if ( this$slotDefinitions == null ? other$slotDefinitions != null : !this$slotDefinitions.equals(other$slotDefinitions)) return false;
+        final Object this$slots = this.getSlots();
+        final Object other$slots = other.getSlots();
+        if ( this$slots == null ? other$slots != null : !this$slots.equals(other$slots)) return false;
         final Object this$classes = this.getClasses();
         final Object other$classes = other.getClasses();
         if ( this$classes == null ? other$classes != null : !this$classes.equals(other$classes)) return false;
@@ -476,8 +475,8 @@ public class SchemaDefinition extends Element {
         result = result * PRIME + ($types == null ? 43 : $types.hashCode());
         final Object $enums = this.getEnums();
         result = result * PRIME + ($enums == null ? 43 : $enums.hashCode());
-        final Object $slotDefinitions = this.getSlotDefinitions();
-        result = result * PRIME + ($slotDefinitions == null ? 43 : $slotDefinitions.hashCode());
+        final Object $slots = this.getSlots();
+        result = result * PRIME + ($slots == null ? 43 : $slots.hashCode());
         final Object $classes = this.getClasses();
         result = result * PRIME + ($classes == null ? 43 : $classes.hashCode());
         final Object $metamodelVersion = this.getMetamodelVersion();

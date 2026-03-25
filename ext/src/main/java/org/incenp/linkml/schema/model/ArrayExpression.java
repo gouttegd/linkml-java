@@ -98,12 +98,12 @@ public class ArrayExpression {
     @LinkURI("http://www.w3.org/2000/01/rdf-schema#seeAlso")
     private List<String> seeAlso;
 
-    @SlotName("deprecated element has exact replacement")
+    @SlotName("deprecated_element_has_exact_replacement")
     @Converter(CurieConverter.class)
     @LinkURI("https://w3id.org/linkml/deprecated_element_has_exact_replacement")
     private String deprecatedElementHasExactReplacement;
 
-    @SlotName("deprecated element has possible replacement")
+    @SlotName("deprecated_element_has_possible_replacement")
     @Converter(CurieConverter.class)
     @LinkURI("https://w3id.org/linkml/deprecated_element_has_possible_replacement")
     private String deprecatedElementHasPossibleReplacement;
@@ -120,27 +120,27 @@ public class ArrayExpression {
     @LinkURI("http://www.w3.org/2004/02/skos/core#mappingRelation")
     private List<String> mappings;
 
-    @SlotName("exact mappings")
+    @SlotName("exact_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#exactMatch")
     private List<String> exactMappings;
 
-    @SlotName("close mappings")
+    @SlotName("close_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#closeMatch")
     private List<String> closeMappings;
 
-    @SlotName("related mappings")
+    @SlotName("related_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#relatedMatch")
     private List<String> relatedMappings;
 
-    @SlotName("narrow mappings")
+    @SlotName("narrow_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#narrowMatch")
     private List<String> narrowMappings;
 
-    @SlotName("broad mappings")
+    @SlotName("broad_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#broadMatch")
     private List<String> broadMappings;
@@ -746,12 +746,12 @@ public class ArrayExpression {
             sb.append(",");
         }
         if ( (o = this.getDeprecatedElementHasExactReplacement()) != null ) {
-            sb.append("deprecated element has exact replacement=");
+            sb.append("deprecated_element_has_exact_replacement=");
             sb.append(o);
             sb.append(",");
         }
         if ( (o = this.getDeprecatedElementHasPossibleReplacement()) != null ) {
-            sb.append("deprecated element has possible replacement=");
+            sb.append("deprecated_element_has_possible_replacement=");
             sb.append(o);
             sb.append(",");
         }
@@ -771,27 +771,27 @@ public class ArrayExpression {
             sb.append(",");
         }
         if ( (o = this.getExactMappings()) != null ) {
-            sb.append("exact mappings=");
+            sb.append("exact_mappings=");
             sb.append(o);
             sb.append(",");
         }
         if ( (o = this.getCloseMappings()) != null ) {
-            sb.append("close mappings=");
+            sb.append("close_mappings=");
             sb.append(o);
             sb.append(",");
         }
         if ( (o = this.getRelatedMappings()) != null ) {
-            sb.append("related mappings=");
+            sb.append("related_mappings=");
             sb.append(o);
             sb.append(",");
         }
         if ( (o = this.getNarrowMappings()) != null ) {
-            sb.append("narrow mappings=");
+            sb.append("narrow_mappings=");
             sb.append(o);
             sb.append(",");
         }
         if ( (o = this.getBroadMappings()) != null ) {
-            sb.append("broad mappings=");
+            sb.append("broad_mappings=");
             sb.append(o);
             sb.append(",");
         }

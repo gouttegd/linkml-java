@@ -32,7 +32,7 @@ public class UnitOfMeasure {
     @LinkURI("rdfs:label")
     private String descriptiveName;
 
-    @SlotName("exact mappings")
+    @SlotName("exact_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#exactMatch")
     private List<String> exactMappings;
@@ -145,7 +145,7 @@ public class UnitOfMeasure {
             sb.append(",");
         }
         if ( (o = this.getExactMappings()) != null ) {
-            sb.append("exact mappings=");
+            sb.append("exact_mappings=");
             sb.append(o);
             sb.append(",");
         }

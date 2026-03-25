@@ -28,10 +28,9 @@ public class TypeDefinition extends Element {
     @LinkURI("https://w3id.org/linkml/base")
     private String base;
 
-    @SlotName("type_uri")
     @Converter(CurieConverter.class)
     @LinkURI("https://w3id.org/linkml/type_uri")
-    private String typeUri;
+    private String uri;
 
     @LinkURI("https://w3id.org/linkml/repr")
     private String repr;
@@ -106,12 +105,12 @@ public class TypeDefinition extends Element {
         return this.base;
     }
 
-    public void setTypeUri(String typeUri) {
-        this.typeUri = typeUri;
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
-    public String getTypeUri() {
-        return this.typeUri;
+    public String getUri() {
+        return this.uri;
     }
 
     public void setRepr(String repr) {
@@ -295,9 +294,9 @@ public class TypeDefinition extends Element {
         final Object this$base = this.getBase();
         final Object other$base = other.getBase();
         if ( this$base == null ? other$base != null : !this$base.equals(other$base)) return false;
-        final Object this$typeUri = this.getTypeUri();
-        final Object other$typeUri = other.getTypeUri();
-        if ( this$typeUri == null ? other$typeUri != null : !this$typeUri.equals(other$typeUri)) return false;
+        final Object this$uri = this.getUri();
+        final Object other$uri = other.getUri();
+        if ( this$uri == null ? other$uri != null : !this$uri.equals(other$uri)) return false;
         final Object this$repr = this.getRepr();
         final Object other$repr = other.getRepr();
         if ( this$repr == null ? other$repr != null : !this$repr.equals(other$repr)) return false;
@@ -358,8 +357,8 @@ public class TypeDefinition extends Element {
         result = result * PRIME + ($typeof == null ? 43 : $typeof.hashCode());
         final Object $base = this.getBase();
         result = result * PRIME + ($base == null ? 43 : $base.hashCode());
-        final Object $typeUri = this.getTypeUri();
-        result = result * PRIME + ($typeUri == null ? 43 : $typeUri.hashCode());
+        final Object $uri = this.getUri();
+        result = result * PRIME + ($uri == null ? 43 : $uri.hashCode());
         final Object $repr = this.getRepr();
         result = result * PRIME + ($repr == null ? 43 : $repr.hashCode());
         final Object $unionOf = this.getUnionOf();

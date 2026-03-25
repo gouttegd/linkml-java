@@ -25,13 +25,11 @@ public class Example {
     @LinkURI("http://www.w3.org/2004/02/skos/core#example")
     private String value;
 
-    @SlotName("value_description")
     @LinkURI("https://w3id.org/linkml/value_description")
-    private String valueDescription;
+    private String description;
 
-    @SlotName("value_object")
     @LinkURI("https://w3id.org/linkml/value_object")
-    private Object valueObject;
+    private Object object;
 
     public void setValue(String value) {
         this.value = value;
@@ -41,20 +39,20 @@ public class Example {
         return this.value;
     }
 
-    public void setValueDescription(String valueDescription) {
-        this.valueDescription = valueDescription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getValueDescription() {
-        return this.valueDescription;
+    public String getDescription() {
+        return this.description;
     }
 
-    public void setValueObject(Object valueObject) {
-        this.valueObject = valueObject;
+    public void setObject(Object object) {
+        this.object = object;
     }
 
-    public Object getValueObject() {
-        return this.valueObject;
+    public Object getObject() {
+        return this.object;
     }
 
     @Override
@@ -67,13 +65,13 @@ public class Example {
             sb.append(o);
             sb.append(",");
         }
-        if ( (o = this.getValueDescription()) != null ) {
-            sb.append("value_description=");
+        if ( (o = this.getDescription()) != null ) {
+            sb.append("description=");
             sb.append(o);
             sb.append(",");
         }
-        if ( (o = this.getValueObject()) != null ) {
-            sb.append("value_object=");
+        if ( (o = this.getObject()) != null ) {
+            sb.append("object=");
             sb.append(o);
             sb.append(",");
         }
@@ -90,12 +88,12 @@ public class Example {
         final Object this$value = this.getValue();
         final Object other$value = other.getValue();
         if ( this$value == null ? other$value != null : !this$value.equals(other$value)) return false;
-        final Object this$valueDescription = this.getValueDescription();
-        final Object other$valueDescription = other.getValueDescription();
-        if ( this$valueDescription == null ? other$valueDescription != null : !this$valueDescription.equals(other$valueDescription)) return false;
-        final Object this$valueObject = this.getValueObject();
-        final Object other$valueObject = other.getValueObject();
-        if ( this$valueObject == null ? other$valueObject != null : !this$valueObject.equals(other$valueObject)) return false;
+        final Object this$description = this.getDescription();
+        final Object other$description = other.getDescription();
+        if ( this$description == null ? other$description != null : !this$description.equals(other$description)) return false;
+        final Object this$object = this.getObject();
+        final Object other$object = other.getObject();
+        if ( this$object == null ? other$object != null : !this$object.equals(other$object)) return false;
         return true;
     }
 
@@ -109,10 +107,10 @@ public class Example {
         int result = 1;
         final Object $value = this.getValue();
         result = result * PRIME + ($value == null ? 43 : $value.hashCode());
-        final Object $valueDescription = this.getValueDescription();
-        result = result * PRIME + ($valueDescription == null ? 43 : $valueDescription.hashCode());
-        final Object $valueObject = this.getValueObject();
-        result = result * PRIME + ($valueObject == null ? 43 : $valueObject.hashCode());
+        final Object $description = this.getDescription();
+        result = result * PRIME + ($description == null ? 43 : $description.hashCode());
+        final Object $object = this.getObject();
+        result = result * PRIME + ($object == null ? 43 : $object.hashCode());
         return result;
     }
 }

@@ -23,34 +23,32 @@ import org.incenp.linkml.core.CurieConverter;
 public class AltDescription {
 
     @Identifier(isGlobal = false)
-    @SlotName("alt_description_source")
     @LinkURI("https://w3id.org/linkml/alt_description_source")
-    private String altDescriptionSource;
+    private String source;
 
-    @SlotName("alt_description_text")
     @Required
     @LinkURI("https://w3id.org/linkml/alt_description_text")
-    private String altDescriptionText;
+    private String description;
 
-    public void setAltDescriptionSource(String altDescriptionSource) {
-        this.altDescriptionSource = altDescriptionSource;
+    public void setSource(String source) {
+        this.source = source;
     }
 
-    public String getAltDescriptionSource() {
-        return this.altDescriptionSource;
+    public String getSource() {
+        return this.source;
     }
 
-    public void setAltDescriptionText(String altDescriptionText) {
-        this.altDescriptionText = altDescriptionText;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getAltDescriptionText() {
-        return this.altDescriptionText;
+    public String getDescription() {
+        return this.description;
     }
 
     @Override
     public String toString() {
-        return "AltDescription(alt_description_source=" + this.getAltDescriptionSource() + ")";
+        return "AltDescription(source=" + this.getSource() + ")";
     }
 
     @Override
@@ -59,12 +57,12 @@ public class AltDescription {
         if ( !(o instanceof AltDescription) ) return false;
         final AltDescription other = (AltDescription) o;
         if ( !other.canEqual((Object) this)) return false;
-        final Object this$altDescriptionSource = this.getAltDescriptionSource();
-        final Object other$altDescriptionSource = other.getAltDescriptionSource();
-        if ( this$altDescriptionSource == null ? other$altDescriptionSource != null : !this$altDescriptionSource.equals(other$altDescriptionSource)) return false;
-        final Object this$altDescriptionText = this.getAltDescriptionText();
-        final Object other$altDescriptionText = other.getAltDescriptionText();
-        if ( this$altDescriptionText == null ? other$altDescriptionText != null : !this$altDescriptionText.equals(other$altDescriptionText)) return false;
+        final Object this$source = this.getSource();
+        final Object other$source = other.getSource();
+        if ( this$source == null ? other$source != null : !this$source.equals(other$source)) return false;
+        final Object this$description = this.getDescription();
+        final Object other$description = other.getDescription();
+        if ( this$description == null ? other$description != null : !this$description.equals(other$description)) return false;
         return true;
     }
 
@@ -76,10 +74,10 @@ public class AltDescription {
     public int hashCode() {
         final int PRIME = 59;
         int result = 1;
-        final Object $altDescriptionSource = this.getAltDescriptionSource();
-        result = result * PRIME + ($altDescriptionSource == null ? 43 : $altDescriptionSource.hashCode());
-        final Object $altDescriptionText = this.getAltDescriptionText();
-        result = result * PRIME + ($altDescriptionText == null ? 43 : $altDescriptionText.hashCode());
+        final Object $source = this.getSource();
+        result = result * PRIME + ($source == null ? 43 : $source.hashCode());
+        final Object $description = this.getDescription();
+        result = result * PRIME + ($description == null ? 43 : $description.hashCode());
         return result;
     }
 }

@@ -43,7 +43,7 @@ public class Annotation extends Extension {
 
     @Override
     public String toString() {
-        return "Annotation(extension_tag=" + this.getExtensionTag() + ")";
+        return "Annotation(tag=" + this.getTag() + ")";
     }
 
     @Override

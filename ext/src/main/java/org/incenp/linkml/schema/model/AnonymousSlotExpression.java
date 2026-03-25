@@ -652,12 +652,12 @@ public class AnonymousSlotExpression extends AnonymousExpression {
             sb.append(",");
         }
         if ( (o = this.getDeprecatedElementHasExactReplacement()) != null ) {
-            sb.append("deprecated element has exact replacement=");
+            sb.append("deprecated_element_has_exact_replacement=");
             sb.append(o);
             sb.append(",");
         }
         if ( (o = this.getDeprecatedElementHasPossibleReplacement()) != null ) {
-            sb.append("deprecated element has possible replacement=");
+            sb.append("deprecated_element_has_possible_replacement=");
             sb.append(o);
             sb.append(",");
         }
@@ -677,27 +677,27 @@ public class AnonymousSlotExpression extends AnonymousExpression {
             sb.append(",");
         }
         if ( (o = this.getExactMappings()) != null ) {
-            sb.append("exact mappings=");
+            sb.append("exact_mappings=");
             sb.append(o);
             sb.append(",");
         }
         if ( (o = this.getCloseMappings()) != null ) {
-            sb.append("close mappings=");
+            sb.append("close_mappings=");
             sb.append(o);
             sb.append(",");
         }
         if ( (o = this.getRelatedMappings()) != null ) {
-            sb.append("related mappings=");
+            sb.append("related_mappings=");
             sb.append(o);
             sb.append(",");
         }
         if ( (o = this.getNarrowMappings()) != null ) {
-            sb.append("narrow mappings=");
+            sb.append("narrow_mappings=");
             sb.append(o);
             sb.append(",");
         }
         if ( (o = this.getBroadMappings()) != null ) {
-            sb.append("broad mappings=");
+            sb.append("broad_mappings=");
             sb.append(o);
             sb.append(",");
         }

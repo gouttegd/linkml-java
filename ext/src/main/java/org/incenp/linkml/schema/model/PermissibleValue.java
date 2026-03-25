@@ -110,12 +110,12 @@ public class PermissibleValue {
     @LinkURI("http://www.w3.org/2000/01/rdf-schema#seeAlso")
     private List<String> seeAlso;
 
-    @SlotName("deprecated element has exact replacement")
+    @SlotName("deprecated_element_has_exact_replacement")
     @Converter(CurieConverter.class)
     @LinkURI("https://w3id.org/linkml/deprecated_element_has_exact_replacement")
     private String deprecatedElementHasExactReplacement;
 
-    @SlotName("deprecated element has possible replacement")
+    @SlotName("deprecated_element_has_possible_replacement")
     @Converter(CurieConverter.class)
     @LinkURI("https://w3id.org/linkml/deprecated_element_has_possible_replacement")
     private String deprecatedElementHasPossibleReplacement;
@@ -132,27 +132,27 @@ public class PermissibleValue {
     @LinkURI("http://www.w3.org/2004/02/skos/core#mappingRelation")
     private List<String> mappings;
 
-    @SlotName("exact mappings")
+    @SlotName("exact_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#exactMatch")
     private List<String> exactMappings;
 
-    @SlotName("close mappings")
+    @SlotName("close_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#closeMatch")
     private List<String> closeMappings;
 
-    @SlotName("related mappings")
+    @SlotName("related_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#relatedMatch")
     private List<String> relatedMappings;
 
-    @SlotName("narrow mappings")
+    @SlotName("narrow_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#narrowMatch")
     private List<String> narrowMappings;
 
-    @SlotName("broad mappings")
+    @SlotName("broad_mappings")
     @Converter(CurieConverter.class)
     @LinkURI("http://www.w3.org/2004/02/skos/core#broadMatch")
     private List<String> broadMappings;
