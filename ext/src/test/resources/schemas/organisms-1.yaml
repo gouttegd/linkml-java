@@ -6,7 +6,7 @@ prefixes:
 imports:
   - linkml:types
 
-slot_definitions:
+slots:
   foo:
     range: string
   bar:

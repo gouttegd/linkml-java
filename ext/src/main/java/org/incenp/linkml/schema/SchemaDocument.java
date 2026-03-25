@@ -325,8 +325,8 @@ public class SchemaDocument {
                 allSlotUsages.put(cd.getName(), slotUsages);
             }
         }
-        if ( schema.getSlotDefinitions() != null ) {
-            for ( SlotDefinition sd : schema.getSlotDefinitions() ) {
+        if ( schema.getSlots() != null ) {
+            for ( SlotDefinition sd : schema.getSlots() ) {
                 allSlots.put(sd.getName(), sd);
             }
         }
