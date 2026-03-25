@@ -27,8 +27,7 @@ def cli(linkml_model_repo):
     gen = JavaGenerator(ROOT / "core/src/test/linkml/samples.yaml",
                         true_enums=True,
                         use_aliases=True,
-                        package="org.incenp.linkml.core.sample",
-                        template_dir=HERE / "templates")
+                        package="org.incenp.linkml.core.sample")
     gen.serialize(output_dir, template_variant="org.incenp.linkml")
 
     # Generate code for LinkML meta model
@@ -43,8 +42,7 @@ def cli(linkml_model_repo):
         gen = JavaGenerator(model_dir / (schema + ".yaml"),
                             true_enums=True,
                             use_aliases=True,
-                            package="org.incenp.linkml.schema.model",
-                            template_dir=HERE / "templates")
+                            package="org.incenp.linkml.schema.model")
         gen.serialize(output_dir, template_variant="org.incenp.linkml")
 
 if __name__ == "__main__":

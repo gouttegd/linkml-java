@@ -19,10 +19,7 @@ import org.incenp.linkml.core.annotations.SlotName;
 import org.incenp.linkml.core.annotations.TypeDesignator;
 import org.incenp.linkml.core.CurieConverter;
 
-import org.incenp.linkml.schema.ClassDefinitionConverter;
-
 @LinkURI("https://w3id.org/linkml/ClassDefinition")
-@Converter(ClassDefinitionConverter.class)
 public class ClassDefinition extends Definition {
 
     @LinkURI("https://w3id.org/linkml/slots")
