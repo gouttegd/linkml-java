@@ -26,6 +26,7 @@ def cli(linkml_model_repo):
     cleanup_dir(output_dir)
     gen = JavaGenerator(ROOT / "core/src/test/linkml/samples.yaml",
                         true_enums=True,
+                        use_aliases=True,
                         package="org.incenp.linkml.core.sample",
                         template_dir=HERE / "templates")
     gen.serialize(output_dir, template_variant="org.incenp.linkml")
@@ -41,6 +42,7 @@ def cli(linkml_model_repo):
         model_dir = linkml_model_repo / "linkml_model/model/schema"
         gen = JavaGenerator(model_dir / (schema + ".yaml"),
                             true_enums=True,
+                            use_aliases=True,
                             package="org.incenp.linkml.schema.model",
                             template_dir=HERE / "templates")
         gen.serialize(output_dir, template_variant="org.incenp.linkml")
