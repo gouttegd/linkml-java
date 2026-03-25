@@ -139,7 +139,7 @@ public class SchemaDocumentTest {
 
     @Test
     void testReadingTypes() {
-        File schemaFile = new File("src/main/resources/types.yaml");
+        File schemaFile = new File("src/main/resources/schemas/linkml/types.yaml");
         SchemaDocument doc = null;
         try {
             doc = new SchemaDocument(schemaFile);

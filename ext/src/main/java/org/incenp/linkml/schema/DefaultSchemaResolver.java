@@ -70,7 +70,7 @@ public class DefaultSchemaResolver implements ISchemaResolver {
 
         if ( name.equals(TYPES_SCHEMA) ) {
             // Redirect the standard linkml:types schema to the embedded version.
-            return new EmbeddedSchemaSource("types.yaml");
+            return new EmbeddedSchemaSource("schemas/linkml/types.yaml");
         }
         try {
             return new URLSchemaSource(name);

@@ -15,11 +15,8 @@ def cleanup_dir(directory):
         directory.rmdir()
 
 
-@click.option("--linkml-model-repo",
-              default="linkml-model", show_default=True,
-              type=click.Path(path_type=Path, dir_okay=True, file_okay=False))
 @click.command()
-def cli(linkml_model_repo):
+def cli():
 
     # Generating test code
     output_dir = ROOT / "core/src/test/java/org/incenp/linkml/core/sample"
@@ -31,14 +28,10 @@ def cli(linkml_model_repo):
     gen.serialize(output_dir, template_variant="org.incenp.linkml")
 
     # Generate code for LinkML meta model
-    if not linkml_model_repo.exists():
-        print("Skipping LinkML meta model generation")
-        return
-
     output_dir = ROOT / "ext/src/main/java/org/incenp/linkml/schema/model"
     cleanup_dir(output_dir)
     for schema in ["annotations", "extensions", "mappings", "meta", "types", "units"]:
-        model_dir = linkml_model_repo / "linkml_model/model/schema"
+        model_dir = ROOT / "ext/src/main/resources/schemas/linkml"
         gen = JavaGenerator(model_dir / (schema + ".yaml"),
                             true_enums=True,
                             use_aliases=True,
