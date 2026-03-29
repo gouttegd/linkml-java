@@ -11,29 +11,29 @@ LinkML-to-Java translation rules
 ### LinkML types
 LinkML’s basic types are rendered in Java as follows:
 
-| LinkML type         | Java type               | Notes |
-| ------------------- | ----------------------- | ----- |
-| xsd:string          | String                  |       |
-| xsd:integer         | Integer                 | (1)   |
-| xsd:float           | Float                   | (1)   |
-| xsd:double          | Double                  | (1)   |
-| xsd:boolean         | Boolean                 | (1)   |
-| xsd:dateTime        | java.time.ZonedDateTime |       |
-| xsd:date            | java.time.LocalDate     |       |
-| xsd:time            | java.time.LocalTime     |       |
-| xsd:anyURI          | java.net.URI            |       |
-| linkml:uriOrCurie   | String                  | (2)   |
+| LinkML type  | Java type               | Notes |
+| ------------ | ----------------------- | ----- |
+| string       | String                  |       |
+| integer      | Integer                 | (1)   |
+| float        | Float                   | (1)   |
+| double       | Double                  | (1)   |
+| boolean      | Boolean                 | (1)   |
+| datetime     | java.time.ZonedDateTime |       |
+| date         | java.time.LocalDate     |       |
+| time         | java.time.LocalTime     |       |
+| uri          | java.net.URI            |       |
+| uriorcurie   | String                  | (2)   |
 
 (1) Those types may also be represented by their primitive equivalent
 (`int`, `float`, `double`, and `boolean`) if and only if the
 corresponding slot is **required**. If the slot is not required, then
 the boxed types are used instead so that we can represent the fact that
-the slot may not a value (by setting the field to `null`).
+the slot may not have a value (by setting the field to `null`).
 
-(2) The LinkML `uriOrCurie` type is represented by a standard Java
+(2) The LinkML `uriorcurie` type is represented by a standard Java
 String object, rather than by a dedicated class, for convenience. To
 support automatic expansion/contraction of CURIEs, the String field
-representing a LinkML `uriOrCurie` slot must be annotated with a
+representing a LinkML `uriorcurie` slot must be annotated with a
 `@Converter(CurieConverter.class)` annotation (more on that below).
 
 ### LinkML classes

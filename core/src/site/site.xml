@@ -6,6 +6,7 @@
   <body>
     <menu name="LinkML-Java core runtime library">
       <item name="Introduction" href="index.html" />
+      <item name="Getting started" href="quickstart.html" />
       <item name="Code generation" href="codegen.html" />
     </menu>
   </body>
