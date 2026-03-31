@@ -34,6 +34,7 @@
 
 package org.incenp.linkml.core;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -369,8 +370,9 @@ public class ClassInfo {
      */
     public Object newInstance() throws LinkMLRuntimeException {
         try {
-            return type.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            return type.getConstructor(new Class<?>[] {}).newInstance();
+        } catch ( InvocationTargetException | InstantiationException | IllegalAccessException | IllegalArgumentException
+                | NoSuchMethodException | SecurityException e ) {
             throw new LinkMLInternalError(String.format(CREATE_ERROR, type.getName()), e);
         }
     }
