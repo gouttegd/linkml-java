@@ -1,3 +1,11 @@
+Changes in LinkML-Java 0.2.0
+----------------------------
+
+    * Library split in two modules: `linkml-core` and `linkml-ext`.
+    * Added support for `linkml:Any`-typed slots.
+    * Added complete representation of LinkML’s own meta-schema.
+
+
 Changes in LinkML-Java 0.1.2
 ----------------------------
 

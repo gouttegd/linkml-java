@@ -1,0 +1,99 @@
+cff-version: 1.2.0
+message: "Should you wish to cite this software, please do so using the following metadata."
+title: "LinkML-Java"
+authors:
+  - family-names: "Goutte-Gattat"
+    given-names: "Damien"
+    orcid: "https://orcid.org/0000-0002-6095-8718"
+license: BSD-3-Clause
+url: "https://incenp.org/dvlpt/linkml-java/"
+repository-code: "https://github.com/gouttegd/linkml-java"
+version: 0.2.0
+date-released: "2026-03-31"
+doi: 10.5281/zenodo.19356014
+references:
+  - authors:
+      - family-names: Moxon
+        given-names: Sierra A.T.
+        orcid: https://orcid.org/0000-0002-8719-7760
+      - family-names: Solbrig
+        given-names: Harold
+      - family-names: Harris
+        given-names: Nomi L.
+        orcid: https://orcid.org/0000-0001-6315-3707
+      - family-names: Kalita
+        given-names: Patrick
+      - family-names: Miller
+        given-names: Mark A.
+      - family-names: Patil
+        given-names: Sujay
+      - family-names: Schaper
+        given-names: Kevin
+      - family-names: Bizon
+        given-names: Chris
+      - family-names: Caufield
+        given-names: J. Harry
+      - family-names: Cirujano Cuesta
+        given-names: Silvano
+      - family-names: Cox
+        given-names: Corey
+      - family-names: Dekervel
+        given-names: Frank
+      - family-names: Dooley
+        given-names: Damion M.
+      - family-names: Duncan
+        given-names: William D.
+      - family-names: Fliss
+        given-names: Tim
+      - family-names: Gehrke
+        given-names: Sarah
+      - family-names: Graefe
+        given-names: Adam S.L.
+      - family-names: Hegde
+        given-names: Harshad
+      - family-names: Ireland
+        given-names: AJ
+      - family-names: Jacobsen
+        given-names: Julius O.B.
+      - family-names: Krishnamurthy
+        given-names: Madan
+      - family-names: Kroll
+        given-names: Carlo
+      - family-names: Linke
+        given-names: David
+      - family-names: Ly
+        given-names: Ryan
+      - family-names: Matentzoglu
+        given-names: Nicolas
+      - family-names: Overton
+        given-names: James A.
+      - family-names: Saunders
+        given-names: Jonny L.
+      - family-names: Unni
+        given-names: Deepak R.
+      - family-names: Vaidya
+        given-names: Gaurav
+      - family-names: Vierdag
+        given-names: Wouter-Michiel A.M.
+      - family-names: Putman
+        given-names: Tim
+      - family-names: LinkML Community Contributors
+      - family-names: Ruebel
+        given-names: Oliver
+      - family-names: Chute
+        given-names: Christopher G.
+      - family-names: Brush
+        given-names: Matthew H.
+      - family-names: Haendel
+        given-names: Melissa A.
+        orcid: https://orcid.org/0000-0001-9114-8737
+      - family-names: Mungall
+        given-names: Christopher J.
+        orcid: https://orcid.org/0000-0002-6601-2165
+    title: "LinkML: an open data modeling framework"
+    type: article
+    journal: "GigaScience"
+    volume: 15
+    pages: giaf152
+    year: 2026
+    doi: 10.1093/gigascience/giaf152
