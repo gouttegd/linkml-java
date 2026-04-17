@@ -36,6 +36,8 @@ package org.incenp.linkml.core;
 
 /**
  * Converts raw objects into boolean values.
+ * <p>
+ * This supports LinkML’s <code>boolean</code> type.
  */
 public class BooleanConverter extends ScalarConverterBase {
 

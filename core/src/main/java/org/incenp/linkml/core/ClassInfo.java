@@ -49,6 +49,37 @@ import org.incenp.linkml.core.annotations.LinkURI;
  * This class is intended merely as a container of various informations about a
  * given LinkML class, as obtained at runtime from the Java class that
  * represents it.
+ * <p>
+ * Of note, to obtain most of the informations collected here, the LinkML-Java
+ * runtime is dependent on the Java class having been properly annotated during
+ * code generation.
+ * <p>
+ * Use the {@link #get(Class)} static method to obtain an instance of that
+ * class. The instance object can then be used to inquire about most aspects of
+ * the LinkML class it represents, such as the list of its slots, whether it has
+ * an identifier slot, a type designator slot, etc.
+ * <p>
+ * For the methods that concern a slot, it does not matter whether the slot is
+ * defined in the very LinkML class that this object represents, or in any of
+ * its parent classes. For example, given the following schema:
+ * 
+ * <pre>
+ * slots:
+ *   id:
+ *     designates_type: true
+ * 
+ * classes:
+ *   Foo:
+ *     slots:
+ *       - id
+ *   Bar:
+ *     is_a: Foo
+ * </pre>
+ * <p>
+ * a <code>ClassInfo</code> object for the <code>Bar</code> class would indicate
+ * (through the {@link #hasTypeDesignator()} method) that the class has a type
+ * designator – because indeed it does have one, even if it is defined in its
+ * parent class <code>Foo</code>.
  */
 public class ClassInfo {
 
@@ -118,22 +149,25 @@ public class ClassInfo {
     /**
      * Gets the LinkML URI for the class.
      * <p>
-     * We can only obtain this if the class has been properly annotated with a
-     * {@link LinkURI} annotation during code generation.
+     * The URI of a LinkML class is used for two purposes:
+     * <ul>
+     * <li>to represent the class in RDF serialisations;
+     * <li>to resolve URI-typed type designator values.
+     * </ul>
      * 
-     * @return The class’s URI, or <code>null</code> if we don't know its URI.
+     * @return The class’s URI, or <code>null</code> if we don't know its URI (the
+     *         only way this could happen is if the class had not been properly
+     *         annotated during code generation).
      */
     public String getURI() {
         return uri;
     }
 
     /**
-     * Gets the name of the class.
-     * <p>
-     * Note that this may not be the original name of the class as defined in the
-     * LinkML schema – the name may have been transformed into a “PascalCase” form
-     * (e.g. <code>mapping set</code> would be transformed into
-     * <code>MappingSet</code>).
+     * Gets the name of the class. This may not necessarily be the <em>original</em>
+     * name as defined in the LinkML schema – the name may have been transformed
+     * into a “PascalCase” form (e.g. <code>mapping set</code> would be transformed
+     * into <code>MappingSet</code>).
      * 
      * @return The class name.
      */
@@ -162,9 +196,12 @@ public class ClassInfo {
     }
 
     /**
-     * Indicates whether the class has any kind of identifier slot, whether it is a
-     * proper LinkML <em>identifier</em> slot (globally unique) or a <em>key
-     * slot</em> (locally unique).
+     * Indicates whether the class has any kind of identifier slot. An “identifier
+     * slot” in the context of this method can be either a proper LinkML
+     * <em>identifier</em> slot (a slot marked with <code>identifier: true</code>,
+     * intended to hold a globally unique identifier) or a <em>key</em> slot (a slot
+     * marked with <code>key: true</code>, intended to hold a locally unique
+     * identifier).
      */
     public boolean hasIdentifier() {
         return identifierSlot != null;
@@ -198,8 +235,9 @@ public class ClassInfo {
     }
 
     /**
-     * Indicates whether the class has a <em>type designator slot</em>, used to
-     * unambiguously specify the runtime type of an object.
+     * Indicates whether the class has a <em>type designator slot</em>. Such a slot
+     * is intended to hold a value that unambiguously specify the runtime type of an
+     * object.
      */
     public boolean hasTypeDesignator() {
         return designatorSlot != null;
@@ -208,6 +246,11 @@ public class ClassInfo {
     /**
      * Indicates whether the class has an additional, non-LinkML-defined slot
      * intended to store non-LinkML-defined attributes.
+     * <p>
+     * The “extension slot” is how the LinkML-Java runtime supports LinkML’s
+     * <code>extra_slots.allowed</code> feature, by which a LinkML class is allowed
+     * to contain “extra slots” that do not correspond to any slot or attribute
+     * defined in the LinkML schema.
      */
     public boolean hasExtensionSlot() {
         return extensionSlot != null;
@@ -221,7 +264,7 @@ public class ClassInfo {
     }
 
     /**
-     * Gets all the slots defined by the class.
+     * Gets all the slots carried by the class.
      * <p>
      * Note that this includes any slot defined in any ancestor class.
      */
@@ -252,8 +295,7 @@ public class ClassInfo {
      * @param uri The URI of the desired slot.
      * @return The corresponding slot, or <code>null</code> if the class either has
      *         no slot with that URI, or at least no slot <em>annotated</em> with
-     *         the appropriate annotation (this is outside of the control of this
-     *         runtime, and entirely dependent on the code generator).
+     *         the appropriate annotation.
      */
     public Slot getSlotByURI(String uri) {
         return slotsByURI.get(uri);
@@ -407,8 +449,10 @@ public class ClassInfo {
      * Gets the <code>ClassInfo</code> object for the LinkML class identifier by the
      * given URI.
      * <p>
-     * This requires that the <code>ClassInfo</code> object for that class has
-     * already been queried before by the class type using {@link #get(Class)}.
+     * Importantly, the runtime currently has no way of pro-actively searching for a
+     * class by its URI, so this method can only work if the <code>ClassInfo</code>
+     * object for the desired class has already been queried before (at least once)
+     * using {@link #get(Class)}.
      * 
      * @param uri The LinkML URI of the class to lookup.
      * @return The corresponding <code>ClassInfo</code> object, or <code>null</code>

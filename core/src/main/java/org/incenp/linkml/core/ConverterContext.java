@@ -49,27 +49,91 @@ import org.incenp.linkml.core.annotations.Converter;
 
 /**
  * Global context for converting LinkML objects (as parsed from a JSON/YAML
- * document) into their corresponding Java objects.
+ * document) into their corresponding Java objects, and the other way round.
+ * <h1>Purposes</h1>
  * <p>
- * An object of this class serves mostly two purposes.
+ * An object of this class serves mostly three purposes:
+ * <ul>
+ * <li>providing {@link IConverter} objects as needed;
+ * <li>allow dereferencing “global” LinkML objects;
+ * <li>providing a resolution/compaction service for CURIEs.
+ * </ul>
+ * 
+ * <h2>Provider of {@link IConverter} objects</h2>
  * <p>
- * First, it holds a list of all the known LinkML classes, along with their
- * respective converter objects. So whenever a converting encounters a slot
- * expecting a value of type <em>Foo</em> (where <em>Foo</em> is a LinkML
- * class), it can obtain from the context the converter it needs to convert the
- * value of the slot into an instance of the <em>Foo</em> class.
+ * The context holds a list of all the known LinkML classes and types, along
+ * with their respective converter objects. So whenever converting an object of
+ * type <em>Foo</em> is required, the appropriate converter needed for such a
+ * conversion can be obtained from the context (through either
+ * {@link #getConverter(Class)} or {@link #getConverter(Slot)}).
  * <p>
- * Second, it provides a solution to the problem of dereferencing entities that
- * may not have been parsed/converted yet. For example, when parsing a class
- * definition, we are likely to encounter a reference to a slot definition, but
- * we may not have parsed that slot definition yet. We cannot solve that simply
- * by ensuring that we always parse slot definitions first, because slot
- * definitions may in turn contain references to a class definition (typically
- * within the <code>range</code> slot). This context object will take care of
- * resolving those references, either immediately if possible (if the referenced
- * object has already been seen before), or in a post-parsing finalization step
- * (when we are sure that all objects contained in the document have been seen,
- * so all references should be resolvable).
+ * The context has built-in knowledge of LinkML’s basic scalar types. For the
+ * other types (classes or enumerations), the client code can provide its own
+ * converters through the {@link #addConverter(IConverter)} method. In the
+ * absence of an explicitly registered converter for a type, the context will
+ * automatically provide a default. It is expected that in most cases, the
+ * default converter should be enough.
+ * 
+ * <h2>Dereferencing global LinkML objects</h2>
+ * <p>
+ * “Dereferencing” is what must happen when converting the value of a LinkML
+ * slot that (1) is expected to contain a globally unique object (an object
+ * belonging to a class that has an <code>identifier</code> slot) and (2) is not
+ * “inlined”. In such a case, in JSON/YAML serialisations the slot will actually
+ * contain only the <em>identifier</em> of the object, the actual object
+ * expectedly being represented elsewhere in the instance data. Dereferencing is
+ * the process of finding the global object corresponding to a given identifier,
+ * so that it can be assigned to the slot.
+ * <p>
+ * One problem that may arise when dereferencing is that an identifier may point
+ * to a global object that has not been parsed and converted yet, depending on
+ * (1) where the global object is defined and (2) the order in which we process
+ * the JSON/YAML tree. For example, when parsing/converting a LinkML schema:
+ * when parsing a class definition, we are likely to encounter a reference to a
+ * slot definition, but we may not have parsed that slot definition yet. (And we
+ * cannot solve that problem simply by ensuring that we always parse slot
+ * definitions first, because slot definitions may in turn contains references
+ * to a class definitions.)
+ * <p>
+ * This context object maintains a cache (implemented by the {@link ObjectCache}
+ * class) of all the global objects, and will take care of resolving references
+ * to those objects – either immediately if possible (if the referenced object
+ * has been seen before and therefore is already in the cache), or in a
+ * post-parsing finalisation step (when we are sure that all objects contained
+ * in the parsed document have been seen, so all references should be
+ * resolvable).
+ * 
+ * <h2>CURIE resolution</h2>
+ * <p>
+ * It is expected that short identifiers, otherwise known as “CURIEs”, will be
+ * used a lot within LinkML instance data. This context object acts as a prefix
+ * manager to help automatically resolve CURIEs into their full-length form
+ * (when deserialising) and conversely compact IRIs into their short form (when
+ * serialising).
+ * 
+ * <h1>Lifecycle</h1>
+ * <p>
+ * As can be inferred from the duties outlined in the previous section, the
+ * converter object has a central role throughout the LinkML-Java runtime. One
+ * such object must be created before doing virtually anything with LinkML
+ * instance data.
+ * <p>
+ * The <em>same</em> converter object must be used for all operations pertaining
+ * to the same set of LinkML instance data, even if the instance data is
+ * physically spread over several JSON or YAML files. For example, when parsing
+ * a LinkML schema, the same context must be used for the root schema and for
+ * all the imported schemas, if any.
+ * <p>
+ * Conversely, in most cases it will not be desirable to reuse an existing
+ * context to manipulate instance data that are not related to the instance data
+ * for which the existing context has already been used.
+ * <p>
+ * Of note, once instance data have been parsed, the parsed objects are
+ * self-sufficient; that is, they do <em>not</em> require the context to be kept
+ * around. However, if the data is to be serialised back, it might be a good
+ * idea to reuse the same context for serialisation as the one that was used for
+ * deserialisation, because it will ensure that the same prefixes are used for
+ * the compaction of CURIEs.
  */
 public class ConverterContext {
 
@@ -108,13 +172,22 @@ public class ConverterContext {
      * 
      * @param type The class for which to register a converter. A default converter
      *             will be automatically created.
+     * @deprecated Use either {@link #addConverter(IConverter)} with an explicitly
+     *             instantiated {@link ObjectConverter}, or
+     *             {@link #getConverter(Class)} (which will automatically trigger
+     *             the registration of a newly instantiated converter if needed).
      */
+    @Deprecated
     public void addConverter(Class<?> type) {
         converters.put(type, new ObjectConverter(type));
     }
 
     /**
      * Registers a pre-built converter.
+     * <p>
+     * This may be used to override the default converter that would normally be
+     * automatically instantiated the first time a converter for a given type is
+     * requested through {@link #getConverter(Class)}.
      * 
      * @param converter The converter to register.
      */
@@ -124,10 +197,19 @@ public class ConverterContext {
 
     /**
      * Gets the converter for objects of the given type.
+     * <p>
+     * If no converter able to handle the type has been previously registered, then
+     * the context will attempt to automatically instantiate and register a default
+     * converter. The default converter will be either:
+     * <ul>
+     * <li>the custom converter as indicated by a {@link Converter} annotation on
+     * the type (or any parent type);
+     * <li>the default {@link EnumConverter} if the type is an enumeration type;
+     * <li>the default {@link ObjectConverter} if the type is anything else.
+     * </ul>
      * 
      * @param type The type to query.
-     * @return The registered converter for the type, or <code>null</code> if no
-     *         converter has been registered for that type.
+     * @return The registered converter for the type.
      * @throws LinkMLRuntimeException If the type is configured to use a custom
      *                                converter that could not be instantiated.
      */
@@ -158,13 +240,16 @@ public class ConverterContext {
 
     /**
      * Gets the converter for the type of object expected by the given slot.
+     * <p>
+     * This is mostly equivalent to calling {@link #getConverter(Class)} on the
+     * “inner type” of the slot, except that it takes into account any
+     * {@link Converter} annotation carried by the slot.
      * 
      * @param slot The slot for which a converter is needed.
      * @return The appropriate converter.
-     * @throws LinkMLRuntimeException If (1) the slot is configured to use a custom
-     *                                converter, but the custom converter could not
-     *                                be instantiated; or (2) if there is no known
-     *                                converter for the slot type.
+     * @throws LinkMLRuntimeException If the slot (or its type) is configured to use
+     *                                a custom converter, but the custom converter
+     *                                could not be instantiated.
      */
     public IConverter getConverter(Slot slot) throws LinkMLRuntimeException {
         IConverter conv = slotConverters.get(slot);
@@ -220,10 +305,19 @@ public class ConverterContext {
     }
 
     /**
-     * Registers a prefix.
+     * Registers a prefix. Any prefix declared here will become resolvable by the
+     * {@link #resolve(String)} method, or conversely usable by the
+     * {@link #compact(String)} method.
      * <p>
-     * Any prefix declared here will become resolvable by the
-     * {@link #resolve(String)} method.
+     * One of the responsibilities of the <code>ConverterContext</code> is to
+     * provide a prefix resolution service, so that any shortened identifier
+     * (“CURIE“) found within LinkML instance data can be resolved into a
+     * full-length identifier.
+     * <p>
+     * This method is used internally throughout LinkML-Java to feed the prefix
+     * resolution service. Client code may also use it as needed to provide its own
+     * prefixes (for example, if the client code has out-of-band knowledge of which
+     * prefixes will be used within the instance data it will manipulate).
      * 
      * @param name   The prefix name.
      * @param prefix The corresponding IRI prefix.
@@ -241,7 +335,7 @@ public class ConverterContext {
      * Resolves a shortened identifier (“CURIE”) into a full-length IRI.
      * 
      * @param name The shortened identifier to resolve.
-     * @return The resolved IRI, or the original String if (1) it was not a
+     * @return The resolved IRI, or the original string if (1) it was not a
      *         shortened identifier to begin with or (2) the prefix is unknown.
      */
     public String resolve(String name) {
@@ -374,6 +468,9 @@ public class ConverterContext {
      * identifier will be automatically created. Use
      * {@link #finalizeAssignments(boolean)} to treat missing references as an error
      * instead.
+     * <p>
+     * It is safe to call this method repeatedly – delayed assignments that were
+     * already performed by a previous call will not be repeated.
      * 
      * @throws LinkMLRuntimeException If an assignment cannot be performed.
      */
