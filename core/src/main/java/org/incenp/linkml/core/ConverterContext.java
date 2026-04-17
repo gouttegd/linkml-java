@@ -50,7 +50,7 @@ import org.incenp.linkml.core.annotations.Converter;
 /**
  * Global context for converting LinkML objects (as parsed from a JSON/YAML
  * document) into their corresponding Java objects, and the other way round.
- * <h1>Purposes</h1>
+ * <h2>Purposes</h2>
  * <p>
  * An object of this class serves mostly three purposes:
  * <ul>
@@ -59,7 +59,7 @@ import org.incenp.linkml.core.annotations.Converter;
  * <li>providing a resolution/compaction service for CURIEs.
  * </ul>
  * 
- * <h2>Provider of {@link IConverter} objects</h2>
+ * <h3>Provider of {@link IConverter} objects</h3>
  * <p>
  * The context holds a list of all the known LinkML classes and types, along
  * with their respective converter objects. So whenever converting an object of
@@ -74,7 +74,7 @@ import org.incenp.linkml.core.annotations.Converter;
  * automatically provide a default. It is expected that in most cases, the
  * default converter should be enough.
  * 
- * <h2>Dereferencing global LinkML objects</h2>
+ * <h3>Dereferencing global LinkML objects</h3>
  * <p>
  * “Dereferencing” is what must happen when converting the value of a LinkML
  * slot that (1) is expected to contain a globally unique object (an object
@@ -103,7 +103,7 @@ import org.incenp.linkml.core.annotations.Converter;
  * in the parsed document have been seen, so all references should be
  * resolvable).
  * 
- * <h2>CURIE resolution</h2>
+ * <h3>CURIE resolution</h3>
  * <p>
  * It is expected that short identifiers, otherwise known as “CURIEs”, will be
  * used a lot within LinkML instance data. This context object acts as a prefix
@@ -111,7 +111,7 @@ import org.incenp.linkml.core.annotations.Converter;
  * (when deserialising) and conversely compact IRIs into their short form (when
  * serialising).
  * 
- * <h1>Lifecycle</h1>
+ * <h2>Lifecycle</h2>
  * <p>
  * As can be inferred from the duties outlined in the previous section, the
  * converter object has a central role throughout the LinkML-Java runtime. One
