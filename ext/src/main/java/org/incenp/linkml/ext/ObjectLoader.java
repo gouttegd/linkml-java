@@ -53,8 +53,12 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
  * Helper class to load or dump LinkML data instances from or to YAML or JSON
  * files.
  * <p>
- * For now this is merely a thin wrapper around both Jackson’s ObjectMapper and
- * our own {@link ConverterContext}.
+ * This is the runtime’s “high-level interface”. For now this is merely a thin
+ * wrapper around both Jackson’s ObjectMapper and our own
+ * {@link ConverterContext}.
+ * <p>
+ * This helper object holds its own LinkML context, which is reused for all
+ * calls to the various <code>load*</code> and <code>dump*</code> methods.
  */
 public class ObjectLoader {
 

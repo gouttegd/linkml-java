@@ -38,12 +38,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Cache for LinkML objects.
+ * Global cache for LinkML identifiable objects.
  * <p>
- * Several LinkML objects (especially all definitions, e.g. class definitions,
- * slot definitions, etc.) live in a global namespace where they are identified
- * by the value of their <em>identifier slot</em>. This object represents that
- * global namespace.
+ * LinkML’s “globally unique objects” (objects belonging to a class that has an
+ * <em>identifier</em> slot; in turn, that’s a slot whose definition contains a
+ * <code>identifier: true</code> slot), as their name implies, are expected to
+ * be unique within a given LinkML context. (In fact they are most often
+ * expected to be universally unique without restriction to any context, but
+ * whatever may happen outside of a LinkML context is out of control of this
+ * runtime, so we do not worry about it.)
+ * <p>
+ * This class implements a cache where such objects, along with their
+ * identifier, may be registered and looked up afterwards.
+ * <p>
+ * Of note, when a LinkML class with an identifier slot has subclasses, the
+ * identifier space is shared between that class and all its subclasses. For
+ * example, in LinkML’s own meta-schema, slot definitions, class definitions,
+ * and enum definitions (among other items) all share the same identifier space
+ * (meaning that a slot definition cannot have the same identifier as a class
+ * definition or a slot definition), because they all represented by subclasses
+ * of the <code>Element</code> class, which is the class that carries the
+ * identifier slot.
  */
 public class ObjectCache {
 

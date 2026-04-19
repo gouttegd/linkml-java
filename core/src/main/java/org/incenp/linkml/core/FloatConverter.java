@@ -36,6 +36,8 @@ package org.incenp.linkml.core;
 
 /**
  * Converts raw objects into single-precision floating point values.
+ * <p>
+ * This supports LinkML’s <code>float</code> type.
  */
 public class FloatConverter extends ScalarConverterBase {
 

@@ -58,7 +58,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 /**
- * Represents an entire LinkML schema.
+ * Represents an entire LinkML schema. This is the primary interface to parse a
+ * LinkML schema.
+ * <p>
+ * While a LinkML schema could in principle be parsed as follows:
+ * 
+ * <pre>
+ * ObjectLoader loader = new ObjectLoader();
+ * SchemaDefinition schema = load.loadObject(new File("schema.yaml"), SchemaDefinition.class);
+ * </pre>
+ * <p>
+ * this would not take into account some aspects of a LinkML schema. In
+ * particular, this would ignore <em>imports</em>, which are a concept that is
+ * specific to LinkML’s meta-model and that is not itself described in LinkML.
+ * <p>
+ * Loading a schema using this class will ensure that all imports are in fact
+ * imported, and will therefore provide a view of the true entire schema.
+ * <p>
+ * This class also provides helper methods to look up the various elements that
+ * make up a schema.
  */
 public class SchemaDocument {
 

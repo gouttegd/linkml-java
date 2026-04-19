@@ -47,10 +47,20 @@ public class FileSchemaSource implements ISchemaSource {
     private File file;
     private InputStream stream;
 
+    /**
+     * Creates a new instance from a {@link File} object.
+     * 
+     * @param file The file object expected to contain the schema.
+     */
     public FileSchemaSource(File file) {
         this.file = file;
     }
 
+    /**
+     * Creates a new instance from a filename.
+     * 
+     * @param filename The name of the file expected to contain the schema.
+     */
     public FileSchemaSource(String filename) {
         this.file = new File(filename);
     }

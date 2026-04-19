@@ -40,6 +40,8 @@ import java.time.format.DateTimeParseException;
 /**
  * A converter for slots typed as <code>xsd:time</code> (represented as
  * {@link LocalTime}).
+ * <p>
+ * This supports LinkML’s <code>time</code> type.
  */
 public class TimeConverter extends ScalarConverterBase {
 

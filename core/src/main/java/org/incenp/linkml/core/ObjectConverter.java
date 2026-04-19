@@ -44,7 +44,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A generic converter to convert “raw objects” (as obtained from a JSON/YAML
- * parser) into instances of LinkML classes.
+ * parser) into/from instances of LinkML classes
+ * <p>
+ * One instance of this class will be responsible for converting a single type
+ * of objects (determined by the type given to the constructor).
+ * <p>
+ * This converter should be suitable for most LinkML classes. However, some
+ * classes might require some adaptations, typically to implement behaviours
+ * that are not fully encoded within their defining LinkML schema. This class
+ * may then be derived to create custom converters as needed.
  */
 public class ObjectConverter implements IConverter {
 

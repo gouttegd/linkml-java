@@ -38,11 +38,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * An object to convert simple LinkML enums (excluding so-called “dynamic
- * enums”, which are not yet supported).
+ * An object to convert simple LinkML enums.
  * <p>
- * Similarly to the <code>ObjectConverter</code>, there should be one instance
- * of this class for every type of enum that needs to be converted.
+ * This converter is explicitly not intended for so-called “dynamic enums”,
+ * which are not yet supported – and when they will be, it will likely be
+ * through another, dedicated converter.
+ * <p>
+ * Similarly to the {@link ObjectConverter}, there should be one instance of
+ * this class for every type of enum that needs to be converted.
  * <p>
  * This converter relies on the enum type providing (1) a
  * <code>fromString</code> method that can be used to deserialise an enum value,

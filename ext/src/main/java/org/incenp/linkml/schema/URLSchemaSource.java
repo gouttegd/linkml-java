@@ -49,6 +49,15 @@ public class URLSchemaSource implements ISchemaSource {
     private URL url;
     private InputStream stream;
 
+    /**
+     * Creates a new instance.
+     * 
+     * @param url The URL to the remote resource that is expected to provide the
+     *            schema.
+     * @throws URISyntaxException    If the given URL cannot be parsed as a proper
+     *                               URI.
+     * @throws MalformedURLException If the given URL uses an unrecognised scheme.
+     */
     public URLSchemaSource(String url) throws URISyntaxException, MalformedURLException {
         this.url = new URI(url).toURL();
     }

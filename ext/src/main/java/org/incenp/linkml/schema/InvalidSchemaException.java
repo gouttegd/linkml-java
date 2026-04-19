@@ -42,10 +42,23 @@ public class InvalidSchemaException extends Exception {
 
     private static final long serialVersionUID = -9079693184858658675L;
 
+    /**
+     * Creates a new instance.
+     * 
+     * @param msg A human-readable error message.
+     */
     public InvalidSchemaException(String msg) {
         super(msg);
     }
 
+    /**
+     * Creates a new instance, for an error that has another exception as the
+     * underlying cause.
+     * 
+     * @param msg   A human-readable error message.
+     * @param inner The original exception that caused the present exception to be
+     *              thrown.
+     */
     public InvalidSchemaException(String msg, Throwable inner) {
         super(msg, inner);
     }

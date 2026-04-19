@@ -36,6 +36,8 @@ package org.incenp.linkml.core;
 
 /**
  * Converts raw objects into string values.
+ * <p>
+ * This supports LinkML’s <code>string</code> type.
  */
 public class StringConverter extends ScalarConverterBase {
 

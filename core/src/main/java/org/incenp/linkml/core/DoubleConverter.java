@@ -36,6 +36,8 @@ package org.incenp.linkml.core;
 
 /**
  * Converts raw objects into double-precision floating point values.
+ * <p>
+ * This supports LinkML’s <code>double</code> type.
  */
 public class DoubleConverter extends ScalarConverterBase {
 

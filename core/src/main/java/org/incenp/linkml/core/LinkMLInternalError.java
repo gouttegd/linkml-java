@@ -35,9 +35,9 @@
 package org.incenp.linkml.core;
 
 /**
- * An exception caused by an internal error within the LinkML runtime, which
- * reveals either (1) a bug in the runtime or (2) an issue with the generated
- * code that is supposed to be used with the runtime.
+ * An exception caused by an internal error within the LinkML runtime. Such an
+ * error reveals either (1) a bug in the runtime or (2) an issue with the
+ * generated code that is supposed to be used with the runtime.
  * <p>
  * Either way, this is an error that should not happen and that is independent
  * of the user's data.
@@ -46,10 +46,23 @@ public class LinkMLInternalError extends LinkMLRuntimeException {
 
     private static final long serialVersionUID = 4460399470375040486L;
 
+    /**
+     * Creates a new instance.
+     * 
+     * @param msg A human-readable error message.
+     */
     public LinkMLInternalError(String msg) {
         super(msg);
     }
 
+    /**
+     * Creates a new instance, for an error that has another exception as the
+     * underlying cause.
+     * 
+     * @param msg   A human-readable error message.
+     * @param inner The original exception that caused the present exception to be
+     *              thrown.
+     */
     public LinkMLInternalError(String msg, Throwable inner ) {
         super(msg, inner);
     }

@@ -37,16 +37,28 @@ package org.incenp.linkml.core;
 /**
  * An object that can convert a “raw object” (as obtained from a JSON/YAML
  * parser) into a LinkML object, and the other way round.
+ * <p>
+ * This interface is at the heart of LinkML-Java’s core library and its
+ * (de)serialisation features. The {@link ConverterContext} must have an
+ * implementation of this interface for every type of LinkML objects (classes,
+ * enums, types) it will need to convert.
  */
 public interface IConverter {
 
     /**
      * Gets the type of object that this converter can convert a raw object into.
+     * 
+     * @return The Java type representing the LinkML object this converter is
+     *         intended for.
      */
     public Class<?> getType();
 
     /**
      * Converts a raw object into a LinkML object.
+     * <p>
+     * Given the raw representation of a LinkML object, as it may have been obtained
+     * from a generic JSON/YAML parser, this method shall return a suitable Java
+     * representation of the object.
      * 
      * @param raw The raw object to convert.
      * @param ctx The global converter context.
@@ -59,6 +71,18 @@ public interface IConverter {
     /**
      * Converts a raw object into a LinkML object and assigns the result to a slot
      * of another object.
+     * <p>
+     * In principle, calling this method shall perform the equivalent of the
+     * following code:
+     * 
+     * <pre>
+     * slot.setValue(dest, convert(raw, ctx));
+     * </pre>
+     * <p>
+     * but sometimes, an object of a given type may have to be deserialised
+     * differently depending on the slot it is intended to be assigned to. Converter
+     * implementations shall then perform whatever is necessary in this method for
+     * converting an object for a given slot.
      * 
      * @param raw  The raw object to convert.
      * @param dest The object that should received the converted value.
@@ -73,6 +97,9 @@ public interface IConverter {
 
     /**
      * Converts a LinkML object into a raw object.
+     * <p>
+     * Given the Java representation of a LinkML object, this method shall return an
+     * object suitable to be given to a generic JSON/YAML writer.
      * 
      * @param object The LinkML object to convert.
      * @param ctx    The global converter context.

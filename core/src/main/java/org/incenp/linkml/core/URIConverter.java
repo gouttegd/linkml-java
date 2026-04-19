@@ -39,6 +39,8 @@ import java.net.URISyntaxException;
 
 /**
  * Converts raw objects into URI values.
+ * <p>
+ * This supports LinkML’s <code>uri</code> type.
  */
 public class URIConverter extends ScalarConverterBase {
 

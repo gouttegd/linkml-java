@@ -37,15 +37,43 @@ package org.incenp.linkml.core;
 /**
  * An exception caused by some invalid data among the data manipulated by the
  * LinkML runtime.
+ * <p>
+ * This is notably the exception that would typically be thrown if the data the
+ * runtime is trying to deserialise does not correspond to what the runtime is
+ * expecting, based on the runtime’s knowledge of the LinkML schema that the
+ * data is supposed to be compliant with.
+ * <p>
+ * An informal way of outlining the difference between
+ * {@link LinkMLInternalError} and this exception is:
+ * <ul>
+ * <li>LinkMLInternalError: the <em>code</em> is messed up;</li>
+ * <li>LinkMLValueError: the <em>data</em> is messed up.</li>
+ * </ul>
+ * <p>
+ * Or to put it differently, a LinkMLValueError is the LinkML-Java developers’
+ * way of saying “it’s not our fault!” :)
  */
 public class LinkMLValueError extends LinkMLRuntimeException {
 
     private static final long serialVersionUID = 3944286776143001579L;
 
+    /**
+     * Creates a new instance.
+     * 
+     * @param msg A human-readable error message.
+     */
     public LinkMLValueError(String msg) {
         super(msg);
     }
 
+    /**
+     * Creates a new instance, for an error that has another exception as the
+     * underlying cause.
+     * 
+     * @param msg   A human-readable error message.
+     * @param inner The original exception that caused the present exception to be
+     *              thrown.
+     */
     public LinkMLValueError(String msg, Throwable inner) {
         super(msg, inner);
     }

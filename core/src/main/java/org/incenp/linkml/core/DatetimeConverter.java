@@ -43,6 +43,18 @@ import java.time.temporal.ChronoField;
 /**
  * A converter for slots typed as <code>xsd:datetime</code> (represented as
  * {@link ZonedDateTime}).
+ * <p>
+ * This supports LinkML’s <code>datetime</code> type. Unfortunately, the LinkML
+ * specification says nothing about how a datetime value is expected to be
+ * serialised, so the behaviour of this converter is based on the behaviour of
+ * the LinkML-Py implementation.
+ * <p>
+ * When deserialising, this converter expects a ISO8601-like string, where the
+ * separator between the date and time parts can be either '<code>T</code>' or a
+ * space. Also, it accepts a string containing the date part only.
+ * <p>
+ * When serialising, the converter turns a {@link ZonedDateTime} object into a
+ * ISO8601-like string with '<code>T</code>' as the date/time separator.
  */
 public class DatetimeConverter extends ScalarConverterBase {
 
@@ -50,12 +62,6 @@ public class DatetimeConverter extends ScalarConverterBase {
     private DateTimeFormatter parseFormat;
 
     public DatetimeConverter() {
-        // The LinkML "specification" says nothing about how a datetime object is
-        // supposed to be serialised, but the Python implementation expects a
-        // ISO8601-like string, where the separator between the date and time parts can
-        // be either 'T' or ' '. Also, it accepts a string containing the date part
-        // only. The following parse format _should_ cover all those cases.
-
         // @formatter:off
         DateTimeFormatter timeFmt1 = new DateTimeFormatterBuilder()
                 .appendLiteral('T')

@@ -41,12 +41,27 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.incenp.linkml.core.IConverter;
+
 /**
- * An annotation to indicate a custom converter class to use to convert values
- * intended for the slot carrying that annotation.
+ * An annotation to indicate that a custom {@link IConverter} implementation
+ * should be used.
+ * <p>
+ * In most cases, the LinkML runtime will automatically find the appropriate
+ * implementation if {@link IConverter} to use to (de)serialise a given object.
+ * The Java code generator can inject this annotation into the generated code to
+ * indicate that a specific implementation shall be used.
+ * <p>
+ * When that annotation is carried by a class, the indicated converter shall be
+ * used for (de)serialising instances of that class (or any of its subclass,
+ * unless a subclass overrides this by also using this annotation to request the
+ * use of another converter).
+ * <p>
+ * When that annotation is carried by a field (representing a LinkML slot), the
+ * indicated converter shall be used for (de)serialising the value of the slot.
  */
 @Retention(RUNTIME)
 @Target({ TYPE, FIELD })
 public @interface Converter {
-    Class<?> value();
+    Class<? extends IConverter> value();
 }

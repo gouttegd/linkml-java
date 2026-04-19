@@ -41,9 +41,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * An annotation to indicate that a field is intended to hold “extensions”, that
- * is, any unknown property that are associated with the object the field
- * belongs to.
+ * An annotation to indicate that a field is intended to hold “extensions”. Such
+ * a field will store any unknown property that is associated with the object
+ * the field belongs to.
+ * <p>
+ * This is how the LinkML-Java runtime supports LinkML’s
+ * <code>extra_slots.allowed: True</code> feature.
  * <p>
  * Only a field typed as a <code>Map&lt;String, Object&gt;</code> should be
  * annotated with this annotation.

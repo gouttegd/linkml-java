@@ -36,6 +36,8 @@ package org.incenp.linkml.core;
 
 /**
  * Converts raw objects into integer values.
+ * <p>
+ * This supports LinkML’s <code>integer</code> type.
  */
 public class IntegerConverter extends ScalarConverterBase {
 

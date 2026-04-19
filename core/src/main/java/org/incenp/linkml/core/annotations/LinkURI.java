@@ -44,10 +44,15 @@ import java.lang.annotation.Target;
 /**
  * An annotation to indicate the URI associated with a class or a field within a
  * class.
- * 
+ * <p>
  * When this annotation is absent, the URI for a class or a field is constructed
  * by appending the name of the class or field to the defining schema’s default
  * prefix.
+ * <p>
+ * However, at present the LinkML-Java runtime has no way of knowing the
+ * schema’s “default prefix”, so code generators should <em>always</em> inject
+ * that annotation. The <code>org.incenp.linkml</code> template variant in
+ * LinkML-Py’s Java code generator does this.
  */
 @Retention(RUNTIME)
 @Target({ TYPE, FIELD })
