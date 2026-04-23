@@ -309,6 +309,14 @@ public class ObjectConverter implements IConverter {
 
     @Override
     public Object serialise(Object object, ConverterContext ctx) throws LinkMLRuntimeException {
+        // Search for a more specialised converter.
+        // FIXME: Looks a bit too much like a hack...
+        IConverter conv = ctx.getConverter(object.getClass());
+        if ( conv instanceof ObjectConverter ) {
+            if ( ((ObjectConverter) conv).klass.getParents().contains(klass) ) {
+                return ((ObjectConverter) conv).serialise(object, true, ctx);
+            }
+        }
         return serialise(object, true, ctx);
     }
 

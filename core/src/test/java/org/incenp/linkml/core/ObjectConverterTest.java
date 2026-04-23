@@ -504,6 +504,8 @@ public class ObjectConverterTest {
         Assertions.assertInstanceOf(SecondDerivedSelfDesignatedClass.class, bsdc);
         bsdc = cosdo.getMultipleTop().get(2);
         Assertions.assertInstanceOf(SecondLevelDerivedSelfDesignatedClass.class, bsdc);
+
+        roundtrip(cosdo);
     }
 
     @Test
