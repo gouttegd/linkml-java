@@ -23,6 +23,7 @@ import org.incenp.linkml.core.CurieConverter;
 public abstract class Element {
 
     @Identifier
+    @Required
     @LinkURI("http://www.w3.org/2000/01/rdf-schema#label")
     private String name;
 

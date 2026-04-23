@@ -23,6 +23,7 @@ import org.incenp.linkml.core.CurieConverter;
 public class SimpleDict {
 
     @Identifier
+    @Required
     @LinkURI("https://incenp.org/dvlpt/linkml-java/tests/samples#key")
     private String key;
 

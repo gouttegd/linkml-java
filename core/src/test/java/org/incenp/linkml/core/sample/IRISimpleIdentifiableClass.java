@@ -23,6 +23,7 @@ import org.incenp.linkml.core.CurieConverter;
 public class IRISimpleIdentifiableClass extends SimpleClass {
 
     @Identifier
+    @Required
     @Converter(CurieConverter.class)
     @LinkURI("https://incenp.org/dvlpt/linkml-java/tests/samples#id")
     private String id;

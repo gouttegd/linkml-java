@@ -24,6 +24,7 @@ public class Setting {
 
     @Identifier(isGlobal = false)
     @SlotName("setting_key")
+    @Required
     @LinkURI("https://w3id.org/linkml/setting_key")
     private String settingKey;
 

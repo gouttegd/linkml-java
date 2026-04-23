@@ -24,6 +24,7 @@ public class Prefix {
 
     @Identifier(isGlobal = false)
     @SlotName("prefix_prefix")
+    @Required
     @LinkURI("http://www.w3.org/ns/shacl#prefix")
     private String prefixPrefix;
 

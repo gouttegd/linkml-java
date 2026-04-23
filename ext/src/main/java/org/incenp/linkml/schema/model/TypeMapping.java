@@ -23,6 +23,7 @@ import org.incenp.linkml.core.CurieConverter;
 public class TypeMapping {
 
     @Identifier(isGlobal = false)
+    @Required
     @LinkURI("https://w3id.org/linkml/framework_key")
     private String framework;
 

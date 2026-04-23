@@ -24,6 +24,7 @@ public class LocalName {
 
     @Identifier(isGlobal = false)
     @SlotName("local_name_source")
+    @Required
     @LinkURI("https://w3id.org/linkml/local_name_source")
     private String localNameSource;
 

@@ -23,6 +23,7 @@ import org.incenp.linkml.core.CurieConverter;
 public class SimpleKeyableClass extends SimpleClass {
 
     @Identifier(isGlobal = false)
+    @Required
     @LinkURI("https://incenp.org/dvlpt/linkml-java/tests/samples#id")
     private String id;
 

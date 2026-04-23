@@ -23,6 +23,7 @@ import org.incenp.linkml.core.CurieConverter;
 public class AltDescription {
 
     @Identifier(isGlobal = false)
+    @Required
     @LinkURI("https://w3id.org/linkml/alt_description_source")
     private String source;
 

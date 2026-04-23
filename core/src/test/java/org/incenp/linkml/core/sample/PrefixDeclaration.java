@@ -23,6 +23,7 @@ import org.incenp.linkml.core.CurieConverter;
 public class PrefixDeclaration {
 
     @Identifier(isGlobal = false)
+    @Required
     @LinkURI("http://www.w3.org/ns/shacl#prefix")
     private String name;
 

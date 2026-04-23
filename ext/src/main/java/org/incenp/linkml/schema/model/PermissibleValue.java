@@ -23,6 +23,7 @@ import org.incenp.linkml.core.CurieConverter;
 public class PermissibleValue {
 
     @Identifier
+    @Required
     @LinkURI("https://w3id.org/linkml/text")
     private String text;
 
