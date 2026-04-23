@@ -1,0 +1,15 @@
+single_top:
+  type: SecondLevelDerivedSelfDesignatedClass
+  foo: foo
+  bax: bax
+single_second_level:
+  type: SecondLevelDerivedSelfDesignatedClass
+  foo: foo
+  bax: bax
+multiple_top:
+  - type: DerivedSelfDesignatedClass
+    bar: bar
+  - type: SecondDerivedSelfDesignatedClass
+    baz: baz
+  - type: SecondLevelDerivedSelfDesignatedClass
+    bax: bax

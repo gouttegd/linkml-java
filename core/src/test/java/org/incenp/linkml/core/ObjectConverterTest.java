@@ -57,6 +57,7 @@ import org.incenp.linkml.core.sample.ContainerOfIRIIdentifiableObjects;
 import org.incenp.linkml.core.sample.ContainerOfInlinedObjects;
 import org.incenp.linkml.core.sample.ContainerOfIntegerValues;
 import org.incenp.linkml.core.sample.ContainerOfReferences;
+import org.incenp.linkml.core.sample.ContainerOfSelfDesignatedObjects;
 import org.incenp.linkml.core.sample.ContainerOfSimpleDicts;
 import org.incenp.linkml.core.sample.ContainerOfSimpleObjects;
 import org.incenp.linkml.core.sample.DerivedCurieSelfDesignatedClass;
@@ -68,6 +69,8 @@ import org.incenp.linkml.core.sample.ExtraSimpleDict;
 import org.incenp.linkml.core.sample.IRISimpleIdentifiableClass;
 import org.incenp.linkml.core.sample.MultivaluedSimpleDict;
 import org.incenp.linkml.core.sample.SampleEnum;
+import org.incenp.linkml.core.sample.SecondDerivedSelfDesignatedClass;
+import org.incenp.linkml.core.sample.SecondLevelDerivedSelfDesignatedClass;
 import org.incenp.linkml.core.sample.SimpleClass;
 import org.incenp.linkml.core.sample.SimpleDict;
 import org.incenp.linkml.core.sample.SimpleIdentifiableClass;
@@ -477,6 +480,30 @@ public class ObjectConverterTest {
         Assertions.assertEquals("Another string", derived.getBar());
 
         roundtrip(derived);
+    }
+
+    @Test
+    void testMultiLevelTypeDesignators() throws IOException {
+        ContainerOfSelfDesignatedObjects cosdo = parse("container-of-self-designated-objects.yaml",
+                ContainerOfSelfDesignatedObjects.class);
+
+        BaseSelfDesignatedClass bsdc = cosdo.getSingleTop();
+        Assertions.assertInstanceOf(SecondDerivedSelfDesignatedClass.class, bsdc);
+        SecondLevelDerivedSelfDesignatedClass derived = (SecondLevelDerivedSelfDesignatedClass) bsdc;
+        Assertions.assertEquals("foo", derived.getFoo());
+        Assertions.assertEquals("bax", derived.getBax());
+
+        bsdc = cosdo.getSingleSecondLevel();
+        Assertions.assertInstanceOf(SecondLevelDerivedSelfDesignatedClass.class, bsdc);
+        derived = (SecondLevelDerivedSelfDesignatedClass) bsdc;
+        Assertions.assertEquals("bax", derived.getBax());
+
+        bsdc = cosdo.getMultipleTop().get(0);
+        Assertions.assertInstanceOf(DerivedSelfDesignatedClass.class, bsdc);
+        bsdc = cosdo.getMultipleTop().get(1);
+        Assertions.assertInstanceOf(SecondDerivedSelfDesignatedClass.class, bsdc);
+        bsdc = cosdo.getMultipleTop().get(2);
+        Assertions.assertInstanceOf(SecondLevelDerivedSelfDesignatedClass.class, bsdc);
     }
 
     @Test

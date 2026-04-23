@@ -140,6 +140,22 @@ classes:
     attributes:
       bar:
 
+  SecondDerivedSelfDesignatedClass:
+    description: >-
+      Another example of a class that derives from
+      BaseSelfDesignatedClass.
+    is_a: BaseSelfDesignatedClass
+    attributes:
+      baz:
+
+  SecondLevelDerivedSelfDesignatedClass:
+    description: >-
+      An example of a class that derives from a class that derives from
+      a class with a type designator slot.
+    is_a: SecondDerivedSelfDesignatedClass
+    attributes:
+      bax:
+
   BaseURISelfDesignatedClass:
     description: >-
       An example of a class that has a URI-typed type designator slot.
@@ -321,6 +337,19 @@ classes:
         range: MultivaluedSimpleDict
         multivalued: true
         inlined: true
+
+  ContainerOfSelfDesignatedObjects:
+    description: >-
+      An example of a class with slots whose range is set to a class
+      that has a type designator slot.
+    attributes:
+      single_top:
+        range: BaseSelfDesignatedClass
+      single_second_level:
+        range: SecondDerivedSelfDesignatedClass
+      multiple_top:
+        range: BaseSelfDesignatedClass
+        multivalued: true
 
   PrefixDeclaration:
     description: >-
