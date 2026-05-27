@@ -1,9 +1,7 @@
 package org.incenp.linkml.core.playground;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.WildcardType;
-
+import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.Slot;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -99,17 +97,40 @@ public class Playground {
     }
 
     @Test
-    void testObtainingParameterBound() {
-        Class<?> klass = FirstDerivedFoo.class;
-        Method m = null;
-        try {
-            m = klass.getDeclaredMethod("getBars", (Class<?>[]) null);
-        } catch ( NoSuchMethodException | SecurityException e ) {
-            Assertions.fail("No getBars method");
-        }
+    void testGetRefinedSingleValuedType() throws LinkMLRuntimeException {
+        Slot barSlot = Slot.getSlot(Foo.class, "bar");
+        Assertions.assertEquals(Bar.class, barSlot.getInnerType());
+        Assertions.assertNull(barSlot.getRefiningClass());
 
-        ParameterizedType t = (ParameterizedType) m.getGenericReturnType();
-        WildcardType t2 = (WildcardType) t.getActualTypeArguments()[0];
-        Assertions.assertEquals(FirstDerivedBar.class, t2.getUpperBounds()[0]);
+        barSlot = Slot.getSlot(FirstDerivedFoo.class, "bar");
+        Assertions.assertEquals(FirstDerivedBar.class, barSlot.getInnerType());
+        Assertions.assertEquals(FirstDerivedFoo.class, barSlot.getRefiningClass());
+
+        barSlot = Slot.getSlot(SecondDerivedFoo.class, "bar");
+        Assertions.assertEquals(FirstDerivedBar.class, barSlot.getInnerType());
+        Assertions.assertEquals(FirstDerivedFoo.class, barSlot.getRefiningClass());
+
+        barSlot = Slot.getSlot(ThirdDerivedFoo.class, "bar");
+        Assertions.assertEquals(SecondDerivedBar.class, barSlot.getInnerType());
+        Assertions.assertEquals(ThirdDerivedFoo.class, barSlot.getRefiningClass());
+    }
+
+    @Test
+    void testGetRefinedMultiValuedType() throws LinkMLRuntimeException {
+        Slot barSlot = Slot.getSlot(Foo.class, "bars");
+        Assertions.assertEquals(Bar.class, barSlot.getInnerType());
+        Assertions.assertNull(barSlot.getRefiningClass());
+
+        barSlot = Slot.getSlot(FirstDerivedFoo.class, "bars");
+        Assertions.assertEquals(FirstDerivedBar.class, barSlot.getInnerType());
+        Assertions.assertEquals(FirstDerivedFoo.class, barSlot.getRefiningClass());
+
+        barSlot = Slot.getSlot(SecondDerivedFoo.class, "bars");
+        Assertions.assertEquals(FirstDerivedBar.class, barSlot.getInnerType());
+        Assertions.assertEquals(FirstDerivedFoo.class, barSlot.getRefiningClass());
+
+        barSlot = Slot.getSlot(ThirdDerivedFoo.class, "bars");
+        Assertions.assertEquals(SecondDerivedBar.class, barSlot.getInnerType());
+        Assertions.assertEquals(ThirdDerivedFoo.class, barSlot.getRefiningClass());
     }
 }

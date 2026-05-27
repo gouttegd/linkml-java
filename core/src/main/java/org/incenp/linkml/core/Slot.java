@@ -38,6 +38,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -79,13 +81,30 @@ public class Slot {
      *                                fide</em> LinkML object).
      */
     public Slot(Field field) throws LinkMLRuntimeException {
-        this.field = field;
-        outerType = field.getType();
+        this(field, field.getDeclaringClass());
+    }
 
-        Class<?> klass = field.getDeclaringClass();
+    /**
+     * Creates a new instance.
+     * 
+     * @param field The Java field that represents the slot.
+     * @param klass The class to which the slot belongs.
+     * @throws LinkMLRuntimeException If neither the class the field belongs to or
+     *                                any of its parents declare accessor methods
+     *                                for the slot (which should not happen if the
+     *                                class is a <em>bona fide</em> LinkML object).
+     */
+    public Slot(Field field, Class<?> klass) throws LinkMLRuntimeException {
+        this.field = field;
+
         try {
-            writeAccessor = klass.getDeclaredMethod(getWriteAccessorName(field), new Class<?>[] { outerType });
-            readAccessor = klass.getDeclaredMethod(getReadAccessorName(field), (Class<?>[]) null);
+            readAccessor = klass.getMethod(getReadAccessorName(field), (Class<?>[]) null);
+        } catch ( NoSuchMethodException | SecurityException e ) {
+            throw new LinkMLInternalError(String.format("Missing accessor for slot '%s'", field.getName()), e);
+        }
+        outerType = readAccessor.getReturnType();
+        try {
+            writeAccessor = klass.getMethod(getWriteAccessorName(field), new Class<?>[] { outerType });
         } catch ( NoSuchMethodException | SecurityException e ) {
             throw new LinkMLInternalError(String.format("Missing accessor for slot '%s'", field.getName()), e);
         }
@@ -210,8 +229,13 @@ public class Slot {
      */
     public Class<?> getInnerType() {
         if ( isMultivalued() ) {
-            ParameterizedType pt = (ParameterizedType) field.getGenericType();
-            return (Class<?>) pt.getActualTypeArguments()[0];
+            ParameterizedType pt = (ParameterizedType) readAccessor.getGenericReturnType();
+            Type t = pt.getActualTypeArguments()[0];
+            if ( t instanceof WildcardType ) {
+                return (Class<?>) ((WildcardType) t).getUpperBounds()[0];
+            } else {
+                return (Class<?>) t;
+            }
         }
         return outerType;
     }
@@ -328,6 +352,28 @@ public class Slot {
     }
 
     /**
+     * Gets the class in which the slot is refined, if any.
+     * <p>
+     * In LinkML, a class that inherit a slot from one of its parents can
+     * <em>refine</em> that slot by restricting its range to a more specific class
+     * than the original range.
+     * <p>
+     * In this runtime, we detect this by looking for a read accessor in one of the
+     * derived classes, that overrides the original read accessor in the class that
+     * defines the slot.
+     * <p>
+     * If the slot is refined by several classes successively, this method will
+     * return the last refining class.
+     * 
+     * @return The class that refines the slot, or <code>null</code> if the slot is
+     *         not refined relatively to its declaring class.
+     */
+    public Class<?> getRefiningClass() {
+        Class<?> klass = readAccessor.getDeclaringClass();
+        return klass != getDeclaringClass() ? klass : null;
+    }
+
+    /**
      * Assigns a value to the slot for the given object.
      * 
      * @param target The LinkML object holding the slot.
@@ -440,7 +486,7 @@ public class Slot {
         do {
             try {
                 Field f = current.getDeclaredField(name);
-                return new Slot(f);
+                return new Slot(f, klass);
             } catch ( NoSuchFieldException e ) {
             }
 
@@ -463,7 +509,7 @@ public class Slot {
         do {
             for ( Field f : current.getDeclaredFields() ) {
                 try {
-                    slots.add(new Slot(f));
+                    slots.add(new Slot(f, klass));
                 } catch ( LinkMLRuntimeException e ) {
                     // Assume this is not a LinkML field
                 }
