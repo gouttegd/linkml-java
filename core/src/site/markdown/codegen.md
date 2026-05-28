@@ -116,6 +116,64 @@ namespace. They are:
 | SlotName       | Provide the original name of a slot |
 | Converter      | Indicate that the class or slot requires a custom converter |
 
+Refined inherited slots
+-----------------------
+In LinkML, a derived class can “refine” a slot it inherits from one of
+its ancestors to restrict its range to a subclass of the original range.
+
+For example, in the following schema (preamble omitted for brevity):
+
+```yaml
+classes:
+  Bar:
+  
+  DerivedBar:
+    is_a: Bar
+  
+  Foo:
+    attributes:
+      bar:
+        range: Bar
+  
+  DerivedFoo:
+    is_a: Foo
+    slot_usage:
+      bar:
+        range: DerivedBar
+```
+
+the class `DerivedFoo` refines the `bar` slot (inherited from its parent
+`Foo`) so that its range is now `DerivedBar` instead of `Bar`. This is
+allowed because `DerivedBar` is itself a subclass of `Bar`.
+
+For the Java runtime to correctly detect this situation, the generated
+code for the `DerivedFoo` class must include at least a read accessor for
+the `bar` slot (`getBar()`) that overrides the accessor from the `Foo`
+class and returns the more precise type:
+
+```java
+public class DerivedFoo extends Foo {
+    @Override
+    public DerivedBar getBar() {
+        return (DerivedBar) super.getBar();
+    }
+}
+```
+
+It is also recommended to include an overriding write accessor to help
+ensure that only a value of the suitable type can be assigned to the
+slot:
+
+```
+    @Override
+    public void setBar(Bar bar) {
+        if ( !(bar instanceof DerivedBar) ) {
+            throw new IllegalArgumentException("Invalid type for 'bar' slot");
+        }
+        super.setBar(bar);
+    }
+```
+
 Example
 -------
 Here is an example of a class ready to be used with the runtime (import
