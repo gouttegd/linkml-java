@@ -1,3 +1,10 @@
+Changes in LinkML-Java 0.2.1
+----------------------------
+
+    * Add support for refined inherited slots.
+    * Fix serialisation not using the most specific converter available.
+
+
 Changes in LinkML-Java 0.2.0
 ----------------------------
 
