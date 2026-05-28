@@ -75,6 +75,13 @@ import org.incenp.linkml.core.sample.SimpleClass;
 import org.incenp.linkml.core.sample.SimpleDict;
 import org.incenp.linkml.core.sample.SimpleIdentifiableClass;
 import org.incenp.linkml.core.sample.SimpleKeyableClass;
+import org.incenp.linkml.core.sample.refinhslot.Bar;
+import org.incenp.linkml.core.sample.refinhslot.FirstDerivedBar;
+import org.incenp.linkml.core.sample.refinhslot.FirstDerivedFoo;
+import org.incenp.linkml.core.sample.refinhslot.Foo;
+import org.incenp.linkml.core.sample.refinhslot.SecondDerivedBar;
+import org.incenp.linkml.core.sample.refinhslot.SecondDerivedFoo;
+import org.incenp.linkml.core.sample.refinhslot.ThirdDerivedFoo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -582,6 +589,39 @@ public class ObjectConverterTest {
         Assertions.assertEquals(1, coa.getSeveralMisc().size());
         Assertions.assertInstanceOf(Map.class, coa.getSeveralMisc().get(0));
         roundtrip(coa);
+    }
+
+    @Test
+    void testParsingWithRefinedInheritedSlots() throws IOException {
+        Foo f = parse("refined-inherited-slots.yaml", Foo.class);
+        Assertions.assertInstanceOf(Bar.class, f.getBar());
+        Assertions.assertEquals("the bar", f.getBar().getName());
+        Assertions.assertInstanceOf(Bar.class, f.getBars().get(0));
+        Assertions.assertEquals("the first bar", f.getBars().get(0).getName());
+
+        FirstDerivedFoo fdf = parse("refined-inherited-slots.yaml", FirstDerivedFoo.class);
+        Assertions.assertInstanceOf(FirstDerivedBar.class, fdf.getBar());
+        Assertions.assertEquals("the bar", fdf.getBar().getName());
+        Assertions.assertEquals(1, fdf.getBar().getLength());
+        Assertions.assertInstanceOf(FirstDerivedBar.class, fdf.getBars().get(0));
+        Assertions.assertEquals("the first bar", fdf.getBars().get(0).getName());
+        Assertions.assertEquals(2, fdf.getBars().get(0).getLength());
+
+        SecondDerivedFoo sdf = parse("refined-inherited-slots.yaml", SecondDerivedFoo.class);
+        Assertions.assertInstanceOf(FirstDerivedBar.class, sdf.getBar());
+        Assertions.assertEquals("the bar", sdf.getBar().getName());
+        Assertions.assertEquals(1, sdf.getBar().getLength());
+        Assertions.assertInstanceOf(FirstDerivedBar.class, sdf.getBars().get(0));
+        Assertions.assertEquals("the first bar", sdf.getBars().get(0).getName());
+        Assertions.assertEquals(2, sdf.getBars().get(0).getLength());
+
+        ThirdDerivedFoo tdf = parse("refined-inherited-slots.yaml", ThirdDerivedFoo.class);
+        Assertions.assertInstanceOf(SecondDerivedBar.class, tdf.getBar());
+        Assertions.assertEquals("the bar", tdf.getBar().getName());
+        Assertions.assertEquals(1, tdf.getBar().getLength());
+        Assertions.assertInstanceOf(SecondDerivedBar.class, tdf.getBars().get(0));
+        Assertions.assertEquals("the first bar", tdf.getBars().get(0).getName());
+        Assertions.assertEquals(2, tdf.getBars().get(0).getLength());
     }
 
     private <T> T parse(String file, Class<T> target) throws IOException {

@@ -1,4 +1,4 @@
-package org.incenp.linkml.core.playground;
+package org.incenp.linkml.core.sample.refinhslot;
 
 import java.util.ArrayList;
 import java.util.List;

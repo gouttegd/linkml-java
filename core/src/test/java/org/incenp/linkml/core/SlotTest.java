@@ -43,6 +43,13 @@ import org.incenp.linkml.core.sample.ExtensibleSimpleClass;
 import org.incenp.linkml.core.sample.SimpleClass;
 import org.incenp.linkml.core.sample.SimpleIdentifiableClass;
 import org.incenp.linkml.core.sample.SimpleKeyableClass;
+import org.incenp.linkml.core.sample.refinhslot.Bar;
+import org.incenp.linkml.core.sample.refinhslot.FirstDerivedBar;
+import org.incenp.linkml.core.sample.refinhslot.FirstDerivedFoo;
+import org.incenp.linkml.core.sample.refinhslot.Foo;
+import org.incenp.linkml.core.sample.refinhslot.SecondDerivedBar;
+import org.incenp.linkml.core.sample.refinhslot.SecondDerivedFoo;
+import org.incenp.linkml.core.sample.refinhslot.ThirdDerivedFoo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -159,5 +166,43 @@ public class SlotTest {
     void testDeclaringClass() throws LinkMLRuntimeException {
         Slot identifierSlot = Slot.getSlot(ExtensibleSimpleClass.class, "foo");
         Assertions.assertEquals(SimpleClass.class, identifierSlot.getDeclaringClass());
+    }
+
+    @Test
+    void testGetRefinedSingleValuedType() throws LinkMLRuntimeException {
+        Slot barSlot = Slot.getSlot(Foo.class, "bar");
+        Assertions.assertEquals(Bar.class, barSlot.getInnerType());
+        Assertions.assertNull(barSlot.getRefiningClass());
+
+        barSlot = Slot.getSlot(FirstDerivedFoo.class, "bar");
+        Assertions.assertEquals(FirstDerivedBar.class, barSlot.getInnerType());
+        Assertions.assertEquals(FirstDerivedFoo.class, barSlot.getRefiningClass());
+
+        barSlot = Slot.getSlot(SecondDerivedFoo.class, "bar");
+        Assertions.assertEquals(FirstDerivedBar.class, barSlot.getInnerType());
+        Assertions.assertEquals(FirstDerivedFoo.class, barSlot.getRefiningClass());
+
+        barSlot = Slot.getSlot(ThirdDerivedFoo.class, "bar");
+        Assertions.assertEquals(SecondDerivedBar.class, barSlot.getInnerType());
+        Assertions.assertEquals(ThirdDerivedFoo.class, barSlot.getRefiningClass());
+    }
+
+    @Test
+    void testGetRefinedMultiValuedType() throws LinkMLRuntimeException {
+        Slot barSlot = Slot.getSlot(Foo.class, "bars");
+        Assertions.assertEquals(Bar.class, barSlot.getInnerType());
+        Assertions.assertNull(barSlot.getRefiningClass());
+
+        barSlot = Slot.getSlot(FirstDerivedFoo.class, "bars");
+        Assertions.assertEquals(FirstDerivedBar.class, barSlot.getInnerType());
+        Assertions.assertEquals(FirstDerivedFoo.class, barSlot.getRefiningClass());
+
+        barSlot = Slot.getSlot(SecondDerivedFoo.class, "bars");
+        Assertions.assertEquals(FirstDerivedBar.class, barSlot.getInnerType());
+        Assertions.assertEquals(FirstDerivedFoo.class, barSlot.getRefiningClass());
+
+        barSlot = Slot.getSlot(ThirdDerivedFoo.class, "bars");
+        Assertions.assertEquals(SecondDerivedBar.class, barSlot.getInnerType());
+        Assertions.assertEquals(ThirdDerivedFoo.class, barSlot.getRefiningClass());
     }
 }

@@ -1,4 +1,4 @@
-package org.incenp.linkml.core.playground;
+package org.incenp.linkml.core.sample.refinhslot;
 
 /**
  * First derived class from Bar.

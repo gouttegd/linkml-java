@@ -1,12 +1,15 @@
-package org.incenp.linkml.core.playground;
+package org.incenp.linkml.core.sample.refinhslot;
 
 import java.util.List;
 
 /**
- * An example of a class that refines the range of its slots to make them accept
- * only a more specialised subclass.
+ * An example of a class that refines the range of its slots, that it inherited
+ * from a class that already refined them.
+ * 
+ * Importantly, this class has no derived class, so we know its slots cannot be
+ * further refined by another class.
  */
-public class FirstDerivedFoo extends Foo {
+public class ThirdDerivedFoo extends SecondDerivedFoo {
 
     /*
      * Overridden read accessor for the `bar` slot.
@@ -14,10 +17,8 @@ public class FirstDerivedFoo extends Foo {
      * We override it to ensure that it returns the more specialised subtype.
      */
     @Override
-    public FirstDerivedBar getBar() {
-        // This cast is perfectly safe because the write accessor below guarantees that
-        // only a FirstDerivedBar object can be assigned to the slot.
-        return (FirstDerivedBar) super.getBar();
+    public SecondDerivedBar getBar() {
+        return (SecondDerivedBar) super.getBar();
     }
 
     /*
@@ -30,7 +31,21 @@ public class FirstDerivedFoo extends Foo {
      */
     @Override
     public void setBar(Bar value) {
-        if ( !(value instanceof FirstDerivedBar) ) {
+        if ( !(value instanceof SecondDerivedBar) ) {
+            throw new IllegalArgumentException("Invalid bar value");
+        }
+        super.setBar(value);
+    }
+
+    /*
+     * Second overridden write accessor for the `bar` slot.
+     * 
+     * Since `FirstDerivedFoo` defined this accessor, we must override it as well,
+     * otherwise it would allow client code to assign a FirstDerivedBar to the slot.
+     */
+    @Override
+    public void setBar(FirstDerivedBar value) {
+        if ( !(value instanceof SecondDerivedBar) ) {
             throw new IllegalArgumentException("Invalid bar value");
         }
         super.setBar(value);
@@ -40,53 +55,51 @@ public class FirstDerivedFoo extends Foo {
      * Overloaded write accessor for the `bar` slot.
      * 
      * This accessor is not strictly necessary, but it makes it clearer that in this
-     * class, the value of the `bar` slot should be a `FirstDerivedBar`. It also
+     * class, the value of the `bar` slot should be a `SecondDerivedBar`. It also
      * allows to bypass the dynamic check in the normal accessor above, if the
      * compiler already knows that the assigned value is a FirstDerivedBar.
      */
-    public void setBar(FirstDerivedBar value) {
+    public void setBar(SecondDerivedBar value) {
         super.setBar(value);
     }
 
     /*
-     * Overridden “Standard” read accessor.
+     * Overridden “standard” read accessor.
      * 
      * We override it to ensure it returns the more specialised subtype.
      * 
-     * Because the slot could be (and instead is, in this example) refined further
-     * in subclasses, we must still return a generic wildcard, so this accessor has
-     * the same limitation as the one it overrides in the `Foo` class: modifying the
-     * returned list requires an explicit cast into a non-wildcard form.
+     * Here, since we know the slot cannot be further refined (no subclass), we can
+     * dispense with a wildcard generic.
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<? extends FirstDerivedBar> getBars() {
-        // This cast should be safe IFF nobody explicitly modify the value returned by
-        // this accessor after casting it into a `List<Bar>`.
-        return (List<FirstDerivedBar>) super.getBars();
+    public List<SecondDerivedBar> getBars() {
+        return (List<SecondDerivedBar>) super.getBars();
     }
 
     /*
-     * Overridden read accessor with optional creation of the list.
+     * Overriden read accessor with optional creation of the list.
      * 
      * We must override this accessor to ensure that the created list (if the list
      * needs to be created) is using the more specialised type.
      */
     @Override
-    public List<? extends FirstDerivedBar> getBars(boolean create) {
+    public List<SecondDerivedBar> getBars(boolean create) {
         // We can delegate the logic to the parent
-        return super.getBars(FirstDerivedBar.class, create);
+        return super.getBars(SecondDerivedBar.class, create);
     }
 
     /*
-     * Overridden parameterised read accessor.
+     * Overidden parameterised read accessor.
      * 
-     * We must override this accessor to add a runtime check that the given type
-     * parameter is compatible with the more specialised type.
+     * In this class, we don’t need this accessor to get a modifiable list (we can
+     * use `getBars()` directly), but we must still override the accessor we inherit
+     * from the parent, otherwise this would allow client code to get a
+     * `List<FirstDerivedBar>`-typed value.
      */
     @Override
     public <T extends Bar> List<T> getBars(Class<T> t) {
-        if ( !FirstDerivedBar.class.isAssignableFrom(t) ) {
+        if ( !SecondDerivedBar.class.isAssignableFrom(t) ) {
             throw new IllegalArgumentException("Invalid type parameter");
         }
         return super.getBars(t);
@@ -100,7 +113,7 @@ public class FirstDerivedFoo extends Foo {
      */
     @Override
     public <T extends Bar> List<T> getBars(Class<T> t, boolean create) {
-        if ( !FirstDerivedBar.class.isAssignableFrom(t) ) {
+        if ( !SecondDerivedBar.class.isAssignableFrom(t) ) {
             throw new IllegalArgumentException("Invalid type parameter");
         }
         return super.getBars(t, create);
@@ -115,11 +128,12 @@ public class FirstDerivedFoo extends Foo {
     @Override
     public void setBars(List<? extends Bar> value) {
         for ( Bar b : value ) {
-            if ( !(b instanceof FirstDerivedBar) ) {
-                throw new IllegalArgumentException("Invalid bars value");
+            if ( !(b instanceof SecondDerivedBar) ) {
+                throw new IllegalArgumentException("Invalid bar value");
             }
         }
+        // FIXME: the parent method will in turn perform a (no longer needed) runtime
+        // check...
         super.setBars(value);
     }
-
 }

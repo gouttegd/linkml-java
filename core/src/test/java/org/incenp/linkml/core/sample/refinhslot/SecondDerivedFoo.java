@@ -1,4 +1,4 @@
-package org.incenp.linkml.core.playground;
+package org.incenp.linkml.core.sample.refinhslot;
 
 /**
  * An example of a class that inherits from a class that refines its slots, but
