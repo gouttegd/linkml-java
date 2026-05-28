@@ -1,0 +1,6 @@
+bar:
+  name: the bar
+  length: 1
+bars:
+  - name: the first bar
+    length: 2
