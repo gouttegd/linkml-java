@@ -19,7 +19,7 @@ def cleanup_dir(directory):
 def cli():
 
     # Generating test code
-    for name, package in [("samples", "base")]:
+    for name, package in [("samples", "base"), ("refined-inherited-slots", "refinhslot")]:
         output_dir = ROOT / "core/src/test/java/org/incenp/linkml/core/samples" / package
         cleanup_dir(output_dir)
         gen = JavaGenerator(ROOT / f"core/src/test/linkml/{name}.yaml",
