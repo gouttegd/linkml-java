@@ -19,13 +19,14 @@ def cleanup_dir(directory):
 def cli():
 
     # Generating test code
-    output_dir = ROOT / "core/src/test/java/org/incenp/linkml/core/sample"
-    cleanup_dir(output_dir)
-    gen = JavaGenerator(ROOT / "core/src/test/linkml/samples.yaml",
-                        true_enums=True,
-                        use_aliases=True,
-                        package="org.incenp.linkml.core.sample")
-    gen.serialize(output_dir, template_variant="org.incenp.linkml")
+    for name, package in [("samples", "base")]:
+        output_dir = ROOT / "core/src/test/java/org/incenp/linkml/core/samples" / package
+        cleanup_dir(output_dir)
+        gen = JavaGenerator(ROOT / f"core/src/test/linkml/{name}.yaml",
+                            true_enums=True,
+                            use_aliases=True,
+                            package=f"org.incenp.linkml.core.samples.{package}")
+        gen.serialize(output_dir, template_variant="org.incenp.linkml")
 
     # Generate code for LinkML meta model
     output_dir = ROOT / "ext/src/main/java/org/incenp/linkml/schema/model"

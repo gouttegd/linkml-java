@@ -37,8 +37,8 @@ package org.incenp.linkml.core;
 import java.io.IOException;
 import java.util.Map;
 
-import org.incenp.linkml.core.sample.PrefixDeclarationHolder;
-import org.incenp.linkml.core.sample.SimpleClass;
+import org.incenp.linkml.core.samples.base.PrefixDeclarationHolder;
+import org.incenp.linkml.core.samples.base.SimpleClass;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

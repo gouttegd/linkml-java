@@ -38,7 +38,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.incenp.linkml.core.sample.ContainerOfIntegerValues;
+import org.incenp.linkml.core.samples.base.ContainerOfIntegerValues;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

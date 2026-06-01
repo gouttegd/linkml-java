@@ -36,20 +36,20 @@ package org.incenp.linkml.core;
 
 import java.util.HashMap;
 
-import org.incenp.linkml.core.sample.ContainerOfInlinedObjects;
-import org.incenp.linkml.core.sample.ContainerOfReferences;
-import org.incenp.linkml.core.sample.ContainerOfSimpleObjects;
-import org.incenp.linkml.core.sample.ExtensibleSimpleClass;
-import org.incenp.linkml.core.sample.SimpleClass;
-import org.incenp.linkml.core.sample.SimpleIdentifiableClass;
-import org.incenp.linkml.core.sample.SimpleKeyableClass;
-import org.incenp.linkml.core.sample.refinhslot.Bar;
-import org.incenp.linkml.core.sample.refinhslot.FirstDerivedBar;
-import org.incenp.linkml.core.sample.refinhslot.FirstDerivedFoo;
-import org.incenp.linkml.core.sample.refinhslot.Foo;
-import org.incenp.linkml.core.sample.refinhslot.SecondDerivedBar;
-import org.incenp.linkml.core.sample.refinhslot.SecondDerivedFoo;
-import org.incenp.linkml.core.sample.refinhslot.ThirdDerivedFoo;
+import org.incenp.linkml.core.samples.base.ContainerOfInlinedObjects;
+import org.incenp.linkml.core.samples.base.ContainerOfReferences;
+import org.incenp.linkml.core.samples.base.ContainerOfSimpleObjects;
+import org.incenp.linkml.core.samples.base.ExtensibleSimpleClass;
+import org.incenp.linkml.core.samples.base.SimpleClass;
+import org.incenp.linkml.core.samples.base.SimpleIdentifiableClass;
+import org.incenp.linkml.core.samples.base.SimpleKeyableClass;
+import org.incenp.linkml.core.samples.refinhslot.Bar;
+import org.incenp.linkml.core.samples.refinhslot.FirstDerivedBar;
+import org.incenp.linkml.core.samples.refinhslot.FirstDerivedFoo;
+import org.incenp.linkml.core.samples.refinhslot.Foo;
+import org.incenp.linkml.core.samples.refinhslot.SecondDerivedBar;
+import org.incenp.linkml.core.samples.refinhslot.SecondDerivedFoo;
+import org.incenp.linkml.core.samples.refinhslot.ThirdDerivedFoo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

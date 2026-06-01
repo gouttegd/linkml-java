@@ -37,9 +37,9 @@ package org.incenp.linkml.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.incenp.linkml.core.sample.ContainerOfReferences;
-import org.incenp.linkml.core.sample.SimpleDict;
-import org.incenp.linkml.core.sample.SimpleIdentifiableClass;
+import org.incenp.linkml.core.samples.base.ContainerOfReferences;
+import org.incenp.linkml.core.samples.base.SimpleDict;
+import org.incenp.linkml.core.samples.base.SimpleIdentifiableClass;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

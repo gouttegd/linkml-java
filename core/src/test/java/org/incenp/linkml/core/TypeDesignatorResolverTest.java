@@ -38,11 +38,11 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.incenp.linkml.core.sample.BaseSelfDesignatedClass;
-import org.incenp.linkml.core.sample.BaseURISelfDesignatedClass;
-import org.incenp.linkml.core.sample.DerivedCurieSelfDesignatedClass;
-import org.incenp.linkml.core.sample.DerivedSelfDesignatedClass;
-import org.incenp.linkml.core.sample.DerivedURISelfDesignatedClass;
+import org.incenp.linkml.core.samples.base.BaseSelfDesignatedClass;
+import org.incenp.linkml.core.samples.base.BaseURISelfDesignatedClass;
+import org.incenp.linkml.core.samples.base.DerivedCurieSelfDesignatedClass;
+import org.incenp.linkml.core.samples.base.DerivedSelfDesignatedClass;
+import org.incenp.linkml.core.samples.base.DerivedURISelfDesignatedClass;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -34,12 +34,12 @@
 
 package org.incenp.linkml.core;
 
-import org.incenp.linkml.core.sample.ExtendedIdentifiableClass;
-import org.incenp.linkml.core.sample.ExtraSimpleDict;
-import org.incenp.linkml.core.sample.SimpleClass;
-import org.incenp.linkml.core.sample.SimpleDict;
-import org.incenp.linkml.core.sample.SimpleIdentifiableClass;
-import org.incenp.linkml.core.sample.SimpleKeyableClass;
+import org.incenp.linkml.core.samples.base.ExtendedIdentifiableClass;
+import org.incenp.linkml.core.samples.base.ExtraSimpleDict;
+import org.incenp.linkml.core.samples.base.SimpleClass;
+import org.incenp.linkml.core.samples.base.SimpleDict;
+import org.incenp.linkml.core.samples.base.SimpleIdentifiableClass;
+import org.incenp.linkml.core.samples.base.SimpleKeyableClass;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

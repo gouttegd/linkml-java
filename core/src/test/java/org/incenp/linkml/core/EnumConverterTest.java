@@ -34,7 +34,7 @@
 
 package org.incenp.linkml.core;
 
-import org.incenp.linkml.core.sample.SampleEnum;
+import org.incenp.linkml.core.samples.base.SampleEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
