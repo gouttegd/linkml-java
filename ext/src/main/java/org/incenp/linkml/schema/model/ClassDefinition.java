@@ -389,6 +389,101 @@ public class ClassDefinition extends Definition {
     }
 
     @Override
+    public ClassDefinition getIsA() {
+        return (ClassDefinition) super.getIsA();
+    }
+
+    public void setIsA(ClassDefinition value) {
+        super.setIsA(value);
+    }
+
+    @Override
+    public void setIsA(Definition value) {
+        if ( !(value instanceof ClassDefinition) ) {
+            throw new IllegalArgumentException("Invalid isA value");
+        }
+        super.setIsA(value);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<ClassDefinition> getMixins() {
+        return (List<ClassDefinition>) super.getMixins();
+    }
+
+    @Override
+    public List<ClassDefinition> getMixins(boolean create) {
+        return super.getMixins(ClassDefinition.class, create);
+    }
+
+    @Override
+    public <T extends Definition> List<T> getMixins(Class<T> t) {
+        if ( !ClassDefinition.class.isAssignableFrom(t) ) {
+            throw new IllegalArgumentException("Invalid type parameter");
+        }
+        return super.getMixins(t);
+    }
+
+    @Override
+    public <T extends Definition> List<T> getMixins(Class<T> t, boolean create) {
+        if ( !ClassDefinition.class.isAssignableFrom(t) ) {
+            throw new IllegalArgumentException("Invalid type parameter");
+        }
+        return super.getMixins(t, create);
+    }
+
+    @Override
+    public void setMixins(List<? extends Definition> value) {
+        if ( value != null ) {
+            for ( Definition item : value ) {
+                if ( !(item instanceof ClassDefinition) ) {
+                    throw new IllegalArgumentException("Invalid mixins value");
+                }
+            }
+        }
+        super.setMixins(value);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<ClassDefinition> getApplyTo() {
+        return (List<ClassDefinition>) super.getApplyTo();
+    }
+
+    @Override
+    public List<ClassDefinition> getApplyTo(boolean create) {
+        return super.getApplyTo(ClassDefinition.class, create);
+    }
+
+    @Override
+    public <T extends Definition> List<T> getApplyTo(Class<T> t) {
+        if ( !ClassDefinition.class.isAssignableFrom(t) ) {
+            throw new IllegalArgumentException("Invalid type parameter");
+        }
+        return super.getApplyTo(t);
+    }
+
+    @Override
+    public <T extends Definition> List<T> getApplyTo(Class<T> t, boolean create) {
+        if ( !ClassDefinition.class.isAssignableFrom(t) ) {
+            throw new IllegalArgumentException("Invalid type parameter");
+        }
+        return super.getApplyTo(t, create);
+    }
+
+    @Override
+    public void setApplyTo(List<? extends Definition> value) {
+        if ( value != null ) {
+            for ( Definition item : value ) {
+                if ( !(item instanceof ClassDefinition) ) {
+                    throw new IllegalArgumentException("Invalid applyTo value");
+                }
+            }
+        }
+        super.setApplyTo(value);
+    }
+
+    @Override
     public String toString() {
         return "ClassDefinition(name=" + this.getName() + ")";
     }

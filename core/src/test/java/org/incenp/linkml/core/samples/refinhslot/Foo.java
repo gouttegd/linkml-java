@@ -1,100 +1,115 @@
 package org.incenp.linkml.core.samples.refinhslot;
 
+import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-/**
- * An example of a class whose slots are “refined” in derived classes.
- */
+import org.incenp.linkml.core.annotations.Converter;
+import org.incenp.linkml.core.annotations.ExtensionHolder;
+import org.incenp.linkml.core.annotations.Identifier;
+import org.incenp.linkml.core.annotations.Inlined;
+import org.incenp.linkml.core.annotations.LinkURI;
+import org.incenp.linkml.core.annotations.Required;
+import org.incenp.linkml.core.annotations.SlotName;
+import org.incenp.linkml.core.annotations.TypeDesignator;
+import org.incenp.linkml.core.CurieConverter;
+
+@LinkURI("https://w3id.org/linkml/tests/refined_derived_slots/Foo")
 public class Foo {
 
+    @LinkURI("https://w3id.org/linkml/tests/refined_derived_slots/bar")
     private Bar bar;
 
-    // We use a wildcard generic to allow derived classes to “refine” the parameter
-    // type
+    @LinkURI("https://w3id.org/linkml/tests/refined_derived_slots/bars")
     private List<? extends Bar> bars;
 
-    /*
-     * Accessors for the `bar` slot.
-     * 
-     * Nothing out of the ordinary here.
-     */
+    public void setBar(Bar bar) {
+        this.bar = bar;
+    }
+
     public Bar getBar() {
-        return bar;
+        return this.bar;
     }
 
-    public void setBar(Bar value) {
-        bar = value;
+    public void setBars(List<? extends Bar> bars) {
+        this.bars = bars;
     }
 
-    /*
-     * Accessors for the multi-valued `bars` slot.
-     */
-
-    /*
-     * “Standard” read accessor. Its return type is parameterized with a wildcard
-     * generic to allow derived classes to refine the parameter.
-     * 
-     * Modifying the returned list is only possible by explicitly casting it to a
-     * non-wildcard form, as in:
-     * 
-     * ((List<Bar>) foo.getBars()).add(new Bar());
-     * 
-     * Without the cast, the following would be a compile-time error:
-     * 
-     * foo.getBars().add(new Bar());
-     */
     public List<? extends Bar> getBars() {
-        return bars;
+        return this.bars;
     }
 
-    /*
-     * LinkML-Java “Standard” read accessor with optional creation of the list.
-     * 
-     * This is a convenience accessor, intended to allow client code to dispense
-     * with a null-ness check.
-     * 
-     * As for the argument-less read accessor, the return type is a wildcard, so
-     * modifying the returned list requires an explicit cast.
-     */
-    public List<? extends Bar> getBars(boolean create) {
-        if ( bars == null && create ) {
-            bars = new ArrayList<Bar>();
+    public List<? extends Bar> getBars(boolean set) {
+        if ( this.bars == null && set ) {
+            this.bars = new ArrayList<Bar>();
         }
-        return bars;
+        return this.bars;
     }
 
-    /*
-     * Parameterised read accessor.
-     * 
-     * This is another convenience accessor. This one is intended to allow client
-     * code to dispense with an explicit cast to modify the list:
-     * 
-     * foo.getBars(Bar.class).add(new Bar());
-     */
     @SuppressWarnings("unchecked")
     public <T extends Bar> List<T> getBars(Class<T> t) {
-        return (List<T>) bars;
+        return (List<T>) this.bars;
     }
 
-    /*
-     * Parameterised read accessor with optional creation of the list.
-     * 
-     * This is another convenience accessor, combining the effects of the two
-     * accessors above.
-     */
     @SuppressWarnings("unchecked")
     public <T extends Bar> List<T> getBars(Class<T> t, boolean create) {
-        if ( bars == null && create ) {
-            bars = new ArrayList<T>();
+        if ( this.bars == null && create ) {
+            this.bars = new ArrayList<T>();
         }
-        return (List<T>) bars;
+        return (List<T>) this.bars;
     }
 
-    /*
-     * “Standard” write accessor.
-     */
-    public void setBars(List<? extends Bar> value) {
-        bars = value;
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        Object o;
+        sb.append("Foo(");
+        if ( (o = this.getBar()) != null ) {
+            sb.append("bar=");
+            sb.append(o);
+            sb.append(",");
+        }
+        if ( (o = this.getBars()) != null ) {
+            sb.append("bars=");
+            sb.append(o);
+            sb.append(",");
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if ( o == this ) return true;
+        if ( !(o instanceof Foo) ) return false;
+        final Foo other = (Foo) o;
+        if ( !other.canEqual((Object) this)) return false;
+        final Object this$bar = this.getBar();
+        final Object other$bar = other.getBar();
+        if ( this$bar == null ? other$bar != null : !this$bar.equals(other$bar)) return false;
+        final Object this$bars = this.getBars();
+        final Object other$bars = other.getBars();
+        if ( this$bars == null ? other$bars != null : !this$bars.equals(other$bars)) return false;
+        return true;
+    }
+
+    protected boolean canEqual(final Object other) {
+        return other instanceof Foo;
+    }
+
+    @Override
+    public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final Object $bar = this.getBar();
+        result = result * PRIME + ($bar == null ? 43 : $bar.hashCode());
+        final Object $bars = this.getBars();
+        result = result * PRIME + ($bars == null ? 43 : $bars.hashCode());
+        return result;
     }
 }
