@@ -874,6 +874,101 @@ public class SlotDefinition extends Definition {
     }
 
     @Override
+    public SlotDefinition getIsA() {
+        return (SlotDefinition) super.getIsA();
+    }
+
+    public void setIsA(SlotDefinition value) {
+        super.setIsA(value);
+    }
+
+    @Override
+    public void setIsA(Definition value) {
+        if ( !(value instanceof SlotDefinition) ) {
+            throw new IllegalArgumentException("Invalid isA value");
+        }
+        super.setIsA(value);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<SlotDefinition> getMixins() {
+        return (List<SlotDefinition>) super.getMixins();
+    }
+
+    @Override
+    public List<SlotDefinition> getMixins(boolean create) {
+        return super.getMixins(SlotDefinition.class, create);
+    }
+
+    @Override
+    public <T extends Definition> List<T> getMixins(Class<T> t) {
+        if ( !SlotDefinition.class.isAssignableFrom(t) ) {
+            throw new IllegalArgumentException("Invalid type parameter");
+        }
+        return super.getMixins(t);
+    }
+
+    @Override
+    public <T extends Definition> List<T> getMixins(Class<T> t, boolean create) {
+        if ( !SlotDefinition.class.isAssignableFrom(t) ) {
+            throw new IllegalArgumentException("Invalid type parameter");
+        }
+        return super.getMixins(t, create);
+    }
+
+    @Override
+    public void setMixins(List<? extends Definition> value) {
+        if ( value != null ) {
+            for ( Definition item : value ) {
+                if ( !(item instanceof SlotDefinition) ) {
+                    throw new IllegalArgumentException("Invalid mixins value");
+                }
+            }
+        }
+        super.setMixins(value);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<SlotDefinition> getApplyTo() {
+        return (List<SlotDefinition>) super.getApplyTo();
+    }
+
+    @Override
+    public List<SlotDefinition> getApplyTo(boolean create) {
+        return super.getApplyTo(SlotDefinition.class, create);
+    }
+
+    @Override
+    public <T extends Definition> List<T> getApplyTo(Class<T> t) {
+        if ( !SlotDefinition.class.isAssignableFrom(t) ) {
+            throw new IllegalArgumentException("Invalid type parameter");
+        }
+        return super.getApplyTo(t);
+    }
+
+    @Override
+    public <T extends Definition> List<T> getApplyTo(Class<T> t, boolean create) {
+        if ( !SlotDefinition.class.isAssignableFrom(t) ) {
+            throw new IllegalArgumentException("Invalid type parameter");
+        }
+        return super.getApplyTo(t, create);
+    }
+
+    @Override
+    public void setApplyTo(List<? extends Definition> value) {
+        if ( value != null ) {
+            for ( Definition item : value ) {
+                if ( !(item instanceof SlotDefinition) ) {
+                    throw new IllegalArgumentException("Invalid applyTo value");
+                }
+            }
+        }
+        super.setApplyTo(value);
+    }
+
+    @Override
     public String toString() {
         return "SlotDefinition(name=" + this.getName() + ")";
     }

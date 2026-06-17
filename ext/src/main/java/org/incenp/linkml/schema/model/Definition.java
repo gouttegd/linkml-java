@@ -34,11 +34,11 @@ public abstract class Definition extends Element {
     private Boolean mixin;
 
     @LinkURI("https://w3id.org/linkml/mixins")
-    private List<Definition> mixins;
+    private List<? extends Definition> mixins;
 
     @SlotName("apply_to")
     @LinkURI("https://w3id.org/linkml/apply_to")
-    private List<Definition> applyTo;
+    private List<? extends Definition> applyTo;
 
     @SlotName("values_from")
     @Converter(CurieConverter.class)
@@ -73,34 +73,60 @@ public abstract class Definition extends Element {
         return this.mixin;
     }
 
-    public void setMixins(List<Definition> mixins) {
+    public void setMixins(List<? extends Definition> mixins) {
         this.mixins = mixins;
     }
 
-    public List<Definition> getMixins() {
+    public List<? extends Definition> getMixins() {
         return this.mixins;
     }
 
-    public List<Definition> getMixins(boolean set) {
+    public List<? extends Definition> getMixins(boolean set) {
         if ( this.mixins == null && set ) {
-            this.mixins = new ArrayList<>();
+            this.mixins = new ArrayList<Definition>();
         }
         return this.mixins;
     }
 
-    public void setApplyTo(List<Definition> applyTo) {
+    @SuppressWarnings("unchecked")
+    public <T extends Definition> List<T> getMixins(Class<T> t) {
+        return (List<T>) this.mixins;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Definition> List<T> getMixins(Class<T> t, boolean create) {
+        if ( this.mixins == null && create ) {
+            this.mixins = new ArrayList<T>();
+        }
+        return (List<T>) this.mixins;
+    }
+
+    public void setApplyTo(List<? extends Definition> applyTo) {
         this.applyTo = applyTo;
     }
 
-    public List<Definition> getApplyTo() {
+    public List<? extends Definition> getApplyTo() {
         return this.applyTo;
     }
 
-    public List<Definition> getApplyTo(boolean set) {
+    public List<? extends Definition> getApplyTo(boolean set) {
         if ( this.applyTo == null && set ) {
-            this.applyTo = new ArrayList<>();
+            this.applyTo = new ArrayList<Definition>();
         }
         return this.applyTo;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Definition> List<T> getApplyTo(Class<T> t) {
+        return (List<T>) this.applyTo;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Definition> List<T> getApplyTo(Class<T> t, boolean create) {
+        if ( this.applyTo == null && create ) {
+            this.applyTo = new ArrayList<T>();
+        }
+        return (List<T>) this.applyTo;
     }
 
     public void setValuesFrom(List<String> valuesFrom) {
