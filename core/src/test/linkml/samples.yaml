@@ -387,6 +387,35 @@ classes:
         range: Anything
         multivalued: true
 
+  KeyedSelfDesignatedClass:
+    description: >-
+      A class with a slot that is both a type designator and a key slot.
+    attributes:
+      type:
+        designates_type: true
+        key: true
+      frobnicator:
+
+  DerivedKeyedSelfDesignatedClass:
+    description: >-
+      A class that derives from a class with a slot that is both a type
+      designator and a key slot.
+    is_a: KeyedSelfDesignatedClass
+    attributes:
+      length:
+        range: integer
+
+  ContainerOfKeyedSelfDesignatedObjects:
+    description: >-
+      A class with a slot whose range is set to a class with a slot that is
+      both a key slot and and a type designator slot.
+    attributes:
+      objects:
+        range: KeyedSelfDesignatedClass
+        multivalued: true
+        inlined: true
+        inlined_as_list: false
+
 
 enums:
 

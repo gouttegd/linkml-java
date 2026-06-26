@@ -1,0 +1,6 @@
+objects:
+  DerivedKeyedSelfDesignatedClass:
+    frobnicator: Bob
+    length: 123
+  KeyedSelfDesignatedClass:
+    frobnicator: Alice

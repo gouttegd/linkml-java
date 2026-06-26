@@ -43,6 +43,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,17 +57,20 @@ import org.incenp.linkml.core.samples.base.ContainerOfBooleanValues;
 import org.incenp.linkml.core.samples.base.ContainerOfIRIIdentifiableObjects;
 import org.incenp.linkml.core.samples.base.ContainerOfInlinedObjects;
 import org.incenp.linkml.core.samples.base.ContainerOfIntegerValues;
+import org.incenp.linkml.core.samples.base.ContainerOfKeyedSelfDesignatedObjects;
 import org.incenp.linkml.core.samples.base.ContainerOfReferences;
 import org.incenp.linkml.core.samples.base.ContainerOfSelfDesignatedObjects;
 import org.incenp.linkml.core.samples.base.ContainerOfSimpleDicts;
 import org.incenp.linkml.core.samples.base.ContainerOfSimpleObjects;
 import org.incenp.linkml.core.samples.base.DerivedCurieSelfDesignatedClass;
+import org.incenp.linkml.core.samples.base.DerivedKeyedSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.DerivedMultiSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.DerivedSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.DerivedURISelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.ExtensibleSimpleClass;
 import org.incenp.linkml.core.samples.base.ExtraSimpleDict;
 import org.incenp.linkml.core.samples.base.IRISimpleIdentifiableClass;
+import org.incenp.linkml.core.samples.base.KeyedSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.MultivaluedSimpleDict;
 import org.incenp.linkml.core.samples.base.SampleEnum;
 import org.incenp.linkml.core.samples.base.SecondDerivedSelfDesignatedClass;
@@ -513,6 +517,26 @@ public class ObjectConverterTest {
         Assertions.assertInstanceOf(SecondLevelDerivedSelfDesignatedClass.class, bsdc);
 
         roundtrip(cosdo);
+    }
+
+    @Test
+    void testKeyTypeDesignator() throws IOException {
+        ContainerOfKeyedSelfDesignatedObjects cksdo = parse("container-of-keyed-self-designated-objects.yaml",
+                ContainerOfKeyedSelfDesignatedObjects.class);
+
+        HashMap<String, KeyedSelfDesignatedClass> d = new HashMap<>();
+        for ( KeyedSelfDesignatedClass o : cksdo.getObjects() ) {
+            d.put(o.getType(), o);
+        }
+        KeyedSelfDesignatedClass ksdc = d.get("KeyedSelfDesignatedClass");
+        Assertions.assertNotNull(ksdc);
+        Assertions.assertEquals("Alice", ksdc.getFrobnicator());
+
+        ksdc = d.get("DerivedKeyedSelfDesignatedClass");
+        Assertions.assertNotNull(ksdc);
+        Assertions.assertEquals("Bob", ksdc.getFrobnicator());
+        Assertions.assertInstanceOf(DerivedKeyedSelfDesignatedClass.class, ksdc);
+        Assertions.assertEquals(123, ((DerivedKeyedSelfDesignatedClass) ksdc).getLength());
     }
 
     @Test
