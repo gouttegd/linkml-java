@@ -418,6 +418,37 @@ classes:
         inlined: true
         inlined_as_list: false
 
+  IdentifiedSelfDesignatedClass:
+    description: >-
+      A class with a slot that is both a type designator and an
+      identifier slot.
+    attributes:
+      type:
+        designates_type: true
+        identifier: true
+        range: uriorcurie
+      frobnicator:
+
+  DerivedIdentifiedSelfDesignatedClass:
+    description: >-
+      A class that derives from a class with a slot that is both a type
+      designator and an identifier slot.
+    is_a: IdentifiedSelfDesignatedClass
+    attributes:
+      length:
+        range: integer
+
+  ContainerOfIdentifiedSelfDesignatedObjects:
+    description: >-
+      A class with a slot whose range is set to a class with a slot that is
+      both an identifier slot and and a type designator slot.
+    attributes:
+      objects:
+        range: IdentifiedSelfDesignatedClass
+        multivalued: true
+        inlined: true
+        inlined_as_list: false
+
 
 enums:
 

@@ -55,6 +55,7 @@ import org.incenp.linkml.core.samples.base.ClassWithCustomConverter;
 import org.incenp.linkml.core.samples.base.ContainerOfAny;
 import org.incenp.linkml.core.samples.base.ContainerOfBooleanValues;
 import org.incenp.linkml.core.samples.base.ContainerOfIRIIdentifiableObjects;
+import org.incenp.linkml.core.samples.base.ContainerOfIdentifiedSelfDesignatedObjects;
 import org.incenp.linkml.core.samples.base.ContainerOfInlinedObjects;
 import org.incenp.linkml.core.samples.base.ContainerOfIntegerValues;
 import org.incenp.linkml.core.samples.base.ContainerOfKeyedSelfDesignatedObjects;
@@ -63,6 +64,7 @@ import org.incenp.linkml.core.samples.base.ContainerOfSelfDesignatedObjects;
 import org.incenp.linkml.core.samples.base.ContainerOfSimpleDicts;
 import org.incenp.linkml.core.samples.base.ContainerOfSimpleObjects;
 import org.incenp.linkml.core.samples.base.DerivedCurieSelfDesignatedClass;
+import org.incenp.linkml.core.samples.base.DerivedIdentifiedSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.DerivedKeyedSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.DerivedMultiSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.DerivedSelfDesignatedClass;
@@ -70,6 +72,7 @@ import org.incenp.linkml.core.samples.base.DerivedURISelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.ExtensibleSimpleClass;
 import org.incenp.linkml.core.samples.base.ExtraSimpleDict;
 import org.incenp.linkml.core.samples.base.IRISimpleIdentifiableClass;
+import org.incenp.linkml.core.samples.base.IdentifiedSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.KeyedSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.MultivaluedSimpleDict;
 import org.incenp.linkml.core.samples.base.SampleEnum;
@@ -607,6 +610,38 @@ public class ObjectConverterTest {
         Assertions.assertEquals("Bob", ksdc2.getFrobnicator());
         Assertions.assertInstanceOf(DerivedKeyedSelfDesignatedClass.class, ksdc2);
         Assertions.assertEquals(123, ((DerivedKeyedSelfDesignatedClass) ksdc2).getLength());
+    }
+
+    @Test
+    void testIdentifierTypeDesignator() throws IOException {
+        String test = "objects:\n" +
+                      "  'EX:IdentifiedSelfDesignatedClass': Alice\n" +
+                      "  'EX:DerivedIdentifiedSelfDesignatedClass':\n" +
+                      "    frobnicator: Bob\n" +
+                      "    length: 123\n";
+        // Make sure the derived class and its IRI are known
+        ClassInfo.get(DerivedIdentifiedSelfDesignatedClass.class);
+        // Make sure the context knows about the EX prefix
+        ctx.addPrefix("EX", TEST_NS);
+        ContainerOfIdentifiedSelfDesignatedObjects cisdo = parseString(test,
+                ContainerOfIdentifiedSelfDesignatedObjects.class);
+
+        HashMap<String, IdentifiedSelfDesignatedClass> d = new HashMap<>();
+        for ( IdentifiedSelfDesignatedClass o : cisdo.getObjects() ) {
+            d.put(o.getType(), o);
+        }
+        IdentifiedSelfDesignatedClass isdc = d.get(TEST_NS + "IdentifiedSelfDesignatedClass");
+        Assertions.assertNotNull(isdc);
+        Assertions.assertEquals("Alice", isdc.getFrobnicator());
+
+        IdentifiedSelfDesignatedClass isdc2 = d.get(TEST_NS + "DerivedIdentifiedSelfDesignatedClass");
+        Assertions.assertNotNull(isdc2);
+        Assertions.assertEquals("Bob", isdc2.getFrobnicator());
+        Assertions.assertInstanceOf(DerivedIdentifiedSelfDesignatedClass.class, isdc2);
+        Assertions.assertEquals(123, ((DerivedIdentifiedSelfDesignatedClass) isdc2).getLength());
+
+        cisdo.getObjects().remove(isdc);
+        roundtrip(cisdo);
     }
 
     @Test
