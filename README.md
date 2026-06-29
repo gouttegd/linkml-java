@@ -72,8 +72,11 @@ a Git repository at <https://github.com/gouttegd/linkml-java>.
 
 Acknowledgements
 ----------------
-Work on LinkML-Java is funded by NSF grant [#2513921](https://www.nsf.gov/awardsearch/show-award/?AWD_ID=2513921)
-(“Frameworks-Imaging-PHD”).
+Work on LinkML-Java is supported by the National Science Foundation
+under Grant [No. 2513921](https://www.nsf.gov/awardsearch/show-award/?AWD_ID=2513921).
+Any opinions, findings, and conclusions or recommendations expressed in
+this material are those of the author(s) and do not necessarily reflect
+the views of the National Science Foundation.
 
 Copying
 -------
