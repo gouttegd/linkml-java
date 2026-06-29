@@ -532,11 +532,20 @@ public class ObjectConverterTest {
         Assertions.assertNotNull(ksdc);
         Assertions.assertEquals("Alice", ksdc.getFrobnicator());
 
-        ksdc = d.get("DerivedKeyedSelfDesignatedClass");
-        Assertions.assertNotNull(ksdc);
-        Assertions.assertEquals("Bob", ksdc.getFrobnicator());
-        Assertions.assertInstanceOf(DerivedKeyedSelfDesignatedClass.class, ksdc);
-        Assertions.assertEquals(123, ((DerivedKeyedSelfDesignatedClass) ksdc).getLength());
+        KeyedSelfDesignatedClass ksdc2 = d.get("DerivedKeyedSelfDesignatedClass");
+        Assertions.assertNotNull(ksdc2);
+        Assertions.assertEquals("Bob", ksdc2.getFrobnicator());
+        Assertions.assertInstanceOf(DerivedKeyedSelfDesignatedClass.class, ksdc2);
+        Assertions.assertEquals(123, ((DerivedKeyedSelfDesignatedClass) ksdc2).getLength());
+
+        // Remove the base object, because the roundtrip test is
+        // sensible to the order of the objects in the list, which is
+        // not guaranteed to be preserved since the list is serialised
+        // as a dictionary. Still, if we can read back the one-item
+        // list, this is enough to know that serialisation works as
+        // expected.
+        cksdo.getObjects().remove(ksdc);
+        roundtrip(cksdo);
     }
 
     @Test

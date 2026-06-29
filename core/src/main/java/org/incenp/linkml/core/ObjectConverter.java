@@ -309,14 +309,6 @@ public class ObjectConverter implements IConverter {
 
     @Override
     public Object serialise(Object object, ConverterContext ctx) throws LinkMLRuntimeException {
-        // Search for a more specialised converter.
-        // FIXME: Looks a bit too much like a hack...
-        IConverter conv = ctx.getConverter(object.getClass());
-        if ( conv instanceof ObjectConverter ) {
-            if ( ((ObjectConverter) conv).klass.getParents().contains(klass) ) {
-                return ((ObjectConverter) conv).serialise(object, true, ctx);
-            }
-        }
         return serialise(object, true, ctx);
     }
 
@@ -344,6 +336,15 @@ public class ObjectConverter implements IConverter {
             throws LinkMLRuntimeException {
         if ( !getType().isInstance(object) ) {
             throw new LinkMLValueError(String.format(OBJECT_EXPECTED, getType().getName()));
+        }
+
+        // Search for a more specialised converter.
+        // FIXME: Looks a bit too much like a hack...
+        IConverter conv = ctx.getConverter(object.getClass());
+        if ( conv instanceof ObjectConverter && conv != this ) {
+            if ( ((ObjectConverter) conv).klass.getParents().contains(klass) ) {
+                return ((ObjectConverter) conv).serialise(object, withIdentifier, ctx);
+            }
         }
 
         Map<String, Object> raw = new HashMap<>();
