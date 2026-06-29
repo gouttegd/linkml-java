@@ -391,7 +391,6 @@ public class ObjectConverter implements IConverter {
                 }
                 return list;
             } else if ( inlining == InliningMode.DICT ) {
-                // boolean simpleDict = klass.isEligibleForSimpleDict(true);
                 Map<Object, Object> map = new HashMap<>();
                 for ( Object item : items ) {
                     boolean simpleDict = ClassInfo.get(item.getClass()).isEligibleForSimpleDict(true);
