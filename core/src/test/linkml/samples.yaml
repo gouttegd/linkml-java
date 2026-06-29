@@ -395,6 +395,8 @@ classes:
         designates_type: true
         key: true
       frobnicator:
+    extra_slots:
+      allowed: true
 
   DerivedKeyedSelfDesignatedClass:
     description: >-

@@ -31,6 +31,9 @@ public class KeyedSelfDesignatedClass {
     @LinkURI("https://incenp.org/dvlpt/linkml-java/tests/samples#frobnicator")
     private String frobnicator;
 
+    @ExtensionHolder
+    private Map<String, Object> extraSlots;
+
     public void setType(String type) {
         this.type = type;
     }
@@ -45,6 +48,21 @@ public class KeyedSelfDesignatedClass {
 
     public String getFrobnicator() {
         return this.frobnicator;
+    }
+
+    public void setExtraSlots(Map<String,Object> extraSlots) {
+        this.extraSlots = extraSlots;
+    }
+
+    public Map<String,Object> getExtraSlots() {
+        return this.extraSlots;
+    }
+
+    public Map<String,Object> getExtraSlots(boolean set) {
+        if ( this.extraSlots == null && set ) {
+            this.extraSlots = new HashMap<>();
+        }
+        return this.extraSlots;
     }
 
     @Override

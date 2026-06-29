@@ -549,6 +549,22 @@ public class ObjectConverterTest {
     }
 
     @Test
+    void testKeyTypeDesignatorWithUnknownType() throws IOException {
+        String test = "objects:\n" +
+                      "  UnknownSelfDesignatedClass:\n" +
+                      "    frobnicator: \"Charlie\"\n" +
+                      "    width: 456\n";
+        ContainerOfKeyedSelfDesignatedObjects cksdo = parseString(test, ContainerOfKeyedSelfDesignatedObjects.class);
+        KeyedSelfDesignatedClass ksdc = cksdo.getObjects().get(0);
+        Assertions.assertNotNull(ksdc);
+        Assertions.assertEquals("UnknownSelfDesignatedClass", ksdc.getType());
+        Assertions.assertEquals("Charlie", ksdc.getFrobnicator());
+        Assertions.assertEquals(456, ksdc.getExtraSlots().get("width"));
+
+        roundtrip(cksdo);
+    }
+
+    @Test
     void testReferenceToIRIIdentifiers() throws IOException, LinkMLRuntimeException {
         ctx.addPrefix("PFX", "https://example.org/");
         String text = "id: PFX:0001\nfoo: A string\n";
