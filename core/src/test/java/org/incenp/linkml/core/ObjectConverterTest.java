@@ -43,6 +43,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,19 +55,25 @@ import org.incenp.linkml.core.samples.base.ClassWithCustomConverter;
 import org.incenp.linkml.core.samples.base.ContainerOfAny;
 import org.incenp.linkml.core.samples.base.ContainerOfBooleanValues;
 import org.incenp.linkml.core.samples.base.ContainerOfIRIIdentifiableObjects;
+import org.incenp.linkml.core.samples.base.ContainerOfIdentifiedSelfDesignatedObjects;
 import org.incenp.linkml.core.samples.base.ContainerOfInlinedObjects;
 import org.incenp.linkml.core.samples.base.ContainerOfIntegerValues;
+import org.incenp.linkml.core.samples.base.ContainerOfKeyedSelfDesignatedObjects;
 import org.incenp.linkml.core.samples.base.ContainerOfReferences;
 import org.incenp.linkml.core.samples.base.ContainerOfSelfDesignatedObjects;
 import org.incenp.linkml.core.samples.base.ContainerOfSimpleDicts;
 import org.incenp.linkml.core.samples.base.ContainerOfSimpleObjects;
 import org.incenp.linkml.core.samples.base.DerivedCurieSelfDesignatedClass;
+import org.incenp.linkml.core.samples.base.DerivedIdentifiedSelfDesignatedClass;
+import org.incenp.linkml.core.samples.base.DerivedKeyedSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.DerivedMultiSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.DerivedSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.DerivedURISelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.ExtensibleSimpleClass;
 import org.incenp.linkml.core.samples.base.ExtraSimpleDict;
 import org.incenp.linkml.core.samples.base.IRISimpleIdentifiableClass;
+import org.incenp.linkml.core.samples.base.IdentifiedSelfDesignatedClass;
+import org.incenp.linkml.core.samples.base.KeyedSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.MultivaluedSimpleDict;
 import org.incenp.linkml.core.samples.base.SampleEnum;
 import org.incenp.linkml.core.samples.base.SecondDerivedSelfDesignatedClass;
@@ -513,6 +520,128 @@ public class ObjectConverterTest {
         Assertions.assertInstanceOf(SecondLevelDerivedSelfDesignatedClass.class, bsdc);
 
         roundtrip(cosdo);
+    }
+
+    @Test
+    void testKeyTypeDesignator() throws IOException, LinkMLRuntimeException {
+        ContainerOfKeyedSelfDesignatedObjects cksdo = parse("container-of-keyed-self-designated-objects.yaml",
+                ContainerOfKeyedSelfDesignatedObjects.class);
+
+        HashMap<String, KeyedSelfDesignatedClass> d = new HashMap<>();
+        for ( KeyedSelfDesignatedClass o : cksdo.getObjects() ) {
+            d.put(o.getType(), o);
+        }
+        KeyedSelfDesignatedClass ksdc = d.get("KeyedSelfDesignatedClass");
+        Assertions.assertNotNull(ksdc);
+        Assertions.assertEquals("Alice", ksdc.getFrobnicator());
+
+        KeyedSelfDesignatedClass ksdc2 = d.get("DerivedKeyedSelfDesignatedClass");
+        Assertions.assertNotNull(ksdc2);
+        Assertions.assertEquals("Bob", ksdc2.getFrobnicator());
+        Assertions.assertInstanceOf(DerivedKeyedSelfDesignatedClass.class, ksdc2);
+        Assertions.assertEquals(123, ((DerivedKeyedSelfDesignatedClass) ksdc2).getLength());
+
+        // Remove the base object, because the roundtrip test is
+        // sensible to the order of the objects in the list, which is
+        // not guaranteed to be preserved since the list is serialised
+        // as a dictionary. Still, if we can read back the one-item
+        // list, this is enough to know that serialisation works as
+        // expected.
+        cksdo.getObjects().remove(ksdc);
+        roundtrip(cksdo);
+
+        // Try serialising again, but this time with the type designator unset; the
+        // correct type designator should still appear in the serialised object
+        ksdc2.setType(null);
+        ObjectConverter conv = (ObjectConverter) ctx.getConverter(cksdo.getClass());
+        Map<String, Object> raw = conv.serialise(cksdo, true, ctx);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> objects = (Map<String, Object>) raw.get("objects");
+        Assertions.assertTrue(objects.containsKey("DerivedKeyedSelfDesignatedClass"));
+    }
+
+    @Test
+    void testKeyTypeDesignatorWithUnknownType() throws IOException, LinkMLRuntimeException {
+        String test = "objects:\n" +
+                      "  UnknownSelfDesignatedClass:\n" +
+                      "    frobnicator: \"Charlie\"\n" +
+                      "    width: 456\n";
+        ContainerOfKeyedSelfDesignatedObjects cksdo = parseString(test, ContainerOfKeyedSelfDesignatedObjects.class);
+        KeyedSelfDesignatedClass ksdc = cksdo.getObjects().get(0);
+        Assertions.assertNotNull(ksdc);
+        Assertions.assertEquals("UnknownSelfDesignatedClass", ksdc.getType());
+        Assertions.assertEquals("Charlie", ksdc.getFrobnicator());
+        Assertions.assertEquals(456, ksdc.getExtraSlots().get("width"));
+
+        roundtrip(cksdo);
+
+        // Try serialising again, but this time with the type designator slot unset; the
+        // base type designator should still appear in the serialised object
+        ksdc.setType(null);
+        ObjectConverter conv = (ObjectConverter) ctx.getConverter(cksdo.getClass());
+        Map<String, Object> raw = conv.serialise(cksdo, true, ctx);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> objects = (Map<String, Object>) raw.get("objects");
+        Assertions.assertTrue(objects.containsKey("KeyedSelfDesignatedClass"));
+    }
+
+    @Test
+    void testKeyTypeDesignatorWithSimpleDictMix() throws IOException, LinkMLRuntimeException {
+        // Same test case as "testKeyTypeDesignator" above, except that the base class
+        // instance is serialised as a "simple dict" entry, while the derived instance
+        // is serialised as a "compact dict".
+        String test = "objects:\n" +
+                      "  KeyedSelfDesignatedClass: Alice\n" +
+                      "  DerivedKeyedSelfDesignatedClass:\n" +
+                      "    frobnicator: Bob\n" +
+                      "    length: 123\n";
+        ContainerOfKeyedSelfDesignatedObjects cksdo = parseString(test, ContainerOfKeyedSelfDesignatedObjects.class);
+
+        HashMap<String, KeyedSelfDesignatedClass> d = new HashMap<>();
+        for ( KeyedSelfDesignatedClass o : cksdo.getObjects() ) {
+            d.put(o.getType(), o);
+        }
+        KeyedSelfDesignatedClass ksdc = d.get("KeyedSelfDesignatedClass");
+        Assertions.assertNotNull(ksdc);
+        Assertions.assertEquals("Alice", ksdc.getFrobnicator());
+
+        KeyedSelfDesignatedClass ksdc2 = d.get("DerivedKeyedSelfDesignatedClass");
+        Assertions.assertNotNull(ksdc2);
+        Assertions.assertEquals("Bob", ksdc2.getFrobnicator());
+        Assertions.assertInstanceOf(DerivedKeyedSelfDesignatedClass.class, ksdc2);
+        Assertions.assertEquals(123, ((DerivedKeyedSelfDesignatedClass) ksdc2).getLength());
+    }
+
+    @Test
+    void testIdentifierTypeDesignator() throws IOException {
+        String test = "objects:\n" +
+                      "  'EX:IdentifiedSelfDesignatedClass': Alice\n" +
+                      "  'EX:DerivedIdentifiedSelfDesignatedClass':\n" +
+                      "    frobnicator: Bob\n" +
+                      "    length: 123\n";
+        // Make sure the derived class and its IRI are known
+        ClassInfo.get(DerivedIdentifiedSelfDesignatedClass.class);
+        // Make sure the context knows about the EX prefix
+        ctx.addPrefix("EX", TEST_NS);
+        ContainerOfIdentifiedSelfDesignatedObjects cisdo = parseString(test,
+                ContainerOfIdentifiedSelfDesignatedObjects.class);
+
+        HashMap<String, IdentifiedSelfDesignatedClass> d = new HashMap<>();
+        for ( IdentifiedSelfDesignatedClass o : cisdo.getObjects() ) {
+            d.put(o.getType(), o);
+        }
+        IdentifiedSelfDesignatedClass isdc = d.get(TEST_NS + "IdentifiedSelfDesignatedClass");
+        Assertions.assertNotNull(isdc);
+        Assertions.assertEquals("Alice", isdc.getFrobnicator());
+
+        IdentifiedSelfDesignatedClass isdc2 = d.get(TEST_NS + "DerivedIdentifiedSelfDesignatedClass");
+        Assertions.assertNotNull(isdc2);
+        Assertions.assertEquals("Bob", isdc2.getFrobnicator());
+        Assertions.assertInstanceOf(DerivedIdentifiedSelfDesignatedClass.class, isdc2);
+        Assertions.assertEquals(123, ((DerivedIdentifiedSelfDesignatedClass) isdc2).getLength());
+
+        cisdo.getObjects().remove(isdc);
+        roundtrip(cisdo);
     }
 
     @Test

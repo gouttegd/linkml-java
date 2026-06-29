@@ -117,7 +117,9 @@ public class ClassInfo {
                 identifierIsLocal = identifierSlot.isLocalIdentifier();
             } else if ( slot.isExtensionStore() ) {
                 extensionSlot = slot;
-            } else if ( slot.isTypeDesignator() ) {
+            }
+
+            if ( slot.isTypeDesignator() ) {
                 designatorSlot = slot;
             }
 

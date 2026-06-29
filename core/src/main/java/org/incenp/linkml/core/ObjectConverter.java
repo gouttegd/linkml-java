@@ -309,14 +309,6 @@ public class ObjectConverter implements IConverter {
 
     @Override
     public Object serialise(Object object, ConverterContext ctx) throws LinkMLRuntimeException {
-        // Search for a more specialised converter.
-        // FIXME: Looks a bit too much like a hack...
-        IConverter conv = ctx.getConverter(object.getClass());
-        if ( conv instanceof ObjectConverter ) {
-            if ( ((ObjectConverter) conv).klass.getParents().contains(klass) ) {
-                return ((ObjectConverter) conv).serialise(object, true, ctx);
-            }
-        }
         return serialise(object, true, ctx);
     }
 
@@ -344,6 +336,15 @@ public class ObjectConverter implements IConverter {
             throws LinkMLRuntimeException {
         if ( !getType().isInstance(object) ) {
             throw new LinkMLValueError(String.format(OBJECT_EXPECTED, getType().getName()));
+        }
+
+        // Search for a more specialised converter.
+        // FIXME: Looks a bit too much like a hack...
+        IConverter conv = ctx.getConverter(object.getClass());
+        if ( conv instanceof ObjectConverter && conv != this ) {
+            if ( ((ObjectConverter) conv).klass.getParents().contains(klass) ) {
+                return ((ObjectConverter) conv).serialise(object, withIdentifier, ctx);
+            }
         }
 
         Map<String, Object> raw = new HashMap<>();
@@ -390,9 +391,10 @@ public class ObjectConverter implements IConverter {
                 }
                 return list;
             } else if ( inlining == InliningMode.DICT ) {
-                boolean simpleDict = klass.isEligibleForSimpleDict(true);
+                // boolean simpleDict = klass.isEligibleForSimpleDict(true);
                 Map<Object, Object> map = new HashMap<>();
                 for ( Object item : items ) {
+                    boolean simpleDict = ClassInfo.get(item.getClass()).isEligibleForSimpleDict(true);
                     Object rawItem = simpleDict ? klass.getPrimarySlot().getValue(item) : serialise(item, false, ctx);
                     map.put(toIdentifier(item, ctx), rawItem);
                 }
@@ -434,7 +436,11 @@ public class ObjectConverter implements IConverter {
         Slot identifierSlot = klass.getIdentifierSlot();
         Object identifier = identifierSlot.getValue(object);
         if ( identifier == null ) {
-            throw new LinkMLValueError(String.format(NO_IDENTIFIER, getType().getName()));
+            if ( identifierSlot.isTypeDesignator() ) {
+                identifier = new TypeDesignatorResolver().getDesignator(ClassInfo.get(object.getClass()));
+            } else {
+                throw new LinkMLValueError(String.format(NO_IDENTIFIER, getType().getName()));
+            }
         }
         return ctx.getConverter(identifierSlot).serialise(identifier, ctx);
     }
