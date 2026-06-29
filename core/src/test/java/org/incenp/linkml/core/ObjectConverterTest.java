@@ -583,6 +583,33 @@ public class ObjectConverterTest {
     }
 
     @Test
+    void testKeyTypeDesignatorWithSimpleDictMix() throws IOException, LinkMLRuntimeException {
+        // Same test case as "testKeyTypeDesignator" above, except that the base class
+        // instance is serialised as a "simple dict" entry, while the derived instance
+        // is serialised as a "compact dict".
+        String test = "objects:\n" +
+                      "  KeyedSelfDesignatedClass: Alice\n" +
+                      "  DerivedKeyedSelfDesignatedClass:\n" +
+                      "    frobnicator: Bob\n" +
+                      "    length: 123\n";
+        ContainerOfKeyedSelfDesignatedObjects cksdo = parseString(test, ContainerOfKeyedSelfDesignatedObjects.class);
+
+        HashMap<String, KeyedSelfDesignatedClass> d = new HashMap<>();
+        for ( KeyedSelfDesignatedClass o : cksdo.getObjects() ) {
+            d.put(o.getType(), o);
+        }
+        KeyedSelfDesignatedClass ksdc = d.get("KeyedSelfDesignatedClass");
+        Assertions.assertNotNull(ksdc);
+        Assertions.assertEquals("Alice", ksdc.getFrobnicator());
+
+        KeyedSelfDesignatedClass ksdc2 = d.get("DerivedKeyedSelfDesignatedClass");
+        Assertions.assertNotNull(ksdc2);
+        Assertions.assertEquals("Bob", ksdc2.getFrobnicator());
+        Assertions.assertInstanceOf(DerivedKeyedSelfDesignatedClass.class, ksdc2);
+        Assertions.assertEquals(123, ((DerivedKeyedSelfDesignatedClass) ksdc2).getLength());
+    }
+
+    @Test
     void testReferenceToIRIIdentifiers() throws IOException, LinkMLRuntimeException {
         ctx.addPrefix("PFX", "https://example.org/");
         String text = "id: PFX:0001\nfoo: A string\n";

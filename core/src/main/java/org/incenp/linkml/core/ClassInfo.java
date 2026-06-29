@@ -230,14 +230,7 @@ public class ClassInfo {
         if ( identifierSlot == null || getPrimarySlot() == null ) {
             return false;
         } else if ( write ) {
-            // FIXME: For now, we completely forbid serialisation as a
-            // simple dict if the class has a type designator, because
-            // we cannot be sure that all child classes are also
-            // eligible. The proper solution here is to allow simple
-            // dict serialisation to be mixed with compact or expanded
-            // dict serialisations (LinkML-Py allows that), but this is
-            // not something we explicitly support for now.
-            return slots.size() == 2 && !hasTypeDesignator();
+            return slots.size() == 2;
         } else {
             return true;
         }
