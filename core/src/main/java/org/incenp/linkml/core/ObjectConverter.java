@@ -435,7 +435,11 @@ public class ObjectConverter implements IConverter {
         Slot identifierSlot = klass.getIdentifierSlot();
         Object identifier = identifierSlot.getValue(object);
         if ( identifier == null ) {
-            throw new LinkMLValueError(String.format(NO_IDENTIFIER, getType().getName()));
+            if ( identifierSlot.isTypeDesignator() ) {
+                identifier = new TypeDesignatorResolver().getDesignator(ClassInfo.get(object.getClass()));
+            } else {
+                throw new LinkMLValueError(String.format(NO_IDENTIFIER, getType().getName()));
+            }
         }
         return ctx.getConverter(identifierSlot).serialise(identifier, ctx);
     }

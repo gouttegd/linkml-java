@@ -520,7 +520,7 @@ public class ObjectConverterTest {
     }
 
     @Test
-    void testKeyTypeDesignator() throws IOException {
+    void testKeyTypeDesignator() throws IOException, LinkMLRuntimeException {
         ContainerOfKeyedSelfDesignatedObjects cksdo = parse("container-of-keyed-self-designated-objects.yaml",
                 ContainerOfKeyedSelfDesignatedObjects.class);
 
@@ -546,10 +546,19 @@ public class ObjectConverterTest {
         // expected.
         cksdo.getObjects().remove(ksdc);
         roundtrip(cksdo);
+
+        // Try serialising again, but this time with the type designator unset; the
+        // correct type designator should still appear in the serialised object
+        ksdc2.setType(null);
+        ObjectConverter conv = (ObjectConverter) ctx.getConverter(cksdo.getClass());
+        Map<String, Object> raw = conv.serialise(cksdo, true, ctx);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> objects = (Map<String, Object>) raw.get("objects");
+        Assertions.assertTrue(objects.containsKey("DerivedKeyedSelfDesignatedClass"));
     }
 
     @Test
-    void testKeyTypeDesignatorWithUnknownType() throws IOException {
+    void testKeyTypeDesignatorWithUnknownType() throws IOException, LinkMLRuntimeException {
         String test = "objects:\n" +
                       "  UnknownSelfDesignatedClass:\n" +
                       "    frobnicator: \"Charlie\"\n" +
@@ -562,6 +571,15 @@ public class ObjectConverterTest {
         Assertions.assertEquals(456, ksdc.getExtraSlots().get("width"));
 
         roundtrip(cksdo);
+
+        // Try serialising again, but this time with the type designator slot unset; the
+        // base type designator should still appear in the serialised object
+        ksdc.setType(null);
+        ObjectConverter conv = (ObjectConverter) ctx.getConverter(cksdo.getClass());
+        Map<String, Object> raw = conv.serialise(cksdo, true, ctx);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> objects = (Map<String, Object>) raw.get("objects");
+        Assertions.assertTrue(objects.containsKey("KeyedSelfDesignatedClass"));
     }
 
     @Test
