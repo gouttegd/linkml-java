@@ -143,6 +143,7 @@ public class ConverterContext {
     private List<DelayedAssignment> delayedAssignments = new ArrayList<>();
     private Map<String, String> prefixMap = new HashMap<>();
     private Map<String, String> iri2CurieCache = new HashMap<>();
+    private IConverterProvider objectConverterProvider;
 
     public ConverterContext() {
         // Register converters for all the basic types.
@@ -165,6 +166,22 @@ public class ConverterContext {
         // We need a special "converter" for Object-typed fields (which represent slots
         // whose range is set to the linkml:Any class).
         converters.put(Object.class, new TransparentConverter());
+
+        objectConverterProvider = (t) -> new ObjectConverter(t);
+    }
+
+    /**
+     * Sets a custom provider for converters of complex objects.
+     * <p>
+     * The default provider systematically creates a {@link ObjectConverter}
+     * instance whenever a converter for a given type is required. Setting a custom
+     * provider is intended to allow client code to override that behaviour
+     * (typically, to use a custom subclass of {@link ObjectConverter} instead).
+     * 
+     * @param provider The custom provider to use.
+     */
+    public void setDefaultObjectConverterProvider(IConverterProvider provider) {
+        objectConverterProvider = provider;
     }
 
     /**
@@ -229,7 +246,7 @@ public class ConverterContext {
                 if ( type.isEnum() ) {
                     conv = new EnumConverter(type);
                 } else {
-                    conv = new ObjectConverter(type);
+                    conv = objectConverterProvider.getConverter(type);
                 }
             }
 
