@@ -8,9 +8,9 @@ authors:
 license: BSD-3-Clause
 url: "https://incenp.org/dvlpt/linkml-java/"
 repository-code: "https://github.com/gouttegd/linkml-java"
-version: 0.2.1
-date-released: "2026-05-28"
-doi: 10.5281/zenodo.20427971
+version: 0.2.2
+date-released: "2026-07-18"
+doi: 10.5281/zenodo.21427426
 references:
   - authors:
       - family-names: Moxon
