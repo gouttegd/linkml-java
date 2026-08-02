@@ -227,7 +227,7 @@ public class SchemaDocumentTest {
     void testReadLinkMLMetaSchema() {
         SchemaDocument doc = null;
         try {
-            doc = new SchemaDocument(new File("src/main/resources/schemas/linkml/meta.yaml"));
+            doc = new SchemaDocument(new File("src/main/linkml/schemas/org/incenp/linkml/schema/model/meta.yaml"));
         } catch ( IOException e ) {
             Assertions.fail("Unexpected exception", e);
         } catch ( InvalidSchemaException e ) {
