@@ -6,7 +6,7 @@ import java.util.Collections;
 
 import org.incenp.linkml.core.annotations.LinkURI;
 
-@LinkURI("https://w3id.org/linkml/alias_predicate_enum")
+@LinkURI("https://w3id.org/linkml/AliasPredicateEnum")
 public enum AliasPredicateEnum {
 
     @LinkURI("http://www.w3.org/2004/02/skos/core#exactMatch")

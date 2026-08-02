@@ -6,7 +6,7 @@ import java.util.Collections;
 
 import org.incenp.linkml.core.annotations.LinkURI;
 
-@LinkURI("https://w3id.org/linkml/obligation_level_enum")
+@LinkURI("https://w3id.org/linkml/ObligationLevelEnum")
 public enum ObligationLevelEnum {
 
     REQUIRED("REQUIRED"),

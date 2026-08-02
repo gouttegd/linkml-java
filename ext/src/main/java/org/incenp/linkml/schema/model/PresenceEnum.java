@@ -6,7 +6,7 @@ import java.util.Collections;
 
 import org.incenp.linkml.core.annotations.LinkURI;
 
-@LinkURI("https://w3id.org/linkml/presence_enum")
+@LinkURI("https://w3id.org/linkml/PresenceEnum")
 public enum PresenceEnum {
 
     UNCOMMITTED("UNCOMMITTED"),

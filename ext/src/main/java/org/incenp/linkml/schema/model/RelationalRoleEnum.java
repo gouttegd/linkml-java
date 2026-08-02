@@ -6,7 +6,7 @@ import java.util.Collections;
 
 import org.incenp.linkml.core.annotations.LinkURI;
 
-@LinkURI("https://w3id.org/linkml/relational_role_enum")
+@LinkURI("https://w3id.org/linkml/RelationalRoleEnum")
 public enum RelationalRoleEnum {
 
     @LinkURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#subject")

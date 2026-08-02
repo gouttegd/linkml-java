@@ -6,7 +6,7 @@ import java.util.Collections;
 
 import org.incenp.linkml.core.annotations.LinkURI;
 
-@LinkURI("https://w3id.org/linkml/pv_formula_options")
+@LinkURI("https://w3id.org/linkml/PvFormulaOptions")
 public enum PvFormulaOptions {
 
     CODE("CODE"),
