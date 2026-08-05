@@ -87,4 +87,9 @@ public class URLSchemaSource implements ISchemaSource {
         }
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "URLSchemaSource: " + url;
+    }
 }

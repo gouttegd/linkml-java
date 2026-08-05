@@ -74,4 +74,9 @@ public class EmbeddedSchemaSource implements ISchemaSource {
         }
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "EmbeddedSchemaSource: " + name;
+    }
 }

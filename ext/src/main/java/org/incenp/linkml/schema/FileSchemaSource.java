@@ -90,4 +90,9 @@ public class FileSchemaSource implements ISchemaSource {
         }
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "FileSchemaSource: " + file.toString();
+    }
 }
