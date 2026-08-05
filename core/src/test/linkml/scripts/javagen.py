@@ -13,18 +13,18 @@ def cleanup_dir(directory: Path) -> None:
 
 
 @click.option("--output-directory",
-              type=click.Path(dir_okay=True, file_okay=False),
+              type=click.Path(dir_okay=True, file_okay=False, path_type=Path),
               default=Path("core/src/test/java"))
-@click.option("--linkml-directory",
-              type=click.Path(dir_okay=True, file_okay=False, exists=True),
+@click.option("--schema-directory",
+              type=click.Path(dir_okay=True, file_okay=False, exists=True, path_type=Path),
               default=Path("core/src/test/linkml/schemas"))
 @click.command()
-def cli(output_directory: Path, linkml_directory: Path) -> None:
+def cli(output_directory: Path, schema_directory: Path) -> None:
 
     cleaned_up_dirs = {}
 
-    for schema in linkml_directory.glob("**/*.yaml"):
-        package_dir = schema.relative_to(linkml_directory).parent
+    for schema in schema_directory.glob("**/*.yaml"):
+        package_dir = schema.relative_to(schema_directory).parent
         output_dir = output_directory / package_dir
         if output_dir not in cleaned_up_dirs:
             cleanup_dir(output_dir)

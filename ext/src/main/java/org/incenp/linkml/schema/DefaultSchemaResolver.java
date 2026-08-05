@@ -46,15 +46,13 @@ import java.net.URISyntaxException;
  * relative file name, and attempts to find it on the local file system.
  * Otherwise, it assumes the name is a URI pointing to a remote resource.
  * <p>
- * Of note, this resolver automatically and silently redirects the
- * <code>https://w3id.org/linkml/types.yaml</code> schema name to a version that
- * is embedded with the LinkML-Java runtime. That schema is expected to be
- * imported in virtually all LinkML schemas, so we don’t want to have to always
- * fetch it from a remote server.
+ * Of note, this resolver automatically and silently redirects any import
+ * starting with the <code>https://w3id.org/linkml/</code> prefix to a version
+ * of the corresponding schema that is embedded within the LinkML-Java runtime.
  */
 public class DefaultSchemaResolver implements ISchemaResolver {
 
-    private final static String TYPES_SCHEMA = "https://w3id.org/linkml/types.yaml";
+    private final static String LINKML_PREFIX = "https://w3id.org/linkml/";
     private final static String UNRESOLVABLE_SCHEMA = "Cannot resolve schema name '%s'";
 
     @Override
@@ -68,10 +66,14 @@ public class DefaultSchemaResolver implements ISchemaResolver {
             return new FileSchemaSource(file);
         }
 
-        if ( name.equals(TYPES_SCHEMA) ) {
-            // Redirect the standard linkml:types schema to the embedded version.
-            return new EmbeddedSchemaSource("schemas/linkml/types.yaml");
+        if ( name.startsWith(LINKML_PREFIX) ) {
+            // Redirect linkml: imports to the embedded version if available
+            String embeddedName = "schemas/linkml/" + name.substring(LINKML_PREFIX.length());
+            if ( DefaultSchemaResolver.class.getClassLoader().getResource(embeddedName) != null ) {
+                return new EmbeddedSchemaSource(embeddedName);
+            }
         }
+
         try {
             return new URLSchemaSource(name);
         } catch ( URISyntaxException | MalformedURLException e ) {
