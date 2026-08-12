@@ -418,6 +418,39 @@ classes:
         inlined: true
         inlined_as_list: false
 
+  URIKeyedSelfDesignatedClass:
+    description: >-
+      A class with a URI-typed slot that is both a type designator and a key
+      slot.
+    attributes:
+      type:
+        range: uri
+        designates_type: true
+        key: true
+      frobnicator:
+    extra_slots:
+      allowed: true
+
+  DerivedURIKeyedSelfDesignatedClass:
+    description: >-
+      A class that derives from a class with a URI-typed slot that is both a
+      type designator and a key slot.
+    is_a: URIKeyedSelfDesignatedClass
+    attributes:
+      length:
+        range: integer
+
+  ContainerOfURIKeyedSelfDesignatedObjects:
+    description: >-
+      A class with a slot whose range is set to a class with a URI-typed slot
+      that is both a key slot and and a type designator slot.
+    attributes:
+      objects:
+        range: URIKeyedSelfDesignatedClass
+        multivalued: true
+        inlined: true
+        inlined_as_list: false
+
   IdentifiedSelfDesignatedClass:
     description: >-
       A class with a slot that is both a type designator and an

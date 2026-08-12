@@ -37,7 +37,6 @@ package org.incenp.linkml.core;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -63,11 +62,13 @@ import org.incenp.linkml.core.samples.base.ContainerOfReferences;
 import org.incenp.linkml.core.samples.base.ContainerOfSelfDesignatedObjects;
 import org.incenp.linkml.core.samples.base.ContainerOfSimpleDicts;
 import org.incenp.linkml.core.samples.base.ContainerOfSimpleObjects;
+import org.incenp.linkml.core.samples.base.ContainerOfURIKeyedSelfDesignatedObjects;
 import org.incenp.linkml.core.samples.base.DerivedCurieSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.DerivedIdentifiedSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.DerivedKeyedSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.DerivedMultiSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.DerivedSelfDesignatedClass;
+import org.incenp.linkml.core.samples.base.DerivedURIKeyedSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.DerivedURISelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.ExtensibleSimpleClass;
 import org.incenp.linkml.core.samples.base.ExtraSimpleDict;
@@ -82,6 +83,7 @@ import org.incenp.linkml.core.samples.base.SimpleClass;
 import org.incenp.linkml.core.samples.base.SimpleDict;
 import org.incenp.linkml.core.samples.base.SimpleIdentifiableClass;
 import org.incenp.linkml.core.samples.base.SimpleKeyableClass;
+import org.incenp.linkml.core.samples.base.URIKeyedSelfDesignatedClass;
 import org.incenp.linkml.core.samples.refinhslot.Bar;
 import org.incenp.linkml.core.samples.refinhslot.FirstDerivedBar;
 import org.incenp.linkml.core.samples.refinhslot.FirstDerivedFoo;
@@ -414,7 +416,7 @@ public class ObjectConverterTest {
         ObjectConverter conv = (ObjectConverter) ctx.getConverter(derived.getClass());
         Map<String, Object> raw = conv.serialise(derived, true, ctx);
         Assertions.assertTrue(raw.containsKey("type"));
-        Assertions.assertEquals(URI.create(TEST_NS + "DerivedURISelfDesignatedClass"), raw.get("type"));
+        Assertions.assertEquals(TEST_NS + "DerivedURISelfDesignatedClass", raw.get("type"));
     }
 
     @Test
@@ -558,6 +560,24 @@ public class ObjectConverterTest {
         @SuppressWarnings("unchecked")
         Map<String, Object> objects = (Map<String, Object>) raw.get("objects");
         Assertions.assertTrue(objects.containsKey("DerivedKeyedSelfDesignatedClass"));
+    }
+
+    @Test
+    void testURIKeyedTypeDesignator() throws IOException, LinkMLRuntimeException {
+        String test = "objects:\n" +
+                      "  " + TEST_NS + "DerivedURIKeyedSelfDesignatedClass:\n" +
+                      "    frobnicator: \"Charlie\"\n" +
+                      "    length: 123\n";
+        ClassInfo.get(DerivedURIKeyedSelfDesignatedClass.class);
+        ContainerOfURIKeyedSelfDesignatedObjects container = parseString(test,
+                ContainerOfURIKeyedSelfDesignatedObjects.class);
+
+        URIKeyedSelfDesignatedClass utdc = container.getObjects().get(0);
+        Assertions.assertNotNull(utdc);
+        Assertions.assertInstanceOf(DerivedURIKeyedSelfDesignatedClass.class, utdc);
+        Assertions.assertEquals(123, ((DerivedURIKeyedSelfDesignatedClass) utdc).getLength());
+
+        roundtrip(container);
     }
 
     @Test

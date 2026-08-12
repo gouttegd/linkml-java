@@ -58,4 +58,12 @@ public class URIConverter extends ScalarConverterBase {
         }
     }
 
+    @Override
+    public Object serialise(Object object, ConverterContext ctx) throws LinkMLRuntimeException {
+        if ( object instanceof URI ) {
+            return object.toString();
+        } else {
+            throw new LinkMLInternalError("Invalid value");
+        }
+    }
 }
