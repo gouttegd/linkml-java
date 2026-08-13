@@ -372,7 +372,10 @@ public class ObjectConverter implements IConverter {
                     raw.put(extension.getKey(), extension.getValue());
                 }
             } else {
-                raw.put(slot.getLinkMLName(), ctx.getConverter(slot).serialiseForSlot(slotValue, slot, ctx));
+                Object o = ctx.getConverter(slot).serialiseForSlot(slotValue, slot, ctx);
+                if ( o != null ) {
+                    raw.put(slot.getLinkMLName(), o);
+                }
             }
         }
 

@@ -120,7 +120,9 @@ public interface IConverter {
      * @param object The LinkML object to convert.
      * @param slot   The slot that the given object is a value of.
      * @param ctx    The global converter context.
-     * @return The raw object that represents the original LinkML object.
+     * @return The raw object that represents the original LinkML object. An
+     *         implementation may also return <code>null</code> to indicate that the
+     *         slot value should <em>not</em> be serialised.
      * @throws LinkMLRuntimeException If the converter cannot convert the given
      *                                object.
      */
