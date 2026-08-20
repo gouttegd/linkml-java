@@ -11,6 +11,7 @@ classes:
 
   Alice:
     description: Alice from S2-2.
+    conforms_to: S2-2.
     notes:
       - Should override S1, which is imported before the S2 chain.
       - But should itself be overridden by main, which comes earlier in the S2 import chain.

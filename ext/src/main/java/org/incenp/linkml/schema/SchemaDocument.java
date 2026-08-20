@@ -48,8 +48,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.incenp.linkml.core.ClassInfo;
 import org.incenp.linkml.core.ConverterContext;
 import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.Slot;
 import org.incenp.linkml.schema.model.ClassDefinition;
 import org.incenp.linkml.schema.model.Element;
 import org.incenp.linkml.schema.model.EnumDefinition;
@@ -290,7 +292,7 @@ public class SchemaDocument {
      *         schema that takes precedence over the currently processed schema,
      *         otherwise <code>false</code>.
      */
-    protected boolean isElementOverriden(Element element) {
+    protected boolean isElementOverriden(Element element) throws LinkMLRuntimeException {
         URI fromSchema = element.getFromSchema();
         if ( fromSchema != null ) {
             if ( importChain.contains(fromSchema) ) {
@@ -300,11 +302,12 @@ public class SchemaDocument {
             }
             else {
                 // The element was defined in a schema that came from an earlier import chain,
-                // so the current schema takes precedence.
-                // FIXME: Should the previous definition be completely erased? Or should the
-                // overriding definition preserve any slot that it does not define itself? (If
-                // only there was some kind of document that could explicitly specify this kind
-                // of details -- a "LinkML specification" or something like that.)
+                // so the current schema takes precedence. As per LinkML-Py's observed
+                // behaviour, the prior definition should be completely ignored, so here we need
+                // to "erase" it.
+                for ( Slot slot : ClassInfo.get(element.getClass()).getSlots() ) {
+                    slot.setValue(element, null);
+                }
             }
         } else {
             // The element has not been defined before.

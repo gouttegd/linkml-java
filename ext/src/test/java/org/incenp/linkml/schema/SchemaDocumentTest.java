@@ -267,5 +267,12 @@ public class SchemaDocumentTest {
         Assertions.assertEquals("Daphne from S1-2-1.", doc.getSlot("Daphne").getDescription());
         Assertions.assertEquals("Eve from S2-1.", doc.getSlot("Eve").getDescription());
         Assertions.assertEquals("Fiona from S1-2.", doc.getSlot("Fiona").getDescription());
+
+        Assertions.assertNull(doc.getClassDefinition("Alice").getConformsTo());
+        Assertions.assertNull(doc.getClassDefinition("Bob").getConformsTo());
+        Assertions.assertNull(doc.getClassDefinition("Charlie").getConformsTo());
+        Assertions.assertNull(doc.getSlot("Daphne").getConformsTo());
+        Assertions.assertNull(doc.getSlot("Eve").getConformsTo());
+        Assertions.assertNull(doc.getSlot("Fiona").getConformsTo());
     }
 }

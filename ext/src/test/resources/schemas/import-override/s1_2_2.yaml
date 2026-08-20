@@ -11,10 +11,12 @@ slots:
 
   Eve:
     description: Eve from S1-2-2.
+    conforms_to: S1-2-2.
     notes:
       - Should be overridden by S2-1, which is imported after S1 and all its imports.
 
   Fiona:
     description: Fiona from S1-2-2.
+    conforms_to: S1-2-2.
     notes:
       - Should be overridden by S1-2, which comes earlier in the same import chain.

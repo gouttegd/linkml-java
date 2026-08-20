@@ -11,6 +11,7 @@ slots:
 
   Daphne:
     description: Daphne from S1-1.
+    conforms_to: S1-1.
     notes:
       - Should be overridden by S1-2-1, which is imported after.
        

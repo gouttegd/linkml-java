@@ -16,6 +16,8 @@ classes:
 
   Bob:
     description: Bob from S1.
+    conforms_to: S1.
 
   Charlie:
     description: Charlie from S1.
+    conforms_to: S1.
