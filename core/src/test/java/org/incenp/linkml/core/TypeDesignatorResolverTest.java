@@ -53,7 +53,7 @@ public class TypeDesignatorResolverTest {
     TypeDesignatorResolver resolver = new TypeDesignatorResolver();
 
     @Test
-    void testResolveSingleDesignator() {
+    void testResolveSingleDesignator() throws LinkMLRuntimeException {
         ClassInfo base = ClassInfo.get(BaseSelfDesignatedClass.class);
         ClassInfo resolved = resolver.resolve("DerivedSelfDesignatedClass", base);
         Assertions.assertEquals(resolved, ClassInfo.get(DerivedSelfDesignatedClass.class));
@@ -66,14 +66,14 @@ public class TypeDesignatorResolverTest {
     }
 
     @Test
-    void testResolveSingleURIDesignator() {
+    void testResolveSingleURIDesignator() throws LinkMLRuntimeException {
         ClassInfo base = ClassInfo.get(BaseURISelfDesignatedClass.class);
         ClassInfo resolved = resolver.resolve(TEST_NS + "DerivedURISelfDesignatedClass", base);
         Assertions.assertEquals(resolved, ClassInfo.get(DerivedURISelfDesignatedClass.class));
     }
 
     @Test
-    void testResolveMultivaluedDesignator() {
+    void testResolveMultivaluedDesignator() throws LinkMLRuntimeException {
         ClassInfo base = ClassInfo.get(BaseSelfDesignatedClass.class);
         ClassInfo resolved = null;
         List<String> designators = new ArrayList<>();

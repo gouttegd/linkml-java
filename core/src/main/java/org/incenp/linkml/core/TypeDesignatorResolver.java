@@ -34,8 +34,6 @@
 
 package org.incenp.linkml.core;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,42 +41,13 @@ import java.util.List;
  * A helper object to (1) resolve type designator values into a LinkML class and
  * (2) obtain the type designator for a LinkML class.
  */
-public class TypeDesignatorResolver {
+public class TypeDesignatorResolver implements ITypeDesignatorResolver {
 
-    private final static String NO_DESIGNATOR = "Type '%s' has no designator slot";
-    private final static String INVALID_CLASS_URI = "Missing or invalid class URI for type '%s'";
+    private ITypeDesignatorResolver innerResolver = new DefaultTypeDesignatorResolver();
 
-    /**
-     * Resolves a single type designator into a LinkML class.
-     * 
-     * @param designator The type designator value; it can be a class name or a
-     *                   class URI.
-     * @param base       The base LinkML class. This would typically be the class
-     *                   that defines the type designator slot, though it could also
-     *                   be any class below it.
-     * @return The {@link ClassInfo} object representing the designated class, or
-     *         <code>null</code> if the designator could not be resolved into a
-     *         descendant of the <code>base</code> class (or the <code>base</code>
-     *         class itself).
-     */
-    public ClassInfo resolve(String designator, ClassInfo base) {
-        // Look up by URI
-        ClassInfo ci = ClassInfo.get(designator);
-        if ( ci == null ) {
-            // Look up by class name; we assume that all derived classes will live in the
-            // same Java package as the base class.
-            String pkgName = base.getType().getPackage().getName();
-            try {
-                ci = ClassInfo.get(Class.forName(pkgName + "." + designator));
-            } catch ( ClassNotFoundException e ) {
-            }
-        }
-
-        if ( ci != null && (ci == base || ci.getParents().contains(base)) ) {
-            return ci;
-        }
-
-        return null;
+    @Override
+    public ClassInfo resolve(String designator, ClassInfo base) throws LinkMLRuntimeException {
+        return innerResolver.resolve(designator, base);
     }
 
     /**
@@ -89,8 +58,7 @@ public class TypeDesignatorResolver {
      * designators for different classes at the same hierarchical level is
      * undefined.
      * 
-     * @param designators The type designator values; each value can be a class name
-     *                    or a class URI.
+     * @param designators The type designator values.
      * @param base        The base LinkML class. This would typically be the class
      *                    that defines the type designator slot, though it could
      *                    also be any class below it.
@@ -98,8 +66,10 @@ public class TypeDesignatorResolver {
      *         designated class, or <code>null</code> if none of the designator
      *         values could be resolved into a descendant of the <code>base</code>
      *         class (or the <code>base</code> class itself).
+     * @exception LinkMLRuntimeException If any error occurs during the resolution
+     *                                   attempt.
      */
-    public ClassInfo resolve(List<String> designators, ClassInfo base) {
+    public ClassInfo resolve(List<String> designators, ClassInfo base) throws LinkMLRuntimeException {
         int length = -1;
         ClassInfo ci = null;
         for ( String designator : designators ) {
@@ -116,26 +86,9 @@ public class TypeDesignatorResolver {
         return ci;
     }
 
-    /**
-     * Gets a single value that designates the provided class.
-     * 
-     * @param klass The {@link ClassInfo} object representing the class to
-     *              designate.
-     * @return The designator value. Depending on the type designator slot in the
-     *         class, it can be a URI, a string representing the URI in short form,
-     *         or a string representing the class name.
-     * @throws LinkMLRuntimeException If the given class has no type designator
-     *                                slot, or if the type designator slot is typed
-     *                                as a URI or CURIE and the class has no known
-     *                                URI.
-     */
+    @Override
     public Object getDesignator(ClassInfo klass) throws LinkMLRuntimeException {
-        Slot designatorSlot = klass.getTypeDesignatorSlot();
-        if ( designatorSlot == null ) {
-            throw new LinkMLInternalError(String.format(NO_DESIGNATOR, klass.getName()));
-        }
-
-        return getDesignator(klass, designatorSlot);
+        return innerResolver.getDesignator(klass);
     }
 
     /**
@@ -149,48 +102,20 @@ public class TypeDesignatorResolver {
      *         either class URIs, strings representing shortened class URIs, or
      *         class names, depending on the type designator slot.
      * @throws LinkMLRuntimeException If the given class has no type designator
-     *                                slot, or if the type designator slot is typed
-     *                                as a URI or CURIE and the class (or one of its
-     *                                ancestors) has no known URI.
+     *                                slot, or if any error occurs when attempting
+     *                                to find the correct designator values.
      */
     public List<Object> getDesignators(ClassInfo klass) throws LinkMLRuntimeException {
-        Slot designatorSlot = klass.getTypeDesignatorSlot();
-        if ( designatorSlot == null ) {
-            throw new LinkMLInternalError(String.format(NO_DESIGNATOR, klass.getName()));
-        }
-
         List<Object> designators = new ArrayList<>();
         List<ClassInfo> parents = klass.getParents();
         for ( int i = parents.size() - 1; i >= 0; i-- ) {
             ClassInfo parent = parents.get(i);
             if ( parent.hasTypeDesignator() ) {
-                designators.add(getDesignator(parent, designatorSlot));
+                designators.add(innerResolver.getDesignator(parent));
             }
         }
-        designators.add(getDesignator(klass, designatorSlot));
+        designators.add(innerResolver.getDesignator(klass));
 
         return designators;
-    }
-
-    /*
-     * Helper method to get a single designator value of the appropriate type
-     * expected by the designator slot.
-     */
-    private Object getDesignator(ClassInfo klass, Slot designatorSlot) throws LinkMLRuntimeException {
-        if ( designatorSlot.getInnerType().equals(URI.class) ) {
-            try {
-                return new URI(klass.getURI());
-            } catch ( NullPointerException | URISyntaxException e ) {
-                throw new LinkMLInternalError(String.format(INVALID_CLASS_URI, klass.getName()));
-            }
-        } else if ( designatorSlot.isCurieTyped() ) {
-            String uri = klass.getURI();
-            if ( uri == null ) {
-                throw new LinkMLInternalError(String.format(INVALID_CLASS_URI, klass.getName()));
-            }
-            return uri;
-        } else {
-            return klass.getName();
-        }
     }
 }
