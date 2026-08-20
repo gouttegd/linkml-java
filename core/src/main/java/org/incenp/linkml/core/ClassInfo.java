@@ -93,6 +93,7 @@ public class ClassInfo {
     private Map<String, Slot> slots = new HashMap<>();
     private Map<String, Slot> slotsByURI = new HashMap<>();
     private List<ClassInfo> parents = new ArrayList<>();
+    private ClassInfo designatorBase;
     private Slot identifierSlot;
     private Slot designatorSlot;
     private Slot extensionSlot;
@@ -122,6 +123,9 @@ public class ClassInfo {
 
             if ( slot.isTypeDesignator() ) {
                 designatorSlot = slot;
+                if ( slot.getDeclaringClass() == klass ) {
+                    designatorBase = this;
+                }
             }
 
             String uri = slot.getLinkedURI();
@@ -142,6 +146,10 @@ public class ClassInfo {
                 ClassInfo parentInfo = ClassInfo.get(parent);
                 if ( parentInfo != null ) {
                     parents.add(parentInfo);
+                    if ( designatorSlot != null && designatorBase == null
+                            && parent == designatorSlot.getDeclaringClass() ) {
+                        designatorBase = parentInfo;
+                    }
                 } else {
                     parent = null;
                 }
@@ -312,6 +320,20 @@ public class ClassInfo {
      */
     public Slot getTypeDesignatorSlot() {
         return designatorSlot;
+    }
+
+    /**
+     * Gets the class that defines the type designator slot, if any.
+     * <p>
+     * If the type designator slot is defined in a parent class, then this will
+     * return that parent.
+     * 
+     * @return The class in which the type designator is defined. It may be this
+     *         very object if the slot is defined in this class. It will be
+     *         <code>null</code> if the class has no type designator slot.
+     */
+    public ClassInfo getDesignatorBase() {
+        return designatorBase;
     }
 
     /**

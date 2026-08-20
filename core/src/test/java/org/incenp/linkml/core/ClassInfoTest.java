@@ -34,6 +34,8 @@
 
 package org.incenp.linkml.core;
 
+import org.incenp.linkml.core.samples.base.BaseCurieSelfDesignatedClass;
+import org.incenp.linkml.core.samples.base.DerivedCurieSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.ExtendedIdentifiableClass;
 import org.incenp.linkml.core.samples.base.ExtraSimpleDict;
 import org.incenp.linkml.core.samples.base.SimpleClass;
@@ -109,6 +111,15 @@ public class ClassInfoTest {
 
         ci = ClassInfo.get(SimpleClass.class);
         Assertions.assertTrue(ci.getParents().isEmpty());
+    }
+
+    @Test
+    void testGetDesignatorBase() {
+        ClassInfo ci = ClassInfo.get(BaseCurieSelfDesignatedClass.class);
+        Assertions.assertEquals(ci, ci.getDesignatorBase());
+
+        ClassInfo ci2 = ClassInfo.get(DerivedCurieSelfDesignatedClass.class);
+        Assertions.assertEquals(ci, ci2.getDesignatorBase());
     }
 
     @Test
