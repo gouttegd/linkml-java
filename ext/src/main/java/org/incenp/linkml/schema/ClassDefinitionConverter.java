@@ -76,10 +76,10 @@ import org.incenp.linkml.schema.model.SlotDefinition;
  * <code>slot_usage</code> section: they are really local to the class and
  * should <em>not</em> be treated as global objects.
  */
-public class ClassDefinitionConverter extends ObjectConverter {
+public class ClassDefinitionConverter extends ElementConverter {
 
-    public ClassDefinitionConverter() {
-        super(ClassDefinition.class);
+    public ClassDefinitionConverter(SchemaDocument doc) {
+        super(ClassDefinition.class, doc);
     }
 
     @Override

@@ -1,0 +1,15 @@
+id: https://example.org/import-override/main
+name: import-override-main
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+
+imports:
+  - linkml:types
+  - s1
+  - s2
+
+classes:
+
+  Alice:
+    description: Alice from main.

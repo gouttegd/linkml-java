@@ -256,4 +256,16 @@ public class SchemaDocumentTest {
         Assertions.assertTrue(annotatableClass.getMixin());
         Assertions.assertTrue(annotationSlot.getDomain() == annotatableClass);
     }
+
+    @Test
+    void testImportOverride() throws InvalidSchemaException, IOException {
+        SchemaDocument doc = new SchemaDocument(new File("src/test/resources/schemas/import-override/main.yaml"));
+
+        Assertions.assertEquals("Alice from main.", doc.getClassDefinition("Alice").getDescription());
+        Assertions.assertEquals("Bob from S2.", doc.getClassDefinition("Bob").getDescription());
+        Assertions.assertEquals("Charlie from S2-1.", doc.getClassDefinition("Charlie").getDescription());
+        Assertions.assertEquals("Daphne from S1-2-1.", doc.getSlot("Daphne").getDescription());
+        Assertions.assertEquals("Eve from S2-1.", doc.getSlot("Eve").getDescription());
+        Assertions.assertEquals("Fiona from S1-2.", doc.getSlot("Fiona").getDescription());
+    }
 }

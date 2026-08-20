@@ -1,0 +1,13 @@
+id: https://example.org/import-override/s1_2_1
+name: import-override-s1_2_1
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+
+imports:
+  - linkml:types
+
+slots:
+
+  Daphne:
+    description: Daphne from S1-2-1.

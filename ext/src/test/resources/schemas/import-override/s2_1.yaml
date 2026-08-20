@@ -1,0 +1,19 @@
+id: https://example.org/import-override/s2_1
+name: import-override-s2_1
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+
+imports:
+  - linkml:types
+
+classes:
+
+  Charlie:
+    description: Charlie from S2-1.
+
+
+slots:
+
+  Eve:
+    description: Eve from S2-1.

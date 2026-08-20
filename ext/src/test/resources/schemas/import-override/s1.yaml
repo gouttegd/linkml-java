@@ -1,0 +1,21 @@
+id: https://example.org/import-override/s1
+name: import-override-s1
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+
+imports:
+  - linkml:types
+  - s1_1
+  - s1_2
+
+classes:
+
+  Alice:
+    description: Alice from S1.
+
+  Bob:
+    description: Bob from S1.
+
+  Charlie:
+    description: Charlie from S1.

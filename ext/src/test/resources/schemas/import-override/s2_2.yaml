@@ -1,0 +1,16 @@
+id: https://example.org/import-override/s2_2
+name: import-override-s2_2
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+
+imports:
+  - linkml:types
+
+classes:
+
+  Alice:
+    description: Alice from S2-2.
+    notes:
+      - Should override S1, which is imported before the S2 chain.
+      - But should itself be overridden by main, which comes earlier in the S2 import chain.
