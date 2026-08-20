@@ -38,22 +38,17 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.incenp.linkml.core.ClassInfo;
 import org.incenp.linkml.core.ConverterContext;
 import org.incenp.linkml.core.LinkMLRuntimeException;
-import org.incenp.linkml.core.Slot;
 import org.incenp.linkml.schema.model.ClassDefinition;
-import org.incenp.linkml.schema.model.Element;
 import org.incenp.linkml.schema.model.EnumDefinition;
 import org.incenp.linkml.schema.model.SchemaDefinition;
 import org.incenp.linkml.schema.model.SlotDefinition;
@@ -95,7 +90,7 @@ public class SchemaDocument {
     private SchemaDefinition rootSchema;
     private List<SchemaDefinition> importedSchemas = new ArrayList<>();
     private Set<ISchemaSource> importedSources = new HashSet<>();
-    private Deque<URI> importChain = new ArrayDeque<>();
+    private SchemaProcessingContext schemaContext = new SchemaProcessingContext();
     private Map<String, ClassDefinition> allClasses = new HashMap<>();
     private Map<String, SlotDefinition> allSlots = new HashMap<>();
     private Map<String, EnumDefinition> allEnums = new HashMap<>();
@@ -284,50 +279,16 @@ public class SchemaDocument {
         return null;
     }
 
-    /**
-     * Checks if the specified element is overridden by another schema.
-     * 
-     * @param element The element to check.
-     * @return <code>true</code> if the element has already been defined in another
-     *         schema that takes precedence over the currently processed schema,
-     *         otherwise <code>false</code>.
-     */
-    protected boolean isElementOverriden(Element element) throws LinkMLRuntimeException {
-        URI fromSchema = element.getFromSchema();
-        if ( fromSchema != null ) {
-            if ( importChain.contains(fromSchema) ) {
-                // The element was defined in a schema that came earlier in the same import
-                // chain as the current schema, so the earlier definition takes precedence.
-                return true;
-            }
-            else {
-                // The element was defined in a schema that came from an earlier import chain,
-                // so the current schema takes precedence. As per LinkML-Py's observed
-                // behaviour, the prior definition should be completely ignored, so here we need
-                // to "erase" it.
-                for ( Slot slot : ClassInfo.get(element.getClass()).getSlots() ) {
-                    slot.setValue(element, null);
-                }
-            }
-        } else {
-            // The element has not been defined before.
-        }
-
-        element.setFromSchema(importChain.getLast());
-
-        return false;
-    }
-
     // The entry point for the actual parsing code
     private SchemaDefinition parseSchema(ISchemaSource source)
             throws IOException, InvalidSchemaException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         ConverterContext ctx = new ConverterContext();
         ctx.addConverter(new SchemaDefinitionConverter());
-        ctx.addConverter(new ClassDefinitionConverter(this));
-        ctx.addConverter(new ElementConverter(SlotDefinition.class, this));
-        ctx.addConverter(new ElementConverter(TypeDefinition.class, this));
-        ctx.addConverter(new ElementConverter(EnumDefinition.class, this));
+        ctx.addConverter(new ClassDefinitionConverter(schemaContext));
+        ctx.addConverter(new ElementConverter(SlotDefinition.class, schemaContext));
+        ctx.addConverter(new ElementConverter(TypeDefinition.class, schemaContext));
+        ctx.addConverter(new ElementConverter(EnumDefinition.class, schemaContext));
 
         // Parse the top-level schema and all its imports recursively
         SchemaDefinition schema = parseSchema(source, mapper, ctx);
@@ -360,7 +321,7 @@ public class SchemaDocument {
             Object schemaId = ((Map) raw).get("id");
             if ( schemaId != null ) {
                 try {
-                    importChain.add(new URI(schemaId.toString()));
+                    schemaContext.pushImport(new URI(schemaId.toString()));
                 } catch ( URISyntaxException e ) {
                     throw new InvalidSchemaException(String.format(INVALID_SCHEMA_ID, schemaId), e);
                 }
@@ -420,7 +381,7 @@ public class SchemaDocument {
             }
         }
 
-        importChain.removeLast();
+        schemaContext.popImport();
         return schema;
     }
 }

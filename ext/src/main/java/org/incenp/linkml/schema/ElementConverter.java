@@ -34,11 +34,13 @@
 
 package org.incenp.linkml.schema;
 
+import java.net.URI;
 import java.util.Map;
 
 import org.incenp.linkml.core.ConverterContext;
 import org.incenp.linkml.core.LinkMLRuntimeException;
 import org.incenp.linkml.core.ObjectConverter;
+import org.incenp.linkml.core.Slot;
 import org.incenp.linkml.schema.model.Element;
 
 /**
@@ -67,19 +69,80 @@ import org.incenp.linkml.schema.model.Element;
  */
 public class ElementConverter extends ObjectConverter {
 
-    private SchemaDocument doc;
+    private SchemaProcessingContext context;
+    private boolean checkOverriding;
 
-    public ElementConverter(Class<? extends Element> klass, SchemaDocument doc) {
+    /**
+     * Creates a new converter for the specified type of element.
+     * 
+     * @param klass   The type of element to convert.
+     * @param context The context for which elements are to be converted.
+     */
+    public ElementConverter(Class<? extends Element> klass, SchemaProcessingContext context) {
         super(klass);
-        this.doc = doc;
+        this.context = context;
+        this.checkOverriding = true;
+    }
+
+    /**
+     * Creates a new converter for the specified type of element.
+     * 
+     * @param klass           The type of element to convert.
+     * @param context         The context for which elements are to be converted.
+     * @param checkOverriding If <code>true</code>, this class will not check
+     *                        whether a given element is overridden. This is
+     *                        intended to allow subclasses to perform this check
+     *                        themselves.
+     */
+    public ElementConverter(Class<? extends Element> klass, SchemaProcessingContext context, boolean checkOverriding) {
+        super(klass);
+        this.context = context;
+        this.checkOverriding = checkOverriding;
     }
 
     @Override
     public void convertTo(Map<String, Object> rawMap, Object dest, ConverterContext ctx) throws LinkMLRuntimeException {
-        if ( doc.isElementOverriden((Element) dest) ) {
-            return;
+        if ( !checkOverriding || !isOverridden((Element) dest) ) {
+            super.convertTo(rawMap, dest, ctx);
+        }
+    }
+
+    /**
+     * Checks whether the schema schema is overridden by another one about the given
+     * element.
+     * <p>
+     * If the current schema is found to override a prior definition (instead of
+     * being overridden itself), then this method ensures that the current schema
+     * takes precedence.
+     * 
+     * @param element The element to check.
+     * @return <code>true</code> if the element is overridden, and therefore does
+     *         not need to be processed any further.
+     * @throws LinkMLRuntimeException If an error occurs when deleting the prior
+     *                                definition, if any (this should never happen).
+     */
+    protected boolean isOverridden(Element element) throws LinkMLRuntimeException {
+        URI fromSchema = element.getFromSchema();
+        if ( fromSchema != null ) {
+            if ( context.isInImportChain(fromSchema) ) {
+                // "Pre-overriding": The element was defined in a schema that came earlier in
+                // the same import chain as the current schema, so the earlier definition takes
+                // precedence.
+                return true;
+            } else {
+                // "Post-overriding": The element was defined in a schema that came from an
+                // earlier import chain, so the current schema takes precedence. As per
+                // LinkML-Py's observed behaviour, the prior definition should be completely
+                // ignored, so here we need to "erase" it.
+                for ( Slot slot : klass.getSlots() ) {
+                    slot.setValue(element, null);
+                }
+            }
+        } else {
+            // The element has not been defined before.
         }
 
-        super.convertTo(rawMap, dest, ctx);
+        element.setFromSchema(context.getCurrentSchema());
+        return false;
     }
 }

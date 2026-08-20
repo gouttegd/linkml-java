@@ -78,13 +78,17 @@ import org.incenp.linkml.schema.model.SlotDefinition;
  */
 public class ClassDefinitionConverter extends ElementConverter {
 
-    public ClassDefinitionConverter(SchemaDocument doc) {
-        super(ClassDefinition.class, doc);
+    public ClassDefinitionConverter(SchemaProcessingContext context) {
+        super(ClassDefinition.class, context, false);
     }
 
     @Override
     public void convertTo(Map<String, Object> rawMap, Object dest, ConverterContext ctx) throws LinkMLRuntimeException {
         ClassDefinition def = (ClassDefinition) dest;
+        if ( isOverridden(def) ) {
+            return;
+        }
+
         Object attributes = rawMap.remove("attributes");
         if ( attributes != null ) {
             def.setAttributes(convertLocalSlotDefinitions(toMap(attributes), ctx));
