@@ -84,6 +84,7 @@ import org.incenp.linkml.core.annotations.LinkURI;
 public class ClassInfo {
 
     private static final String CREATE_ERROR = "Cannot create global object of type '%s'";
+    private static final String INVALID_TYPE = "Invalid type for object: expected '%s', found '%s'";
 
     private static Map<Class<?>, ClassInfo> cache = new HashMap<>();
     private static Map<String, ClassInfo> cacheByURI = new HashMap<>();
@@ -418,6 +419,30 @@ public class ClassInfo {
         } catch ( InvocationTargetException | InstantiationException | IllegalAccessException | IllegalArgumentException
                 | NoSuchMethodException | SecurityException e ) {
             throw new LinkMLInternalError(String.format(CREATE_ERROR, type.getName()), e);
+        }
+    }
+
+    /**
+     * Applies an operation to all the slots for a given object.
+     * 
+     * @param object    The object to whose slots the operation should be applied.
+     * @param processor The operation to perform.
+     * @param unset     If <code>true</code>, the operation is applied to slots that
+     *                  are unset; otherwise, only slots that have a value will be
+     *                  concerned.
+     * @throws LinkMLRuntimeException If the given object is not compatible with the
+     *                                LinkML class represented by this ClassInfo
+     *                                object.
+     */
+    public void processSlots(Object object, ISlotProcessor processor, boolean unset) throws LinkMLRuntimeException {
+        if ( !type.isInstance(object) ) {
+            throw new LinkMLInternalError(String.format(INVALID_TYPE, type, object.getClass()));
+        }
+        for ( Slot slot : slots.values() ) {
+            Object value = slot.getValue(object);
+            if ( value != null || unset ) {
+                processor.process(slot, object, slot.getValue(object));
+            }
         }
     }
 

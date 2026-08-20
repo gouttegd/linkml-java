@@ -110,4 +110,13 @@ public class ClassInfoTest {
         ci = ClassInfo.get(SimpleClass.class);
         Assertions.assertTrue(ci.getParents().isEmpty());
     }
+
+    @Test
+    void testSlotProcessor() throws LinkMLRuntimeException {
+        SimpleIdentifiableClass sic = new SimpleIdentifiableClass();
+        sic.setFoo("The foo");
+        ClassInfo.get(SimpleIdentifiableClass.class).processSlots(sic, (s, o, v) -> s.setValue(o, null), true);
+        Assertions.assertNull(sic.getFoo());
+
+    }
 }

@@ -40,7 +40,6 @@ import java.util.Map;
 import org.incenp.linkml.core.ConverterContext;
 import org.incenp.linkml.core.LinkMLRuntimeException;
 import org.incenp.linkml.core.ObjectConverter;
-import org.incenp.linkml.core.Slot;
 import org.incenp.linkml.schema.model.Element;
 
 /**
@@ -134,9 +133,7 @@ public class ElementConverter extends ObjectConverter {
                 // earlier import chain, so the current schema takes precedence. As per
                 // LinkML-Py's observed behaviour, the prior definition should be completely
                 // ignored, so here we need to "erase" it.
-                for ( Slot slot : klass.getSlots() ) {
-                    slot.setValue(element, null);
-                }
+                klass.processSlots(element, (s, o, v) -> s.setValue(o, null), false);
             }
         } else {
             // The element has not been defined before.
