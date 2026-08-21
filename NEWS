@@ -1,3 +1,13 @@
+Changes in LinkML-Java 0.2.3
+----------------------------
+
+    * All standard LinkML schema imports are now embedded
+      (not longer just `linkml:types`).
+    * Allow using a XML Catalog to resolve imports.
+    * Allow using custom type designator resolution logic.
+    * Correctly support multiple definitions across several schemas.
+
+
 Changes in LinkML-Java 0.2.2
 ----------------------------
 
