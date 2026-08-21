@@ -171,7 +171,6 @@ public class ObjectConverter implements IConverter {
             Slot designatorSlot = klass.getTypeDesignatorSlot();
             Object designator = raw.get(designatorSlot.getLinkMLName());
             if ( designator != null ) {
-                TypeDesignatorResolver resolver = new TypeDesignatorResolver();
                 IConverter designatorConverter = ctx.getConverter(designatorSlot);
                 ClassInfo designatedClass = null;
 
@@ -180,10 +179,10 @@ public class ObjectConverter implements IConverter {
                     for ( Object rawDesignator : toList(designator, true) ) {
                         designatorNames.add(designatorConverter.convert(rawDesignator, ctx).toString());
                     }
-                    designatedClass = resolver.resolve(designatorNames, klass);
+                    designatedClass = ctx.getTypeDesignatorResolver().resolve(designatorNames, klass);
                 } else {
                     String designatedName = designatorConverter.convert(designator, ctx).toString();
-                    designatedClass = resolver.resolve(designatedName, klass);
+                    designatedClass = ctx.getTypeDesignatorResolver().resolve(designatedName, klass);
                 }
 
                 if ( designatedClass != null ) {
@@ -356,11 +355,10 @@ public class ObjectConverter implements IConverter {
             Object slotValue = slot.getValue(object);
             if ( slotValue == null && slot.isTypeDesignator() ) {
                 // Set the slot to the actual type name
-                TypeDesignatorResolver resolver = new TypeDesignatorResolver();
                 if ( slot.isMultivalued() ) {
-                    slotValue = resolver.getDesignators(klass);
+                    slotValue = ctx.getTypeDesignatorResolver().getDesignators(klass);
                 } else {
-                    slotValue = resolver.getDesignator(klass);
+                    slotValue = ctx.getTypeDesignatorResolver().getDesignator(klass);
                 }
             } else if ( slotValue == null ) {
                 // Ignore all other empty slots
@@ -439,7 +437,7 @@ public class ObjectConverter implements IConverter {
         Object identifier = identifierSlot.getValue(object);
         if ( identifier == null ) {
             if ( identifierSlot.isTypeDesignator() ) {
-                identifier = new TypeDesignatorResolver().getDesignator(ClassInfo.get(object.getClass()));
+                identifier = ctx.getTypeDesignatorResolver().getDesignator(ClassInfo.get(object.getClass()));
             } else {
                 throw new LinkMLValueError(String.format(NO_IDENTIFIER, getType().getName()));
             }

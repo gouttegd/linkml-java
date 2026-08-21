@@ -144,6 +144,7 @@ public class ConverterContext {
     private Map<String, String> prefixMap = new HashMap<>();
     private Map<String, String> iri2CurieCache = new HashMap<>();
     private IConverterProvider objectConverterProvider;
+    private ITypeDesignatorResolver typeResolver;
 
     public ConverterContext() {
         // Register converters for all the basic types.
@@ -168,6 +169,7 @@ public class ConverterContext {
         converters.put(Object.class, new TransparentConverter());
 
         objectConverterProvider = (t) -> new ObjectConverter(t);
+        typeResolver = new DefaultTypeDesignatorResolver();
     }
 
     /**
@@ -182,6 +184,29 @@ public class ConverterContext {
      */
     public void setDefaultObjectConverterProvider(IConverterProvider provider) {
         objectConverterProvider = provider;
+    }
+
+    /**
+     * Sets a custom resolver for type designators.
+     * <p>
+     * The default resolver resolves type designators using the standard LinkML
+     * logic. Client code may assign a specialised type resolver to implement a
+     * custom logic as needed.
+     * 
+     * @param resolver The type designator resolver to use for all operations
+     *                 performed using this context.
+     */
+    public void setTypeDesignatorResolver(ITypeDesignatorResolver resolver) {
+        typeResolver = resolver;
+    }
+
+    /**
+     * Gets the resolver for type designators.
+     * 
+     * @return The resolver to use for resolving all type designators.
+     */
+    public ITypeDesignatorResolver getTypeDesignatorResolver() {
+        return typeResolver;
     }
 
     /**
