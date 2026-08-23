@@ -53,6 +53,45 @@ import org.slf4j.LoggerFactory;
  * classes might require some adaptations, typically to implement behaviours
  * that are not fully encoded within their defining LinkML schema. This class
  * may then be derived to create custom converters as needed.
+ * 
+ * <h2>Converting from raw objects</h2>
+ * <p>
+ * The process to convert from a raw object (“deserialisation”) uses the
+ * following path:
+ * <ul>
+ * <li>{@link #convert(Object, ConverterContext)} – checks that the raw object
+ * is a map, then passes it to…
+ * <li>{@link #convert(Map, ConverterContext)} – handles type designator and
+ * identifier, then calls…
+ * <li>{@link #convert(Map, String, ConverterContext)} – instantiates the object
+ * (or retrieves an already instantiated global object), then calls…
+ * <li>{@link #convertTo(Map, Object, ConverterContext)} – assigns all slots on
+ * the object based on the contents of the map; each slot will be converted by
+ * calling the {@link #convertForSlot(Object, Object, Slot, ConverterContext)}
+ * method on the appropriate {@link IConverter} object for the slot.
+ * </ul>
+ * 
+ * <h2>Converting to raw objects</h2>
+ * <p>
+ * The process to convert into a raw object (“serialisation”) uses the following
+ * path:
+ * <ul>
+ * <li>{@link #serialise(Object, ConverterContext)} – immediately calls
+ * {@link #serialise(Object, boolean, ConverterContext)}; client code may call
+ * that second method directly to control whether the object’s identifier should
+ * be serialised or not;
+ * <li>{@link #serialise(Object, boolean, ConverterContext)} – ensures this is
+ * the correct {@link IConverter} for the object to serialise, then
+ * <ul>
+ * <li>calls {@link #serialiseInit(Object, boolean, ConverterContext)} to create
+ * the map that will represent the serialised object;
+ * <li>handles the type designator slot and any extra slots;
+ * <li>calls {@link #serialiseSlot(Slot, Object, Map, ConverterContext)} to
+ * serialise each slot – this method will in turn call the
+ * {@link #serialiseForSlot(Object, Slot, ConverterContext)} method on the
+ * appropriate {@link IConverter} object for the slot.
+ * </ul>
+ * </ul>
  */
 public class ObjectConverter implements IConverter {
 
@@ -65,7 +104,7 @@ public class ObjectConverter implements IConverter {
     private final static String NO_IDENTIFIER = "Missing identifier for type '%s'";
 
     protected ClassInfo klass;
-    private PrefixDeclarationExtractor prefixExtractor;
+    protected PrefixDeclarationExtractor prefixExtractor;
 
     /**
      * Creates a new converter for objects of the specified type.
@@ -346,7 +385,7 @@ public class ObjectConverter implements IConverter {
             }
         }
 
-        Map<String, Object> raw = new HashMap<>();
+        Map<String, Object> raw = serialiseInit(object, withIdentifier, ctx);
         for ( Slot slot : klass.getSlots() ) {
             if ( (slot.isIdentifier()) && !withIdentifier ) {
                 continue;
@@ -370,14 +409,51 @@ public class ObjectConverter implements IConverter {
                     raw.put(extension.getKey(), extension.getValue());
                 }
             } else {
-                Object o = ctx.getConverter(slot).serialiseForSlot(slotValue, slot, ctx);
-                if ( o != null ) {
-                    raw.put(slot.getLinkMLName(), o);
-                }
+                serialiseSlot(slot, slotValue, raw, ctx);
             }
         }
 
         return raw;
+    }
+
+    /**
+     * Initialises the raw map that will be used to store the serialisation of the
+     * given object.
+     * <p>
+     * This method simply returns an empty map. It can be overridden in subclasses
+     * as needed to implement some custom serialisation behaviours.
+     * 
+     * @param object         The LinkML object to convert.
+     * @param withIdentifier If <code>false</code>, the object’s unique identifier
+     *                       (if it has one) should not be serialised into the map.
+     * @param ctx            The global converter context.
+     * @return The map that will contain the serialisation of the object. This
+     *         implementation returns an empty map. Overriding methods in subclasses
+     *         can return a pre-filled map.
+     * @throws LinkMLRuntimeException If any error occurs during the serialisation.
+     */
+    protected Map<String, Object> serialiseInit(Object object, boolean withIdentifier, ConverterContext ctx)
+            throws LinkMLRuntimeException {
+        return new HashMap<String, Object>();
+    }
+
+    /**
+     * Serialises the value of a single slot.
+     * 
+     * @param slot  The slot to serialise.
+     * @param value The value of the slot. Cannot be <code>null</code> – this method
+     *              is only called for slots that do have a value.
+     * @param dest  The map representing the serialised object, in which the
+     *              serialised slot value is to be stored.
+     * @param ctx   The global converter context.
+     * @throws LinkMLRuntimeException If any error occurs during the serialisation.
+     */
+    protected void serialiseSlot(Slot slot, Object value, Map<String, Object> dest, ConverterContext ctx)
+            throws LinkMLRuntimeException {
+        Object rawValue = ctx.getConverter(slot).serialiseForSlot(value, slot, ctx);
+        if ( rawValue != null ) {
+            dest.put(slot.getLinkMLName(), rawValue);
+        }
     }
 
     @Override
