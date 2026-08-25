@@ -463,7 +463,7 @@ public class ClassInfo {
         for ( Slot slot : slots.values() ) {
             Object value = slot.getValue(object);
             if ( value != null || unset ) {
-                processor.process(slot, object, slot.getValue(object));
+                processor.process(slot, object, value);
             }
         }
     }
