@@ -59,10 +59,10 @@ public class SimpleDict {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$key = this.getKey();
         final Object other$key = other.getKey();
-        if ( this$key == null ? other$key != null : !this$key.equals(other$key)) return false;
+        if ( this$key == null ? other$key != null : !this$key.equals(other$key) ) return false;
         final Object this$value = this.getValue();
         final Object other$value = other.getValue();
-        if ( this$value == null ? other$value != null : !this$value.equals(other$value)) return false;
+        if ( this$value == null ? other$value != null : !this$value.equals(other$value) ) return false;
         return true;
     }
 

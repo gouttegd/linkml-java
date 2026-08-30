@@ -158,22 +158,22 @@ public class ReachabilityQuery {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$sourceOntology = this.getSourceOntology();
         final Object other$sourceOntology = other.getSourceOntology();
-        if ( this$sourceOntology == null ? other$sourceOntology != null : !this$sourceOntology.equals(other$sourceOntology)) return false;
+        if ( this$sourceOntology == null ? other$sourceOntology != null : !this$sourceOntology.equals(other$sourceOntology) ) return false;
         final Object this$sourceNodes = this.getSourceNodes();
         final Object other$sourceNodes = other.getSourceNodes();
-        if ( this$sourceNodes == null ? other$sourceNodes != null : !this$sourceNodes.equals(other$sourceNodes)) return false;
+        if ( this$sourceNodes == null ? other$sourceNodes != null : !this$sourceNodes.equals(other$sourceNodes) ) return false;
         final Object this$relationshipTypes = this.getRelationshipTypes();
         final Object other$relationshipTypes = other.getRelationshipTypes();
-        if ( this$relationshipTypes == null ? other$relationshipTypes != null : !this$relationshipTypes.equals(other$relationshipTypes)) return false;
+        if ( this$relationshipTypes == null ? other$relationshipTypes != null : !this$relationshipTypes.equals(other$relationshipTypes) ) return false;
         final Object this$isDirect = this.getIsDirect();
         final Object other$isDirect = other.getIsDirect();
-        if ( this$isDirect == null ? other$isDirect != null : !this$isDirect.equals(other$isDirect)) return false;
+        if ( this$isDirect == null ? other$isDirect != null : !this$isDirect.equals(other$isDirect) ) return false;
         final Object this$includeSelf = this.getIncludeSelf();
         final Object other$includeSelf = other.getIncludeSelf();
-        if ( this$includeSelf == null ? other$includeSelf != null : !this$includeSelf.equals(other$includeSelf)) return false;
+        if ( this$includeSelf == null ? other$includeSelf != null : !this$includeSelf.equals(other$includeSelf) ) return false;
         final Object this$traverseUp = this.getTraverseUp();
         final Object other$traverseUp = other.getTraverseUp();
-        if ( this$traverseUp == null ? other$traverseUp != null : !this$traverseUp.equals(other$traverseUp)) return false;
+        if ( this$traverseUp == null ? other$traverseUp != null : !this$traverseUp.equals(other$traverseUp) ) return false;
         return true;
     }
 

@@ -78,10 +78,10 @@ public class PrefixDeclarationHolder {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$prefixes = this.getPrefixes();
         final Object other$prefixes = other.getPrefixes();
-        if ( this$prefixes == null ? other$prefixes != null : !this$prefixes.equals(other$prefixes)) return false;
+        if ( this$prefixes == null ? other$prefixes != null : !this$prefixes.equals(other$prefixes) ) return false;
         final Object this$foo = this.getFoo();
         final Object other$foo = other.getFoo();
-        if ( this$foo == null ? other$foo != null : !this$foo.equals(other$foo)) return false;
+        if ( this$foo == null ? other$foo != null : !this$foo.equals(other$foo) ) return false;
         return true;
     }
 

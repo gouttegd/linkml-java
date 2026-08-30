@@ -98,10 +98,10 @@ public class ContainerOfIntegerValues {
         if ( this$foo != other$foo ) return false;
         final Object this$bar = this.getBar();
         final Object other$bar = other.getBar();
-        if ( this$bar == null ? other$bar != null : !this$bar.equals(other$bar)) return false;
+        if ( this$bar == null ? other$bar != null : !this$bar.equals(other$bar) ) return false;
         final Object this$baz = this.getBaz();
         final Object other$baz = other.getBaz();
-        if ( this$baz == null ? other$baz != null : !this$baz.equals(other$baz)) return false;
+        if ( this$baz == null ? other$baz != null : !this$baz.equals(other$baz) ) return false;
         return true;
     }
 

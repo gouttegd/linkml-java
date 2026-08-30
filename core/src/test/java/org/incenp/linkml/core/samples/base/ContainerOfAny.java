@@ -95,13 +95,13 @@ public class ContainerOfAny {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$foo = this.getFoo();
         final Object other$foo = other.getFoo();
-        if ( this$foo == null ? other$foo != null : !this$foo.equals(other$foo)) return false;
+        if ( this$foo == null ? other$foo != null : !this$foo.equals(other$foo) ) return false;
         final Object this$misc = this.getMisc();
         final Object other$misc = other.getMisc();
-        if ( this$misc == null ? other$misc != null : !this$misc.equals(other$misc)) return false;
+        if ( this$misc == null ? other$misc != null : !this$misc.equals(other$misc) ) return false;
         final Object this$severalMisc = this.getSeveralMisc();
         final Object other$severalMisc = other.getSeveralMisc();
-        if ( this$severalMisc == null ? other$severalMisc != null : !this$severalMisc.equals(other$severalMisc)) return false;
+        if ( this$severalMisc == null ? other$severalMisc != null : !this$severalMisc.equals(other$severalMisc) ) return false;
         return true;
     }
 

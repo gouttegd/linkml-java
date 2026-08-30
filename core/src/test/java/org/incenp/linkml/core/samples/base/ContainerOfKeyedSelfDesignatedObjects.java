@@ -63,7 +63,7 @@ public class ContainerOfKeyedSelfDesignatedObjects {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$objects = this.getObjects();
         final Object other$objects = other.getObjects();
-        if ( this$objects == null ? other$objects != null : !this$objects.equals(other$objects)) return false;
+        if ( this$objects == null ? other$objects != null : !this$objects.equals(other$objects) ) return false;
         return true;
     }
 

@@ -66,10 +66,10 @@ public class MultivaluedSimpleDict {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$key = this.getKey();
         final Object other$key = other.getKey();
-        if ( this$key == null ? other$key != null : !this$key.equals(other$key)) return false;
+        if ( this$key == null ? other$key != null : !this$key.equals(other$key) ) return false;
         final Object this$values = this.getValues();
         final Object other$values = other.getValues();
-        if ( this$values == null ? other$values != null : !this$values.equals(other$values)) return false;
+        if ( this$values == null ? other$values != null : !this$values.equals(other$values) ) return false;
         return true;
     }
 

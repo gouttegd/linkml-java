@@ -63,7 +63,7 @@ public class Annotatable {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$annotations = this.getAnnotations();
         final Object other$annotations = other.getAnnotations();
-        if ( this$annotations == null ? other$annotations != null : !this$annotations.equals(other$annotations)) return false;
+        if ( this$annotations == null ? other$annotations != null : !this$annotations.equals(other$annotations) ) return false;
         return true;
     }
 

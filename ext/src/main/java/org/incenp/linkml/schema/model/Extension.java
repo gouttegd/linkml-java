@@ -80,13 +80,13 @@ public class Extension {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$tag = this.getTag();
         final Object other$tag = other.getTag();
-        if ( this$tag == null ? other$tag != null : !this$tag.equals(other$tag)) return false;
+        if ( this$tag == null ? other$tag != null : !this$tag.equals(other$tag) ) return false;
         final Object this$value = this.getValue();
         final Object other$value = other.getValue();
-        if ( this$value == null ? other$value != null : !this$value.equals(other$value)) return false;
+        if ( this$value == null ? other$value != null : !this$value.equals(other$value) ) return false;
         final Object this$extensions = this.getExtensions();
         final Object other$extensions = other.getExtensions();
-        if ( this$extensions == null ? other$extensions != null : !this$extensions.equals(other$extensions)) return false;
+        if ( this$extensions == null ? other$extensions != null : !this$extensions.equals(other$extensions) ) return false;
         return true;
     }
 

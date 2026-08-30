@@ -67,7 +67,7 @@ public class DerivedSelfDesignatedClass extends BaseSelfDesignatedClass {
 
         final Object this$bar = this.getBar();
         final Object other$bar = other.getBar();
-        if ( this$bar == null ? other$bar != null : !this$bar.equals(other$bar)) return false;
+        if ( this$bar == null ? other$bar != null : !this$bar.equals(other$bar) ) return false;
         return true;
     }
 

@@ -29,7 +29,7 @@ public class UnitOfMeasure {
     private String abbreviation;
 
     @SlotName("descriptive_name")
-    @LinkURI("rdfs:label")
+    @LinkURI("http://www.w3.org/2000/01/rdf-schema#label")
     private String descriptiveName;
 
     @SlotName("exact_mappings")
@@ -181,28 +181,28 @@ public class UnitOfMeasure {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$symbol = this.getSymbol();
         final Object other$symbol = other.getSymbol();
-        if ( this$symbol == null ? other$symbol != null : !this$symbol.equals(other$symbol)) return false;
+        if ( this$symbol == null ? other$symbol != null : !this$symbol.equals(other$symbol) ) return false;
         final Object this$abbreviation = this.getAbbreviation();
         final Object other$abbreviation = other.getAbbreviation();
-        if ( this$abbreviation == null ? other$abbreviation != null : !this$abbreviation.equals(other$abbreviation)) return false;
+        if ( this$abbreviation == null ? other$abbreviation != null : !this$abbreviation.equals(other$abbreviation) ) return false;
         final Object this$descriptiveName = this.getDescriptiveName();
         final Object other$descriptiveName = other.getDescriptiveName();
-        if ( this$descriptiveName == null ? other$descriptiveName != null : !this$descriptiveName.equals(other$descriptiveName)) return false;
+        if ( this$descriptiveName == null ? other$descriptiveName != null : !this$descriptiveName.equals(other$descriptiveName) ) return false;
         final Object this$exactMappings = this.getExactMappings();
         final Object other$exactMappings = other.getExactMappings();
-        if ( this$exactMappings == null ? other$exactMappings != null : !this$exactMappings.equals(other$exactMappings)) return false;
+        if ( this$exactMappings == null ? other$exactMappings != null : !this$exactMappings.equals(other$exactMappings) ) return false;
         final Object this$ucumCode = this.getUcumCode();
         final Object other$ucumCode = other.getUcumCode();
-        if ( this$ucumCode == null ? other$ucumCode != null : !this$ucumCode.equals(other$ucumCode)) return false;
+        if ( this$ucumCode == null ? other$ucumCode != null : !this$ucumCode.equals(other$ucumCode) ) return false;
         final Object this$derivation = this.getDerivation();
         final Object other$derivation = other.getDerivation();
-        if ( this$derivation == null ? other$derivation != null : !this$derivation.equals(other$derivation)) return false;
+        if ( this$derivation == null ? other$derivation != null : !this$derivation.equals(other$derivation) ) return false;
         final Object this$hasQuantityKind = this.getHasQuantityKind();
         final Object other$hasQuantityKind = other.getHasQuantityKind();
-        if ( this$hasQuantityKind == null ? other$hasQuantityKind != null : !this$hasQuantityKind.equals(other$hasQuantityKind)) return false;
+        if ( this$hasQuantityKind == null ? other$hasQuantityKind != null : !this$hasQuantityKind.equals(other$hasQuantityKind) ) return false;
         final Object this$iec61360code = this.getIec61360code();
         final Object other$iec61360code = other.getIec61360code();
-        if ( this$iec61360code == null ? other$iec61360code != null : !this$iec61360code.equals(other$iec61360code)) return false;
+        if ( this$iec61360code == null ? other$iec61360code != null : !this$iec61360code.equals(other$iec61360code) ) return false;
         return true;
     }
 

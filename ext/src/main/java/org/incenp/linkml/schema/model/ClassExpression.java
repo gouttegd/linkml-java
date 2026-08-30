@@ -160,19 +160,19 @@ public class ClassExpression {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$anyOf = this.getAnyOf();
         final Object other$anyOf = other.getAnyOf();
-        if ( this$anyOf == null ? other$anyOf != null : !this$anyOf.equals(other$anyOf)) return false;
+        if ( this$anyOf == null ? other$anyOf != null : !this$anyOf.equals(other$anyOf) ) return false;
         final Object this$exactlyOneOf = this.getExactlyOneOf();
         final Object other$exactlyOneOf = other.getExactlyOneOf();
-        if ( this$exactlyOneOf == null ? other$exactlyOneOf != null : !this$exactlyOneOf.equals(other$exactlyOneOf)) return false;
+        if ( this$exactlyOneOf == null ? other$exactlyOneOf != null : !this$exactlyOneOf.equals(other$exactlyOneOf) ) return false;
         final Object this$noneOf = this.getNoneOf();
         final Object other$noneOf = other.getNoneOf();
-        if ( this$noneOf == null ? other$noneOf != null : !this$noneOf.equals(other$noneOf)) return false;
+        if ( this$noneOf == null ? other$noneOf != null : !this$noneOf.equals(other$noneOf) ) return false;
         final Object this$allOf = this.getAllOf();
         final Object other$allOf = other.getAllOf();
-        if ( this$allOf == null ? other$allOf != null : !this$allOf.equals(other$allOf)) return false;
+        if ( this$allOf == null ? other$allOf != null : !this$allOf.equals(other$allOf) ) return false;
         final Object this$slotConditions = this.getSlotConditions();
         final Object other$slotConditions = other.getSlotConditions();
-        if ( this$slotConditions == null ? other$slotConditions != null : !this$slotConditions.equals(other$slotConditions)) return false;
+        if ( this$slotConditions == null ? other$slotConditions != null : !this$slotConditions.equals(other$slotConditions) ) return false;
         return true;
     }
 

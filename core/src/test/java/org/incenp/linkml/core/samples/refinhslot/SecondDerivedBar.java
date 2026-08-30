@@ -67,7 +67,7 @@ public class SecondDerivedBar extends FirstDerivedBar {
 
         final Object this$width = this.getWidth();
         final Object other$width = other.getWidth();
-        if ( this$width == null ? other$width != null : !this$width.equals(other$width)) return false;
+        if ( this$width == null ? other$width != null : !this$width.equals(other$width) ) return false;
         return true;
     }
 

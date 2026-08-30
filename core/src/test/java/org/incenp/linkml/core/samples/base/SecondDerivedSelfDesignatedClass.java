@@ -67,7 +67,7 @@ public class SecondDerivedSelfDesignatedClass extends BaseSelfDesignatedClass {
 
         final Object this$baz = this.getBaz();
         final Object other$baz = other.getBaz();
-        if ( this$baz == null ? other$baz != null : !this$baz.equals(other$baz)) return false;
+        if ( this$baz == null ? other$baz != null : !this$baz.equals(other$baz) ) return false;
         return true;
     }
 

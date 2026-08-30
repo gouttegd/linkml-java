@@ -175,28 +175,28 @@ public class SimpleClass {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$foo = this.getFoo();
         final Object other$foo = other.getFoo();
-        if ( this$foo == null ? other$foo != null : !this$foo.equals(other$foo)) return false;
+        if ( this$foo == null ? other$foo != null : !this$foo.equals(other$foo) ) return false;
         final Object this$theBar = this.getTheBar();
         final Object other$theBar = other.getTheBar();
-        if ( this$theBar == null ? other$theBar != null : !this$theBar.equals(other$theBar)) return false;
+        if ( this$theBar == null ? other$theBar != null : !this$theBar.equals(other$theBar) ) return false;
         final Object this$baz = this.getBaz();
         final Object other$baz = other.getBaz();
-        if ( this$baz == null ? other$baz != null : !this$baz.equals(other$baz)) return false;
+        if ( this$baz == null ? other$baz != null : !this$baz.equals(other$baz) ) return false;
         final Object this$foos = this.getFoos();
         final Object other$foos = other.getFoos();
-        if ( this$foos == null ? other$foos != null : !this$foos.equals(other$foos)) return false;
+        if ( this$foos == null ? other$foos != null : !this$foos.equals(other$foos) ) return false;
         final Object this$type = this.getType();
         final Object other$type = other.getType();
-        if ( this$type == null ? other$type != null : !this$type.equals(other$type)) return false;
+        if ( this$type == null ? other$type != null : !this$type.equals(other$type) ) return false;
         final Object this$datetime = this.getDatetime();
         final Object other$datetime = other.getDatetime();
-        if ( this$datetime == null ? other$datetime != null : !this$datetime.equals(other$datetime)) return false;
+        if ( this$datetime == null ? other$datetime != null : !this$datetime.equals(other$datetime) ) return false;
         final Object this$date = this.getDate();
         final Object other$date = other.getDate();
-        if ( this$date == null ? other$date != null : !this$date.equals(other$date)) return false;
+        if ( this$date == null ? other$date != null : !this$date.equals(other$date) ) return false;
         final Object this$time = this.getTime();
         final Object other$time = other.getTime();
-        if ( this$time == null ? other$time != null : !this$time.equals(other$time)) return false;
+        if ( this$time == null ? other$time != null : !this$time.equals(other$time) ) return false;
         return true;
     }
 

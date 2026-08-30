@@ -97,13 +97,13 @@ public class ContainerOfSelfDesignatedObjects {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$singleTop = this.getSingleTop();
         final Object other$singleTop = other.getSingleTop();
-        if ( this$singleTop == null ? other$singleTop != null : !this$singleTop.equals(other$singleTop)) return false;
+        if ( this$singleTop == null ? other$singleTop != null : !this$singleTop.equals(other$singleTop) ) return false;
         final Object this$singleSecondLevel = this.getSingleSecondLevel();
         final Object other$singleSecondLevel = other.getSingleSecondLevel();
-        if ( this$singleSecondLevel == null ? other$singleSecondLevel != null : !this$singleSecondLevel.equals(other$singleSecondLevel)) return false;
+        if ( this$singleSecondLevel == null ? other$singleSecondLevel != null : !this$singleSecondLevel.equals(other$singleSecondLevel) ) return false;
         final Object this$multipleTop = this.getMultipleTop();
         final Object other$multipleTop = other.getMultipleTop();
-        if ( this$multipleTop == null ? other$multipleTop != null : !this$multipleTop.equals(other$multipleTop)) return false;
+        if ( this$multipleTop == null ? other$multipleTop != null : !this$multipleTop.equals(other$multipleTop) ) return false;
         return true;
     }
 

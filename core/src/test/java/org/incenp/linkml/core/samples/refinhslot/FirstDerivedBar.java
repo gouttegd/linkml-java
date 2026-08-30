@@ -62,7 +62,7 @@ public class FirstDerivedBar extends Bar {
 
         final Object this$length = this.getLength();
         final Object other$length = other.getLength();
-        if ( this$length == null ? other$length != null : !this$length.equals(other$length)) return false;
+        if ( this$length == null ? other$length != null : !this$length.equals(other$length) ) return false;
         return true;
     }
 

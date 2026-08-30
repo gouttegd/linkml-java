@@ -61,10 +61,10 @@ public class IdentifiedSelfDesignatedClass {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$type = this.getType();
         final Object other$type = other.getType();
-        if ( this$type == null ? other$type != null : !this$type.equals(other$type)) return false;
+        if ( this$type == null ? other$type != null : !this$type.equals(other$type) ) return false;
         final Object this$frobnicator = this.getFrobnicator();
         final Object other$frobnicator = other.getFrobnicator();
-        if ( this$frobnicator == null ? other$frobnicator != null : !this$frobnicator.equals(other$frobnicator)) return false;
+        if ( this$frobnicator == null ? other$frobnicator != null : !this$frobnicator.equals(other$frobnicator) ) return false;
         return true;
     }
 

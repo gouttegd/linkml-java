@@ -91,10 +91,10 @@ public class Foo {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$bar = this.getBar();
         final Object other$bar = other.getBar();
-        if ( this$bar == null ? other$bar != null : !this$bar.equals(other$bar)) return false;
+        if ( this$bar == null ? other$bar != null : !this$bar.equals(other$bar) ) return false;
         final Object this$bars = this.getBars();
         final Object other$bars = other.getBars();
-        if ( this$bars == null ? other$bars != null : !this$bars.equals(other$bars)) return false;
+        if ( this$bars == null ? other$bars != null : !this$bars.equals(other$bars) ) return false;
         return true;
     }
 

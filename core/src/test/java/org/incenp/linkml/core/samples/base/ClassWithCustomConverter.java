@@ -80,10 +80,10 @@ public class ClassWithCustomConverter {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$uri = this.getUri();
         final Object other$uri = other.getUri();
-        if ( this$uri == null ? other$uri != null : !this$uri.equals(other$uri)) return false;
+        if ( this$uri == null ? other$uri != null : !this$uri.equals(other$uri) ) return false;
         final Object this$uris = this.getUris();
         final Object other$uris = other.getUris();
-        if ( this$uris == null ? other$uris != null : !this$uris.equals(other$uris)) return false;
+        if ( this$uris == null ? other$uris != null : !this$uris.equals(other$uris) ) return false;
         return true;
     }
 

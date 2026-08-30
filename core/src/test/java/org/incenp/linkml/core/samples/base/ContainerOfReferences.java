@@ -78,10 +78,10 @@ public class ContainerOfReferences {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$single = this.getSingle();
         final Object other$single = other.getSingle();
-        if ( this$single == null ? other$single != null : !this$single.equals(other$single)) return false;
+        if ( this$single == null ? other$single != null : !this$single.equals(other$single) ) return false;
         final Object this$multiple = this.getMultiple();
         final Object other$multiple = other.getMultiple();
-        if ( this$multiple == null ? other$multiple != null : !this$multiple.equals(other$multiple)) return false;
+        if ( this$multiple == null ? other$multiple != null : !this$multiple.equals(other$multiple) ) return false;
         return true;
     }
 

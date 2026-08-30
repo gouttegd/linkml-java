@@ -49,7 +49,7 @@ public class ExtendedIdentifiableClass extends SimpleIdentifiableClass {
 
         final Object this$anotherFoo = this.getAnotherFoo();
         final Object other$anotherFoo = other.getAnotherFoo();
-        if ( this$anotherFoo == null ? other$anotherFoo != null : !this$anotherFoo.equals(other$anotherFoo)) return false;
+        if ( this$anotherFoo == null ? other$anotherFoo != null : !this$anotherFoo.equals(other$anotherFoo) ) return false;
         return true;
     }
 

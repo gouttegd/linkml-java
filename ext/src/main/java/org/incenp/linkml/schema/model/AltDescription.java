@@ -60,10 +60,10 @@ public class AltDescription {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$source = this.getSource();
         final Object other$source = other.getSource();
-        if ( this$source == null ? other$source != null : !this$source.equals(other$source)) return false;
+        if ( this$source == null ? other$source != null : !this$source.equals(other$source) ) return false;
         final Object this$description = this.getDescription();
         final Object other$description = other.getDescription();
-        if ( this$description == null ? other$description != null : !this$description.equals(other$description)) return false;
+        if ( this$description == null ? other$description != null : !this$description.equals(other$description) ) return false;
         return true;
     }
 

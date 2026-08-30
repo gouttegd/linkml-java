@@ -87,13 +87,13 @@ public class Example {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$value = this.getValue();
         final Object other$value = other.getValue();
-        if ( this$value == null ? other$value != null : !this$value.equals(other$value)) return false;
+        if ( this$value == null ? other$value != null : !this$value.equals(other$value) ) return false;
         final Object this$description = this.getDescription();
         final Object other$description = other.getDescription();
-        if ( this$description == null ? other$description != null : !this$description.equals(other$description)) return false;
+        if ( this$description == null ? other$description != null : !this$description.equals(other$description) ) return false;
         final Object this$object = this.getObject();
         final Object other$object = other.getObject();
-        if ( this$object == null ? other$object != null : !this$object.equals(other$object)) return false;
+        if ( this$object == null ? other$object != null : !this$object.equals(other$object) ) return false;
         return true;
     }
 

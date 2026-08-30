@@ -114,13 +114,13 @@ public class ContainerOfSimpleDicts {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$simpleDict = this.getSimpleDict();
         final Object other$simpleDict = other.getSimpleDict();
-        if ( this$simpleDict == null ? other$simpleDict != null : !this$simpleDict.equals(other$simpleDict)) return false;
+        if ( this$simpleDict == null ? other$simpleDict != null : !this$simpleDict.equals(other$simpleDict) ) return false;
         final Object this$extraSimpleDict = this.getExtraSimpleDict();
         final Object other$extraSimpleDict = other.getExtraSimpleDict();
-        if ( this$extraSimpleDict == null ? other$extraSimpleDict != null : !this$extraSimpleDict.equals(other$extraSimpleDict)) return false;
+        if ( this$extraSimpleDict == null ? other$extraSimpleDict != null : !this$extraSimpleDict.equals(other$extraSimpleDict) ) return false;
         final Object this$multivaluedSimpleDict = this.getMultivaluedSimpleDict();
         final Object other$multivaluedSimpleDict = other.getMultivaluedSimpleDict();
-        if ( this$multivaluedSimpleDict == null ? other$multivaluedSimpleDict != null : !this$multivaluedSimpleDict.equals(other$multivaluedSimpleDict)) return false;
+        if ( this$multivaluedSimpleDict == null ? other$multivaluedSimpleDict != null : !this$multivaluedSimpleDict.equals(other$multivaluedSimpleDict) ) return false;
         return true;
     }
 

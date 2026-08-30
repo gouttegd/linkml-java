@@ -167,25 +167,25 @@ public abstract class Definition extends Element {
 
         final Object this$isA = this.getIsA();
         final Object other$isA = other.getIsA();
-        if ( this$isA == null ? other$isA != null : !this$isA.equals(other$isA)) return false;
+        if ( this$isA == null ? other$isA != null : !this$isA.equals(other$isA) ) return false;
         final Object this$abstract_ = this.getAbstract();
         final Object other$abstract_ = other.getAbstract();
-        if ( this$abstract_ == null ? other$abstract_ != null : !this$abstract_.equals(other$abstract_)) return false;
+        if ( this$abstract_ == null ? other$abstract_ != null : !this$abstract_.equals(other$abstract_) ) return false;
         final Object this$mixin = this.getMixin();
         final Object other$mixin = other.getMixin();
-        if ( this$mixin == null ? other$mixin != null : !this$mixin.equals(other$mixin)) return false;
+        if ( this$mixin == null ? other$mixin != null : !this$mixin.equals(other$mixin) ) return false;
         final Object this$mixins = this.getMixins();
         final Object other$mixins = other.getMixins();
-        if ( this$mixins == null ? other$mixins != null : !this$mixins.equals(other$mixins)) return false;
+        if ( this$mixins == null ? other$mixins != null : !this$mixins.equals(other$mixins) ) return false;
         final Object this$applyTo = this.getApplyTo();
         final Object other$applyTo = other.getApplyTo();
-        if ( this$applyTo == null ? other$applyTo != null : !this$applyTo.equals(other$applyTo)) return false;
+        if ( this$applyTo == null ? other$applyTo != null : !this$applyTo.equals(other$applyTo) ) return false;
         final Object this$valuesFrom = this.getValuesFrom();
         final Object other$valuesFrom = other.getValuesFrom();
-        if ( this$valuesFrom == null ? other$valuesFrom != null : !this$valuesFrom.equals(other$valuesFrom)) return false;
+        if ( this$valuesFrom == null ? other$valuesFrom != null : !this$valuesFrom.equals(other$valuesFrom) ) return false;
         final Object this$stringSerialization = this.getStringSerialization();
         final Object other$stringSerialization = other.getStringSerialization();
-        if ( this$stringSerialization == null ? other$stringSerialization != null : !this$stringSerialization.equals(other$stringSerialization)) return false;
+        if ( this$stringSerialization == null ? other$stringSerialization != null : !this$stringSerialization.equals(other$stringSerialization) ) return false;
         return true;
     }
 

@@ -78,10 +78,11 @@ public class KeyedSelfDesignatedClass {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$type = this.getType();
         final Object other$type = other.getType();
-        if ( this$type == null ? other$type != null : !this$type.equals(other$type)) return false;
+        if ( this$type == null ? other$type != null : !this$type.equals(other$type) ) return false;
         final Object this$frobnicator = this.getFrobnicator();
         final Object other$frobnicator = other.getFrobnicator();
-        if ( this$frobnicator == null ? other$frobnicator != null : !this$frobnicator.equals(other$frobnicator)) return false;
+        if ( this$frobnicator == null ? other$frobnicator != null : !this$frobnicator.equals(other$frobnicator) ) return false;
+        if ( this.extraSlots == null ? other.extraSlots != null : !this.extraSlots.equals(other.extraSlots) ) return false;
         return true;
     }
 
@@ -97,6 +98,7 @@ public class KeyedSelfDesignatedClass {
         result = result * PRIME + ($type == null ? 43 : $type.hashCode());
         final Object $frobnicator = this.getFrobnicator();
         result = result * PRIME + ($frobnicator == null ? 43 : $frobnicator.hashCode());
+        result = result * PRIME + (this.extraSlots == null ? 43 : this.extraSlots.hashCode());
         return result;
     }
 }

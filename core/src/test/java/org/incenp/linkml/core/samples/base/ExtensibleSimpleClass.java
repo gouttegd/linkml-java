@@ -97,6 +97,7 @@ public class ExtensibleSimpleClass extends SimpleClass {
         if ( !other.canEqual((Object) this)) return false;
         if ( !super.equals(o) ) return false;
 
+        if ( this.extraSlots == null ? other.extraSlots != null : !this.extraSlots.equals(other.extraSlots) ) return false;
         return true;
     }
 
@@ -108,6 +109,7 @@ public class ExtensibleSimpleClass extends SimpleClass {
     public int hashCode() {
         final int PRIME = 59;
         int result = super.hashCode();
+        result = result * PRIME + (this.extraSlots == null ? 43 : this.extraSlots.hashCode());
         return result;
     }
 }

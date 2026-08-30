@@ -90,10 +90,11 @@ public class BaseSelfDesignatedClass {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$foo = this.getFoo();
         final Object other$foo = other.getFoo();
-        if ( this$foo == null ? other$foo != null : !this$foo.equals(other$foo)) return false;
+        if ( this$foo == null ? other$foo != null : !this$foo.equals(other$foo) ) return false;
         final Object this$type = this.getType();
         final Object other$type = other.getType();
-        if ( this$type == null ? other$type != null : !this$type.equals(other$type)) return false;
+        if ( this$type == null ? other$type != null : !this$type.equals(other$type) ) return false;
+        if ( this.extraSlots == null ? other.extraSlots != null : !this.extraSlots.equals(other.extraSlots) ) return false;
         return true;
     }
 
@@ -109,6 +110,7 @@ public class BaseSelfDesignatedClass {
         result = result * PRIME + ($foo == null ? 43 : $foo.hashCode());
         final Object $type = this.getType();
         result = result * PRIME + ($type == null ? 43 : $type.hashCode());
+        result = result * PRIME + (this.extraSlots == null ? 43 : this.extraSlots.hashCode());
         return result;
     }
 }

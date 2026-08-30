@@ -148,19 +148,19 @@ public class ContainerOfIRIIdentifiableObjects {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$singleReference = this.getSingleReference();
         final Object other$singleReference = other.getSingleReference();
-        if ( this$singleReference == null ? other$singleReference != null : !this$singleReference.equals(other$singleReference)) return false;
+        if ( this$singleReference == null ? other$singleReference != null : !this$singleReference.equals(other$singleReference) ) return false;
         final Object this$multipleReferences = this.getMultipleReferences();
         final Object other$multipleReferences = other.getMultipleReferences();
-        if ( this$multipleReferences == null ? other$multipleReferences != null : !this$multipleReferences.equals(other$multipleReferences)) return false;
+        if ( this$multipleReferences == null ? other$multipleReferences != null : !this$multipleReferences.equals(other$multipleReferences) ) return false;
         final Object this$singleInlined = this.getSingleInlined();
         final Object other$singleInlined = other.getSingleInlined();
-        if ( this$singleInlined == null ? other$singleInlined != null : !this$singleInlined.equals(other$singleInlined)) return false;
+        if ( this$singleInlined == null ? other$singleInlined != null : !this$singleInlined.equals(other$singleInlined) ) return false;
         final Object this$multipleInlinedAsList = this.getMultipleInlinedAsList();
         final Object other$multipleInlinedAsList = other.getMultipleInlinedAsList();
-        if ( this$multipleInlinedAsList == null ? other$multipleInlinedAsList != null : !this$multipleInlinedAsList.equals(other$multipleInlinedAsList)) return false;
+        if ( this$multipleInlinedAsList == null ? other$multipleInlinedAsList != null : !this$multipleInlinedAsList.equals(other$multipleInlinedAsList) ) return false;
         final Object this$multipleInlinedAsDict = this.getMultipleInlinedAsDict();
         final Object other$multipleInlinedAsDict = other.getMultipleInlinedAsDict();
-        if ( this$multipleInlinedAsDict == null ? other$multipleInlinedAsDict != null : !this$multipleInlinedAsDict.equals(other$multipleInlinedAsDict)) return false;
+        if ( this$multipleInlinedAsDict == null ? other$multipleInlinedAsDict != null : !this$multipleInlinedAsDict.equals(other$multipleInlinedAsDict) ) return false;
         return true;
     }
 

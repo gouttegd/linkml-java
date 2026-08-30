@@ -59,10 +59,10 @@ public class PrefixDeclaration {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$name = this.getName();
         final Object other$name = other.getName();
-        if ( this$name == null ? other$name != null : !this$name.equals(other$name)) return false;
+        if ( this$name == null ? other$name != null : !this$name.equals(other$name) ) return false;
         final Object this$prefix = this.getPrefix();
         final Object other$prefix = other.getPrefix();
-        if ( this$prefix == null ? other$prefix != null : !this$prefix.equals(other$prefix)) return false;
+        if ( this$prefix == null ? other$prefix != null : !this$prefix.equals(other$prefix) ) return false;
         return true;
     }
 

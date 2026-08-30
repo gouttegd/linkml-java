@@ -175,22 +175,22 @@ public class ContainerOfInlinedObjects {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$singleInlined = this.getSingleInlined();
         final Object other$singleInlined = other.getSingleInlined();
-        if ( this$singleInlined == null ? other$singleInlined != null : !this$singleInlined.equals(other$singleInlined)) return false;
+        if ( this$singleInlined == null ? other$singleInlined != null : !this$singleInlined.equals(other$singleInlined) ) return false;
         final Object this$inlinedAsList = this.getInlinedAsList();
         final Object other$inlinedAsList = other.getInlinedAsList();
-        if ( this$inlinedAsList == null ? other$inlinedAsList != null : !this$inlinedAsList.equals(other$inlinedAsList)) return false;
+        if ( this$inlinedAsList == null ? other$inlinedAsList != null : !this$inlinedAsList.equals(other$inlinedAsList) ) return false;
         final Object this$inlinedAsDict = this.getInlinedAsDict();
         final Object other$inlinedAsDict = other.getInlinedAsDict();
-        if ( this$inlinedAsDict == null ? other$inlinedAsDict != null : !this$inlinedAsDict.equals(other$inlinedAsDict)) return false;
+        if ( this$inlinedAsDict == null ? other$inlinedAsDict != null : !this$inlinedAsDict.equals(other$inlinedAsDict) ) return false;
         final Object this$localSingleInlined = this.getLocalSingleInlined();
         final Object other$localSingleInlined = other.getLocalSingleInlined();
-        if ( this$localSingleInlined == null ? other$localSingleInlined != null : !this$localSingleInlined.equals(other$localSingleInlined)) return false;
+        if ( this$localSingleInlined == null ? other$localSingleInlined != null : !this$localSingleInlined.equals(other$localSingleInlined) ) return false;
         final Object this$localInlinedAsList = this.getLocalInlinedAsList();
         final Object other$localInlinedAsList = other.getLocalInlinedAsList();
-        if ( this$localInlinedAsList == null ? other$localInlinedAsList != null : !this$localInlinedAsList.equals(other$localInlinedAsList)) return false;
+        if ( this$localInlinedAsList == null ? other$localInlinedAsList != null : !this$localInlinedAsList.equals(other$localInlinedAsList) ) return false;
         final Object this$localInlinedAsDict = this.getLocalInlinedAsDict();
         final Object other$localInlinedAsDict = other.getLocalInlinedAsDict();
-        if ( this$localInlinedAsDict == null ? other$localInlinedAsDict != null : !this$localInlinedAsDict.equals(other$localInlinedAsDict)) return false;
+        if ( this$localInlinedAsDict == null ? other$localInlinedAsDict != null : !this$localInlinedAsDict.equals(other$localInlinedAsDict) ) return false;
         return true;
     }
 

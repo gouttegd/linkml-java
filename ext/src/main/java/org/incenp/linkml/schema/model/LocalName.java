@@ -62,10 +62,10 @@ public class LocalName {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$localNameSource = this.getLocalNameSource();
         final Object other$localNameSource = other.getLocalNameSource();
-        if ( this$localNameSource == null ? other$localNameSource != null : !this$localNameSource.equals(other$localNameSource)) return false;
+        if ( this$localNameSource == null ? other$localNameSource != null : !this$localNameSource.equals(other$localNameSource) ) return false;
         final Object this$localNameValue = this.getLocalNameValue();
         final Object other$localNameValue = other.getLocalNameValue();
-        if ( this$localNameValue == null ? other$localNameValue != null : !this$localNameValue.equals(other$localNameValue)) return false;
+        if ( this$localNameValue == null ? other$localNameValue != null : !this$localNameValue.equals(other$localNameValue) ) return false;
         return true;
     }
 

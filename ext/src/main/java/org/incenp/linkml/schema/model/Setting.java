@@ -62,10 +62,10 @@ public class Setting {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$settingKey = this.getSettingKey();
         final Object other$settingKey = other.getSettingKey();
-        if ( this$settingKey == null ? other$settingKey != null : !this$settingKey.equals(other$settingKey)) return false;
+        if ( this$settingKey == null ? other$settingKey != null : !this$settingKey.equals(other$settingKey) ) return false;
         final Object this$settingValue = this.getSettingValue();
         final Object other$settingValue = other.getSettingValue();
-        if ( this$settingValue == null ? other$settingValue != null : !this$settingValue.equals(other$settingValue)) return false;
+        if ( this$settingValue == null ? other$settingValue != null : !this$settingValue.equals(other$settingValue) ) return false;
         return true;
     }
 

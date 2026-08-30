@@ -50,7 +50,7 @@ public class SimpleKeyableClass extends SimpleClass {
 
         final Object this$id = this.getId();
         final Object other$id = other.getId();
-        if ( this$id == null ? other$id != null : !this$id.equals(other$id)) return false;
+        if ( this$id == null ? other$id != null : !this$id.equals(other$id) ) return false;
         return true;
     }
 

@@ -72,10 +72,10 @@ public class ExtraSlotsExpression {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$allowed = this.getAllowed();
         final Object other$allowed = other.getAllowed();
-        if ( this$allowed == null ? other$allowed != null : !this$allowed.equals(other$allowed)) return false;
+        if ( this$allowed == null ? other$allowed != null : !this$allowed.equals(other$allowed) ) return false;
         final Object this$rangeExpression = this.getRangeExpression();
         final Object other$rangeExpression = other.getRangeExpression();
-        if ( this$rangeExpression == null ? other$rangeExpression != null : !this$rangeExpression.equals(other$rangeExpression)) return false;
+        if ( this$rangeExpression == null ? other$rangeExpression != null : !this$rangeExpression.equals(other$rangeExpression) ) return false;
         return true;
     }
 

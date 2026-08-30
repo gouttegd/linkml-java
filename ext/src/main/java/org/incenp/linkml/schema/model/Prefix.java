@@ -62,10 +62,10 @@ public class Prefix {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$prefixPrefix = this.getPrefixPrefix();
         final Object other$prefixPrefix = other.getPrefixPrefix();
-        if ( this$prefixPrefix == null ? other$prefixPrefix != null : !this$prefixPrefix.equals(other$prefixPrefix)) return false;
+        if ( this$prefixPrefix == null ? other$prefixPrefix != null : !this$prefixPrefix.equals(other$prefixPrefix) ) return false;
         final Object this$prefixReference = this.getPrefixReference();
         final Object other$prefixReference = other.getPrefixReference();
-        if ( this$prefixReference == null ? other$prefixReference != null : !this$prefixReference.equals(other$prefixReference)) return false;
+        if ( this$prefixReference == null ? other$prefixReference != null : !this$prefixReference.equals(other$prefixReference) ) return false;
         return true;
     }
 

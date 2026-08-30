@@ -150,13 +150,13 @@ public class ContainerOfBooleanValues {
         if ( this$primitiveBaz != other$primitiveBaz ) return false;
         final Object this$foo = this.getFoo();
         final Object other$foo = other.getFoo();
-        if ( this$foo == null ? other$foo != null : !this$foo.equals(other$foo)) return false;
+        if ( this$foo == null ? other$foo != null : !this$foo.equals(other$foo) ) return false;
         final Object this$bar = this.getBar();
         final Object other$bar = other.getBar();
-        if ( this$bar == null ? other$bar != null : !this$bar.equals(other$bar)) return false;
+        if ( this$bar == null ? other$bar != null : !this$bar.equals(other$bar) ) return false;
         final Object this$baz = this.getBaz();
         final Object other$baz = other.getBaz();
-        if ( this$baz == null ? other$baz != null : !this$baz.equals(other$baz)) return false;
+        if ( this$baz == null ? other$baz != null : !this$baz.equals(other$baz) ) return false;
         return true;
     }
 

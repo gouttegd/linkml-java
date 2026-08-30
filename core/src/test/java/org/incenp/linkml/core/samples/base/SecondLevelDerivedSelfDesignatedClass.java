@@ -72,7 +72,7 @@ public class SecondLevelDerivedSelfDesignatedClass extends SecondDerivedSelfDesi
 
         final Object this$bax = this.getBax();
         final Object other$bax = other.getBax();
-        if ( this$bax == null ? other$bax != null : !this$bax.equals(other$bax)) return false;
+        if ( this$bax == null ? other$bax != null : !this$bax.equals(other$bax) ) return false;
         return true;
     }
 

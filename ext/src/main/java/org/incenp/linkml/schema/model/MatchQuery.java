@@ -74,10 +74,10 @@ public class MatchQuery {
         if ( !other.canEqual((Object) this)) return false;
         final Object this$identifierPattern = this.getIdentifierPattern();
         final Object other$identifierPattern = other.getIdentifierPattern();
-        if ( this$identifierPattern == null ? other$identifierPattern != null : !this$identifierPattern.equals(other$identifierPattern)) return false;
+        if ( this$identifierPattern == null ? other$identifierPattern != null : !this$identifierPattern.equals(other$identifierPattern) ) return false;
         final Object this$sourceOntology = this.getSourceOntology();
         final Object other$sourceOntology = other.getSourceOntology();
-        if ( this$sourceOntology == null ? other$sourceOntology != null : !this$sourceOntology.equals(other$sourceOntology)) return false;
+        if ( this$sourceOntology == null ? other$sourceOntology != null : !this$sourceOntology.equals(other$sourceOntology) ) return false;
         return true;
     }
 
