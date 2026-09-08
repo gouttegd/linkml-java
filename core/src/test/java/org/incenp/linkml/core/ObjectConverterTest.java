@@ -52,6 +52,7 @@ import org.incenp.linkml.core.samples.base.BaseSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.BaseURISelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.ClassWithCustomConverter;
 import org.incenp.linkml.core.samples.base.ContainerOfAny;
+import org.incenp.linkml.core.samples.base.ContainerOfBinaryData;
 import org.incenp.linkml.core.samples.base.ContainerOfBooleanValues;
 import org.incenp.linkml.core.samples.base.ContainerOfIRIIdentifiableObjects;
 import org.incenp.linkml.core.samples.base.ContainerOfIdentifiedSelfDesignatedObjects;
@@ -771,6 +772,30 @@ public class ObjectConverterTest {
         Assertions.assertInstanceOf(SecondDerivedBar.class, tdf.getBars().get(0));
         Assertions.assertEquals("the first bar", tdf.getBars().get(0).getName());
         Assertions.assertEquals(2, tdf.getBars().get(0).getLength());
+    }
+
+    @Test
+    void testParsingBinaryBlobs() throws IOException {
+        ContainerOfBinaryData cobd = parseString("checksum: aGVsbG8=\nchecksums:\n  - d29ybGQ=",
+                ContainerOfBinaryData.class);
+        Assertions.assertEquals("hello", new String(cobd.getChecksum()));
+        Assertions.assertEquals("world", new String(cobd.getChecksums().get(0)));
+
+        // Can't use roundtrip for now because the generated Java code for binary blobs
+        // does not handle arrays the way we'd need it (two different arrays with the
+        // same contents are not equals). The Javagen template will need to be updated
+        // to
+        // use Arrays.hashCode() and Arrays.equals for those slots.
+        try {
+            Object raw = ctx.getConverter(cobd.getClass()).serialise(cobd, ctx);
+            Object cooked = ctx.getConverter(ContainerOfBinaryData.class).convert(raw, ctx);
+            Assertions.assertInstanceOf(ContainerOfBinaryData.class, cooked);
+            Assertions.assertEquals("hello", new String(((ContainerOfBinaryData) cooked).getChecksum()));
+            Assertions.assertEquals("world", new String(((ContainerOfBinaryData) cooked).getChecksums().get(0)));
+        } catch ( LinkMLRuntimeException e ) {
+            Assertions.fail("Unexpected exception", e);
+        }
+
     }
 
     private <T> T parse(String file, Class<T> target) throws IOException {

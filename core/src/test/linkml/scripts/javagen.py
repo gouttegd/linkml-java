@@ -12,6 +12,17 @@ def cleanup_dir(directory: Path) -> None:
         directory.rmdir()
 
 
+# We need a custom generator for now to deal with the custom
+# "binary blob" type.
+class CustomGenerator(JavaGenerator):
+
+    def map_type(self, t, required = False):
+        if t.uri == "xsd:base64Binary":
+            return "byte[]"
+        else:
+            return super().map_type(t, required)
+
+
 @click.option("--output-directory",
               type=click.Path(dir_okay=True, file_okay=False, path_type=Path),
               default=Path("core/src/test/java"))
@@ -31,10 +42,10 @@ def cli(output_directory: Path, schema_directory: Path) -> None:
             cleaned_up_dirs[output_dir] = 1
 
         package_name = package_dir.as_posix().replace("/", ".")
-        gen = JavaGenerator(schema,
-                            true_enums=True,
-                            use_aliases=True,
-                            package=package_name)
+        gen = CustomGenerator(schema,
+                              true_enums=True,
+                              use_aliases=True,
+                              package=package_name)
         gen.serialize(output_dir, template_variant="org.incenp.linkml")
 
 

@@ -168,6 +168,8 @@ public class ConverterContext {
         // whose range is set to the linkml:Any class).
         converters.put(Object.class, new TransparentConverter());
 
+        addConverter(new BinaryBlobConverter());
+
         objectConverterProvider = (t) -> new ObjectConverter(t);
         typeResolver = new DefaultTypeDesignatorResolver();
     }
