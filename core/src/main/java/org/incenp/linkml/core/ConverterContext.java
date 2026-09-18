@@ -139,6 +139,7 @@ public class ConverterContext {
 
     private Map<Class<?>, IConverter> converters = new HashMap<>();
     private Map<Slot, IConverter> slotConverters = new HashMap<>();
+    private Map<String, IConverter> uriConverters = new HashMap<>();
     private ObjectCache objectCache = new ObjectCache();
     private List<DelayedAssignment> delayedAssignments = new ArrayList<>();
     private Map<String, String> prefixMap = new HashMap<>();
@@ -167,6 +168,9 @@ public class ConverterContext {
         // We need a special "converter" for Object-typed fields (which represent slots
         // whose range is set to the linkml:Any class).
         converters.put(Object.class, new TransparentConverter());
+
+        // Converters that are looked up by type URIs.
+        addConverter(new CurieConverter());
 
         objectConverterProvider = (t) -> new ObjectConverter(t);
         typeResolver = new DefaultTypeDesignatorResolver();
@@ -234,7 +238,12 @@ public class ConverterContext {
      * @param converter The converter to register.
      */
     public void addConverter(IConverter converter) {
-        converters.put(converter.getType(), converter);
+        String uri = converter.getURI();
+        if ( uri != null ) {
+            uriConverters.put(uri, converter);
+        } else {
+            converters.put(converter.getType(), converter);
+        }
     }
 
     /**
@@ -300,7 +309,14 @@ public class ConverterContext {
             if ( type != null ) {
                 conv = getCustomConverter(type, slot.getInnerType());
             } else {
-                conv = getConverter(slot.getInnerType());
+                String typeUri = slot.getTypeURI();
+                if ( typeUri != null ) {
+                    conv = uriConverters.get(typeUri);
+                }
+
+                if ( conv == null ) {
+                    conv = getConverter(slot.getInnerType());
+                }
             }
             slotConverters.put(slot, conv);
         }

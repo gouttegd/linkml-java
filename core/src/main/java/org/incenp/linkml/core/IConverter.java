@@ -54,6 +54,19 @@ public interface IConverter {
     public Class<?> getType();
 
     /**
+     * Gets the URI identifying the LinkML type this converter is intended for.
+     * <p>
+     * This is intended to provide another way to look up converter objects, if
+     * looking up by the Java type (using {@link #getType()}) is not enough
+     * (typically, when several LinkML types are rendered using the same Java type).
+     * 
+     * @return The LinkML type URI. May be {@code null}.
+     */
+    default public String getURI() {
+        return null;
+    }
+
+    /**
      * Converts a raw object into a LinkML object.
      * <p>
      * Given the raw representation of a LinkML object, as it may have been obtained

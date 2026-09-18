@@ -52,6 +52,7 @@ import org.incenp.linkml.core.annotations.LinkURI;
 import org.incenp.linkml.core.annotations.Required;
 import org.incenp.linkml.core.annotations.SlotName;
 import org.incenp.linkml.core.annotations.TypeDesignator;
+import org.incenp.linkml.core.annotations.TypeURI;
 
 /**
  * Represents a “slot” (that is, a field) on a specific LinkML object.
@@ -198,6 +199,23 @@ public class Slot {
     }
 
     /**
+     * Gets the URI that identifies the type of the slot.
+     * <p>
+     * A field representing a LinkML slot may be annotated with a {@link TypeURI}
+     * annotation indicating the URI for the type of the slot’s range. This is
+     * useful if several LinkML types are rendered using the same Java type, to
+     * distinguish what was the original LinkML type.
+     * 
+     * @return The URI for the type set as the slot’s range. May be {@code null} if
+     *         the field has not been explicitly annotated.
+     */
+    public String getTypeURI() {
+        TypeURI annot = field.getAnnotation(TypeURI.class);
+        return annot != null ? annot.value() : null;
+
+    }
+
+    /**
      * Indicates whether the slot is expected to hold multiple values.
      * 
      * @return <code>true</code> if the slot is multi-valued, otherwise
@@ -214,6 +232,9 @@ public class Slot {
      *         <code>false</code>.
      */
     public boolean isCurieTyped() {
+        if ( CurieConverter.URIORCURIE_TYPE_URI.equals(getTypeURI()) ) {
+            return true;
+        }
         Class<?> customConverter = getCustomConverter();
         return customConverter != null && customConverter.equals(CurieConverter.class);
     }
