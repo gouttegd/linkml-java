@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.core.converters;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,6 +46,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.incenp.linkml.core.ClassInfo;
+import org.incenp.linkml.core.ConverterContext;
+import org.incenp.linkml.core.IConverter;
+import org.incenp.linkml.core.LinkMLRuntimeException;
 import org.incenp.linkml.core.samples.base.BaseCurieSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.BaseMultiSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.BaseSelfDesignatedClass;

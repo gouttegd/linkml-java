@@ -32,33 +32,47 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.core.converters;
+
+import org.incenp.linkml.core.ConverterContext;
+import org.incenp.linkml.core.LinkMLInternalError;
+import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.LinkMLValueError;
+import org.incenp.linkml.core.types.BinaryBlob;
+import org.incenp.linkml.core.types.BinaryBlob.BinaryEncoding;
 
 /**
- * Converts raw objects into boolean values.
+ * A converter for slots typed as <code>xsd:base64Binary</code>.
  * <p>
- * This supports LinkML’s <code>boolean</code> type.
+ * Such slots are represented in this runtime as {@link BinaryBlob} fields.
  */
-public class BooleanConverter extends ScalarConverterBase {
+public class Base64BlobConverter extends ScalarConverterBase {
 
     @Override
     public Class<?> getType() {
-        return Boolean.class;
+        return BinaryBlob.class;
+    }
+
+    @Override
+    public String getURI() {
+        return "http://www.w3.org/2001/XMLSchema#base64Binary";
     }
 
     @Override
     protected Object convertImpl(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
-        if ( raw instanceof Boolean ) {
-            return raw;
+        try {
+            return new BinaryBlob(raw.toString(), BinaryEncoding.BASE64);
+        } catch ( IllegalArgumentException e ) {
+            throw new LinkMLValueError("Invalid value, Base64-encoded binary blob expected", e);
+        }
+    }
+
+    @Override
+    public Object serialise(Object object, ConverterContext ctx) throws LinkMLRuntimeException {
+        if ( getType().isInstance(object) ) {
+            return ((BinaryBlob) object).getValue(BinaryEncoding.BASE64);
         } else {
-            String stringValue = raw.toString();
-            if ( stringValue.equalsIgnoreCase("true") ) {
-                return Boolean.TRUE;
-            } else if ( stringValue.equalsIgnoreCase("false") ) {
-                return Boolean.FALSE;
-            } else {
-                throw new LinkMLValueError(String.format("Invalid value, boolean expected: %s", stringValue));
-            }
+            throw new LinkMLInternalError("Invalid value");
         }
     }
 }

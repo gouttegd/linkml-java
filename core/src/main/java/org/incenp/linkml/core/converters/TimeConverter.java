@@ -32,38 +32,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.core.converters;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
+
+import org.incenp.linkml.core.ConverterContext;
+import org.incenp.linkml.core.LinkMLInternalError;
+import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.LinkMLValueError;
 
 /**
- * Converts raw objects into URI values.
+ * A converter for slots typed as <code>xsd:time</code> (represented as
+ * {@link LocalTime}).
  * <p>
- * This supports LinkML’s <code>uri</code> type.
+ * This supports LinkML’s <code>time</code> type.
  */
-public class URIConverter extends ScalarConverterBase {
+public class TimeConverter extends ScalarConverterBase {
 
     @Override
     public Class<?> getType() {
-        return URI.class;
+        return LocalTime.class;
     }
 
     @Override
     protected Object convertImpl(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
-        try {
-            return new URI(raw.toString());
-        } catch ( URISyntaxException e ) {
-            throw new LinkMLValueError(String.format("Invalid value, URI expected: %s", raw), e);
+        if ( raw instanceof LocalTime ) {
+            return raw;
+        } else {
+            try {
+                return LocalTime.parse(raw.toString());
+            } catch ( DateTimeParseException e ) {
+                throw new LinkMLValueError(String.format("Invalid value, time expected: %s", raw), e);
+            }
         }
     }
 
     @Override
     public Object serialise(Object object, ConverterContext ctx) throws LinkMLRuntimeException {
-        if ( object instanceof URI ) {
+        if ( object instanceof LocalTime ) {
             return object.toString();
         } else {
-            throw new LinkMLInternalError("Invalid value");
+            throw new LinkMLInternalError("invalid value, time expected");
         }
     }
 }

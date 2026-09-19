@@ -32,10 +32,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.core.converters;
 
 import java.util.Collections;
 import java.util.List;
+
+import org.incenp.linkml.core.ConverterContext;
+import org.incenp.linkml.core.IConverter;
+import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.Slot;
 
 /**
  * A special “converter” that does not, in fact, convert anything, but simply

@@ -32,30 +32,34 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.core.converters;
+
+import org.incenp.linkml.core.ConverterContext;
+import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.LinkMLValueError;
 
 /**
- * Converts raw objects into integer values.
+ * Converts raw objects into double-precision floating point values.
  * <p>
- * This supports LinkML’s <code>integer</code> type.
+ * This supports LinkML’s <code>double</code> type.
  */
-public class IntegerConverter extends ScalarConverterBase {
+public class DoubleConverter extends ScalarConverterBase {
 
     @Override
     public Class<?> getType() {
-        return Integer.class;
+        return Double.class;
     }
 
     @Override
     protected Object convertImpl(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
-        if ( raw instanceof Integer ) {
+        if ( raw instanceof Double ) {
             return raw;
         } else {
             String stringValue = raw.toString();
             try {
-                return Integer.valueOf(stringValue);
+                return Double.valueOf(stringValue);
             } catch ( NumberFormatException e ) {
-                throw new LinkMLValueError(String.format("Invalid value, integer expected: %s", stringValue), e);
+                throw new LinkMLValueError(String.format("Invalid value, double expected: %s", stringValue), e);
             }
         }
     }

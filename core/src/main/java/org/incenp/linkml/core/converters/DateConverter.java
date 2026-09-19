@@ -32,22 +32,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.core.converters;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
+import org.incenp.linkml.core.ConverterContext;
+import org.incenp.linkml.core.LinkMLInternalError;
+import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.LinkMLValueError;
 
 /**
- * Converts raw objects into string values.
+ * A converter for slots typed as <code>xsd:date</code> (represented as
+ * {@link LocalDate}).
  * <p>
- * This supports LinkML’s <code>string</code> type.
+ * This supports LinkML’s <code>date</code> type.
  */
-public class StringConverter extends ScalarConverterBase {
+public class DateConverter extends ScalarConverterBase {
 
     @Override
     public Class<?> getType() {
-        return String.class;
+        return LocalDate.class;
     }
 
     @Override
     protected Object convertImpl(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
-        return raw instanceof String ? raw : raw.toString();
+        if ( raw instanceof LocalDate ) {
+            return raw;
+        } else {
+            try {
+                return LocalDate.parse(raw.toString());
+            } catch ( DateTimeParseException e ) {
+                throw new LinkMLValueError(String.format("Invalid value, date expected: %s", raw), e);
+            }
+        }
+    }
+
+    @Override
+    public Object serialise(Object object, ConverterContext ctx) throws LinkMLRuntimeException {
+        if ( object instanceof LocalDate ) {
+            return object.toString();
+        } else {
+            throw new LinkMLInternalError("Invalid value, date expected");
+        }
     }
 }

@@ -32,43 +32,35 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.core.converters;
 
-import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
+import org.incenp.linkml.core.ConverterContext;
+import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.LinkMLValueError;
 
 /**
- * A converter for slots typed as <code>xsd:time</code> (represented as
- * {@link LocalTime}).
+ * Converts raw objects into single-precision floating point values.
  * <p>
- * This supports LinkML’s <code>time</code> type.
+ * This supports LinkML’s <code>float</code> type.
  */
-public class TimeConverter extends ScalarConverterBase {
+public class FloatConverter extends ScalarConverterBase {
 
     @Override
     public Class<?> getType() {
-        return LocalTime.class;
+        return Float.class;
     }
 
     @Override
     protected Object convertImpl(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
-        if ( raw instanceof LocalTime ) {
+        if ( raw instanceof Float ) {
             return raw;
         } else {
+            String stringValue = raw.toString();
             try {
-                return LocalTime.parse(raw.toString());
-            } catch ( DateTimeParseException e ) {
-                throw new LinkMLValueError(String.format("Invalid value, time expected: %s", raw), e);
+                return Float.valueOf(stringValue);
+            } catch ( NumberFormatException e ) {
+                throw new LinkMLValueError(String.format("Invalid value, float expected: %s", stringValue), e);
             }
-        }
-    }
-
-    @Override
-    public Object serialise(Object object, ConverterContext ctx) throws LinkMLRuntimeException {
-        if ( object instanceof LocalTime ) {
-            return object.toString();
-        } else {
-            throw new LinkMLInternalError("invalid value, time expected");
         }
     }
 }

@@ -32,12 +32,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.core.converters;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.incenp.linkml.core.ConverterContext;
+import org.incenp.linkml.core.IConverter;
+import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.Slot;
+import org.incenp.linkml.core.converters.BooleanConverter;
+import org.incenp.linkml.core.converters.DoubleConverter;
+import org.incenp.linkml.core.converters.FloatConverter;
+import org.incenp.linkml.core.converters.IntegerConverter;
+import org.incenp.linkml.core.converters.StringConverter;
+import org.incenp.linkml.core.converters.URIConverter;
 import org.incenp.linkml.core.samples.base.ContainerOfIntegerValues;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

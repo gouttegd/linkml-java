@@ -32,41 +32,41 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.core.converters;
 
-import org.incenp.linkml.core.types.BinaryBlob;
-import org.incenp.linkml.core.types.BinaryBlob.BinaryEncoding;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.incenp.linkml.core.ConverterContext;
+import org.incenp.linkml.core.LinkMLInternalError;
+import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.LinkMLValueError;
 
 /**
- * A converter for slots typed as <code>xsd:hexBinary</code>.
+ * Converts raw objects into URI values.
  * <p>
- * Such slots are represented in this runtime as {@link BinaryBlob} fields.
+ * This supports LinkML’s <code>uri</code> type.
  */
-public class Base16BlobConverter extends ScalarConverterBase {
+public class URIConverter extends ScalarConverterBase {
 
     @Override
     public Class<?> getType() {
-        return BinaryBlob.class;
-    }
-
-    @Override
-    public String getURI() {
-        return "http://www.w3.org/2001/XMLSchema#hexBinary";
+        return URI.class;
     }
 
     @Override
     protected Object convertImpl(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
         try {
-            return new BinaryBlob(raw.toString(), BinaryEncoding.BASE16);
-        } catch ( IllegalArgumentException e ) {
-            throw new LinkMLValueError("Invalid value, hex-encoded binary blob expected", e);
+            return new URI(raw.toString());
+        } catch ( URISyntaxException e ) {
+            throw new LinkMLValueError(String.format("Invalid value, URI expected: %s", raw), e);
         }
     }
 
     @Override
     public Object serialise(Object object, ConverterContext ctx) throws LinkMLRuntimeException {
-        if ( getType().isInstance(object) ) {
-            return ((BinaryBlob) object).getValue(BinaryEncoding.BASE16);
+        if ( object instanceof URI ) {
+            return object.toString();
         } else {
             throw new LinkMLInternalError("Invalid value");
         }

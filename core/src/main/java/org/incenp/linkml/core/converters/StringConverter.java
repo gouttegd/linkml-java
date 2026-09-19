@@ -32,31 +32,25 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.core.converters;
+
+import org.incenp.linkml.core.ConverterContext;
+import org.incenp.linkml.core.LinkMLRuntimeException;
 
 /**
- * Converts raw objects into single-precision floating point values.
+ * Converts raw objects into string values.
  * <p>
- * This supports LinkML’s <code>float</code> type.
+ * This supports LinkML’s <code>string</code> type.
  */
-public class FloatConverter extends ScalarConverterBase {
+public class StringConverter extends ScalarConverterBase {
 
     @Override
     public Class<?> getType() {
-        return Float.class;
+        return String.class;
     }
 
     @Override
     protected Object convertImpl(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
-        if ( raw instanceof Float ) {
-            return raw;
-        } else {
-            String stringValue = raw.toString();
-            try {
-                return Float.valueOf(stringValue);
-            } catch ( NumberFormatException e ) {
-                throw new LinkMLValueError(String.format("Invalid value, float expected: %s", stringValue), e);
-            }
-        }
+        return raw instanceof String ? raw : raw.toString();
     }
 }

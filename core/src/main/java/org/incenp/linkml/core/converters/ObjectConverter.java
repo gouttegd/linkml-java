@@ -32,13 +32,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.core.converters;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.incenp.linkml.core.ClassInfo;
+import org.incenp.linkml.core.ConverterContext;
+import org.incenp.linkml.core.CurieConverter;
+import org.incenp.linkml.core.IConverter;
+import org.incenp.linkml.core.InliningMode;
+import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.LinkMLValueError;
+import org.incenp.linkml.core.PrefixDeclarationExtractor;
+import org.incenp.linkml.core.Slot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

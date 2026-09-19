@@ -32,12 +32,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.core.converters;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import org.incenp.linkml.core.ConverterContext;
+import org.incenp.linkml.core.IConverter;
+import org.incenp.linkml.core.LinkMLInternalError;
+import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.LinkMLValueError;
+import org.incenp.linkml.core.Slot;
 
 /**
  * Base class for most scalar converters.

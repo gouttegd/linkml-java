@@ -32,31 +32,47 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.core.converters;
+
+import org.incenp.linkml.core.ConverterContext;
+import org.incenp.linkml.core.LinkMLInternalError;
+import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.LinkMLValueError;
+import org.incenp.linkml.core.types.BinaryBlob;
+import org.incenp.linkml.core.types.BinaryBlob.BinaryEncoding;
 
 /**
- * Converts raw objects into double-precision floating point values.
+ * A converter for slots typed as <code>xsd:hexBinary</code>.
  * <p>
- * This supports LinkML’s <code>double</code> type.
+ * Such slots are represented in this runtime as {@link BinaryBlob} fields.
  */
-public class DoubleConverter extends ScalarConverterBase {
+public class Base16BlobConverter extends ScalarConverterBase {
 
     @Override
     public Class<?> getType() {
-        return Double.class;
+        return BinaryBlob.class;
+    }
+
+    @Override
+    public String getURI() {
+        return "http://www.w3.org/2001/XMLSchema#hexBinary";
     }
 
     @Override
     protected Object convertImpl(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
-        if ( raw instanceof Double ) {
-            return raw;
+        try {
+            return new BinaryBlob(raw.toString(), BinaryEncoding.BASE16);
+        } catch ( IllegalArgumentException e ) {
+            throw new LinkMLValueError("Invalid value, hex-encoded binary blob expected", e);
+        }
+    }
+
+    @Override
+    public Object serialise(Object object, ConverterContext ctx) throws LinkMLRuntimeException {
+        if ( getType().isInstance(object) ) {
+            return ((BinaryBlob) object).getValue(BinaryEncoding.BASE16);
         } else {
-            String stringValue = raw.toString();
-            try {
-                return Double.valueOf(stringValue);
-            } catch ( NumberFormatException e ) {
-                throw new LinkMLValueError(String.format("Invalid value, double expected: %s", stringValue), e);
-            }
+            throw new LinkMLInternalError("Invalid value");
         }
     }
 }

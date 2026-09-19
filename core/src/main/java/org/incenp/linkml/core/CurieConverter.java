@@ -34,6 +34,8 @@
 
 package org.incenp.linkml.core;
 
+import org.incenp.linkml.core.converters.StringConverter;
+
 /**
  * A converter for String-typed fields whose value is expected to be a CURIE.
  * <p>
@@ -49,6 +51,12 @@ package org.incenp.linkml.core;
  * data, contract them as late as possible upon writing data. In between, you
  * only need to deal with full-length IRIs. This is the only sane way of working
  * with CURIEs.
+ * <p>
+ * Note: This class would normally belong to the
+ * {@link org.incenp.linkml.core.converters} package, along with all other
+ * {@link IConverter} implementations. But LinkML-Py’s Java generator used to
+ * assume that <code>CurieConverter</code> was in the <code>core</code> package
+ * instead, so for backwards compatibility it has to remain here.
  */
 public class CurieConverter extends StringConverter {
 

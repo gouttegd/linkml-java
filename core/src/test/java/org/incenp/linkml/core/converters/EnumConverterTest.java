@@ -32,8 +32,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.incenp.linkml.core;
+package org.incenp.linkml.core.converters;
 
+import org.incenp.linkml.core.ConverterContext;
+import org.incenp.linkml.core.InliningMode;
+import org.incenp.linkml.core.LinkMLInternalError;
+import org.incenp.linkml.core.LinkMLRuntimeException;
+import org.incenp.linkml.core.LinkMLValueError;
+import org.incenp.linkml.core.converters.EnumConverter;
 import org.incenp.linkml.core.samples.base.SampleEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
