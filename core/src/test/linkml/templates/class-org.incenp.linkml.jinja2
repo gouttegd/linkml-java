@@ -14,16 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-{# The annotations required by the LinkML-Java runtime -#}
-import org.incenp.linkml.core.annotations.Converter;
-import org.incenp.linkml.core.annotations.ExtensionHolder;
-import org.incenp.linkml.core.annotations.Identifier;
-import org.incenp.linkml.core.annotations.Inlined;
-import org.incenp.linkml.core.annotations.LinkURI;
-import org.incenp.linkml.core.annotations.Required;
-import org.incenp.linkml.core.annotations.SlotName;
-import org.incenp.linkml.core.annotations.TypeDesignator;
-import org.incenp.linkml.core.annotations.TypeURI;
+{# The annotations and types required by the LinkML-Java runtime -#}
+import org.incenp.linkml.core.annotations.*;
+import org.incenp.linkml.core.types.*;
 
 @LinkURI("{{ cls.class_uri }}")
 public{%if cls.abstract %} abstract{% endif %} class {{ cls.name }}{% if cls.is_a %} extends {{ cls.is_a }}{% endif %} {
