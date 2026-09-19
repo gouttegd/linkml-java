@@ -10,12 +10,25 @@ license: https://spdx.org/licenses/BSD-3-Clause.html
 prefixes:
   linkml: https://w3id.org/linkml/
   rt: https://incenp.org/dvlpt/linkml-java/tests/samples#
+  xsd: http://www.w3.org/2001/XMLSchema#
 
 default_prefix: rt
 default_range: string
 
 imports:
   - linkml:types
+
+types:
+
+  base64blob:
+    uri: xsd:base64Binary
+    base: string
+    description: A Base64-encoded array of bytes.
+
+  hexblob:
+    uri: xsd:hexBinary
+    base: string
+    description: A hexadecimal-encoded array of bytes.
 
 classes:
 
@@ -481,6 +494,21 @@ classes:
         multivalued: true
         inlined: true
         inlined_as_list: false
+
+  ContainerOfBinaryData:
+    description: >-
+      A class with slots expecting binary blobs.
+    attributes:
+      checksum:
+        range: hexblob
+      checksums:
+        range: hexblob
+        multivalued: true
+      signature:
+        range: base64blob
+      signatures:
+        range: base64blob
+        multivalued: true
 
 
 enums:

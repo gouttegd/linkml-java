@@ -42,6 +42,7 @@ import org.incenp.linkml.core.samples.base.SimpleClass;
 import org.incenp.linkml.core.samples.base.SimpleDict;
 import org.incenp.linkml.core.samples.base.SimpleIdentifiableClass;
 import org.incenp.linkml.core.samples.base.SimpleKeyableClass;
+import org.incenp.linkml.core.types.BinaryBlob;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -53,6 +54,7 @@ public class ClassInfoTest {
         Assertions.assertNull(ClassInfo.get(Boolean.TYPE));
         Assertions.assertNull(ClassInfo.get(String.class));
         Assertions.assertNull(ClassInfo.get(InliningMode.class));
+        Assertions.assertNull(ClassInfo.get(BinaryBlob.class));
         Assertions.assertNotNull(ClassInfo.get(SimpleClass.class));
     }
 
@@ -128,6 +130,5 @@ public class ClassInfoTest {
         sic.setFoo("The foo");
         ClassInfo.get(SimpleIdentifiableClass.class).processSlots(sic, (s, o, v) -> s.setValue(o, null), true);
         Assertions.assertNull(sic.getFoo());
-
     }
 }

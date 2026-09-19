@@ -9,15 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.incenp.linkml.core.annotations.Converter;
-import org.incenp.linkml.core.annotations.ExtensionHolder;
-import org.incenp.linkml.core.annotations.Identifier;
-import org.incenp.linkml.core.annotations.Inlined;
-import org.incenp.linkml.core.annotations.LinkURI;
-import org.incenp.linkml.core.annotations.Required;
-import org.incenp.linkml.core.annotations.SlotName;
-import org.incenp.linkml.core.annotations.TypeDesignator;
-import org.incenp.linkml.core.CurieConverter;
+import org.incenp.linkml.core.annotations.*;
+import org.incenp.linkml.core.types.*;
 
 @LinkURI("http://qudt.org/schema/qudt/Unit")
 public class UnitOfMeasure {
@@ -33,7 +26,7 @@ public class UnitOfMeasure {
     private String descriptiveName;
 
     @SlotName("exact_mappings")
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("http://www.w3.org/2004/02/skos/core#exactMatch")
     private List<String> exactMappings;
 
@@ -46,7 +39,7 @@ public class UnitOfMeasure {
     private String derivation;
 
     @SlotName("has_quantity_kind")
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("http://qudt.org/schema/qudt/hasQuantityKind")
     private String hasQuantityKind;
 

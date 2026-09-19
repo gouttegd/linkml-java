@@ -9,15 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.incenp.linkml.core.annotations.Converter;
-import org.incenp.linkml.core.annotations.ExtensionHolder;
-import org.incenp.linkml.core.annotations.Identifier;
-import org.incenp.linkml.core.annotations.Inlined;
-import org.incenp.linkml.core.annotations.LinkURI;
-import org.incenp.linkml.core.annotations.Required;
-import org.incenp.linkml.core.annotations.SlotName;
-import org.incenp.linkml.core.annotations.TypeDesignator;
-import org.incenp.linkml.core.CurieConverter;
+import org.incenp.linkml.core.annotations.*;
+import org.incenp.linkml.core.types.*;
 
 @LinkURI("http://www.w3.org/2008/05/skos-xl#Label")
 public class StructuredAlias {
@@ -31,7 +24,7 @@ public class StructuredAlias {
     @LinkURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate")
     private AliasPredicateEnum predicate;
 
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("http://purl.org/dc/terms/subject")
     private List<String> categories;
 
@@ -86,7 +79,7 @@ public class StructuredAlias {
     @LinkURI("https://w3id.org/linkml/imported_from")
     private String importedFrom;
 
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("http://purl.org/dc/terms/source")
     private String source;
 
@@ -95,17 +88,17 @@ public class StructuredAlias {
     private String inLanguage;
 
     @SlotName("see_also")
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("http://www.w3.org/2000/01/rdf-schema#seeAlso")
     private List<String> seeAlso;
 
     @SlotName("deprecated_element_has_exact_replacement")
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("https://w3id.org/linkml/deprecated_element_has_exact_replacement")
     private String deprecatedElementHasExactReplacement;
 
     @SlotName("deprecated_element_has_possible_replacement")
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("https://w3id.org/linkml/deprecated_element_has_possible_replacement")
     private String deprecatedElementHasPossibleReplacement;
 
@@ -117,41 +110,41 @@ public class StructuredAlias {
     @LinkURI("http://www.w3.org/2008/05/skos-xl#altLabel")
     private List<StructuredAlias> structuredAliases;
 
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("http://www.w3.org/2004/02/skos/core#mappingRelation")
     private List<String> mappings;
 
     @SlotName("exact_mappings")
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("http://www.w3.org/2004/02/skos/core#exactMatch")
     private List<String> exactMappings;
 
     @SlotName("close_mappings")
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("http://www.w3.org/2004/02/skos/core#closeMatch")
     private List<String> closeMappings;
 
     @SlotName("related_mappings")
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("http://www.w3.org/2004/02/skos/core#relatedMatch")
     private List<String> relatedMappings;
 
     @SlotName("narrow_mappings")
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("http://www.w3.org/2004/02/skos/core#narrowMatch")
     private List<String> narrowMappings;
 
     @SlotName("broad_mappings")
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("http://www.w3.org/2004/02/skos/core#broadMatch")
     private List<String> broadMappings;
 
     @SlotName("created_by")
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("http://purl.org/pav/createdBy")
     private String createdBy;
 
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("http://purl.org/dc/terms/contributor")
     private List<String> contributors;
 
@@ -164,11 +157,11 @@ public class StructuredAlias {
     private ZonedDateTime lastUpdatedOn;
 
     @SlotName("modified_by")
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("http://open-services.net/ns/core#modifiedBy")
     private String modifiedBy;
 
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("http://purl.org/ontology/bibo/status")
     private String status;
 

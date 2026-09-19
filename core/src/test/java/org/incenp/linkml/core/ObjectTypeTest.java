@@ -36,6 +36,7 @@ package org.incenp.linkml.core;
 
 import org.incenp.linkml.core.samples.base.SampleEnum;
 import org.incenp.linkml.core.samples.base.SimpleClass;
+import org.incenp.linkml.core.types.BinaryBlob;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -55,6 +56,11 @@ public class ObjectTypeTest {
     @Test
     void testDetectClasses() {
         Assertions.assertEquals(ObjectType.CLASS, ObjectType.get(SimpleClass.class));
+    }
+
+    @Test
+    void testDetectCustomTypes() {
+        Assertions.assertEquals(ObjectType.TYPE, ObjectType.get(BinaryBlob.class));
     }
 
     @Test

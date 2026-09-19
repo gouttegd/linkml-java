@@ -52,6 +52,13 @@ package org.incenp.linkml.core;
  */
 public class CurieConverter extends StringConverter {
 
+    public static final String URIORCURIE_TYPE_URI = "https://w3id.org/linkml/Uriorcurie";
+
+    @Override
+    public String getURI() {
+        return URIORCURIE_TYPE_URI;
+    }
+
     @Override
     protected Object convertImpl(Object raw, ConverterContext ctx) throws LinkMLRuntimeException {
         if ( raw instanceof String ) {

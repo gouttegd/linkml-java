@@ -52,6 +52,7 @@ import org.incenp.linkml.core.samples.base.BaseSelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.BaseURISelfDesignatedClass;
 import org.incenp.linkml.core.samples.base.ClassWithCustomConverter;
 import org.incenp.linkml.core.samples.base.ContainerOfAny;
+import org.incenp.linkml.core.samples.base.ContainerOfBinaryData;
 import org.incenp.linkml.core.samples.base.ContainerOfBooleanValues;
 import org.incenp.linkml.core.samples.base.ContainerOfIRIIdentifiableObjects;
 import org.incenp.linkml.core.samples.base.ContainerOfIdentifiedSelfDesignatedObjects;
@@ -771,6 +772,20 @@ public class ObjectConverterTest {
         Assertions.assertInstanceOf(SecondDerivedBar.class, tdf.getBars().get(0));
         Assertions.assertEquals("the first bar", tdf.getBars().get(0).getName());
         Assertions.assertEquals(2, tdf.getBars().get(0).getLength());
+    }
+
+    @Test
+    void testParsingBinaryBlobs() throws IOException {
+        ContainerOfBinaryData cobd = parseString("signature: aGVsbG8=\nsignatures:\n  - d29ybGQ=\n"
+                + "checksum: 68656C6C6F\nchecksums:\n  - 776F726C64\n",
+                ContainerOfBinaryData.class);
+
+        Assertions.assertEquals("hello", new String(cobd.getSignature().getValue()));
+        Assertions.assertEquals("world", new String(cobd.getSignatures().get(0).getValue()));
+        Assertions.assertEquals("hello", new String(cobd.getChecksum().getValue()));
+        Assertions.assertEquals("world", new String(cobd.getChecksums().get(0).getValue()));
+
+        roundtrip(cobd);
     }
 
     private <T> T parse(String file, Class<T> target) throws IOException {

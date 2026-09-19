@@ -9,15 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.incenp.linkml.core.annotations.Converter;
-import org.incenp.linkml.core.annotations.ExtensionHolder;
-import org.incenp.linkml.core.annotations.Identifier;
-import org.incenp.linkml.core.annotations.Inlined;
-import org.incenp.linkml.core.annotations.LinkURI;
-import org.incenp.linkml.core.annotations.Required;
-import org.incenp.linkml.core.annotations.SlotName;
-import org.incenp.linkml.core.annotations.TypeDesignator;
-import org.incenp.linkml.core.CurieConverter;
+import org.incenp.linkml.core.annotations.*;
+import org.incenp.linkml.core.types.*;
 
 @LinkURI("https://incenp.org/dvlpt/linkml-java/tests/samples#SimpleClass")
 public class SimpleClass {
