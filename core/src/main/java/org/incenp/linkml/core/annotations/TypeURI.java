@@ -35,6 +35,7 @@
 package org.incenp.linkml.core.annotations;
 
 import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Retention;
@@ -46,9 +47,13 @@ import java.lang.annotation.Target;
  * When this annotation is present, it can be used to determine how the field
  * should be (de)serialized, instead of determining that solely from the field’s
  * Java type.
+ * <p>
+ * A secondary use of this annotation is to mark classes that represent custom
+ * types, to make sure they are not mistaken for classes representing LinkML
+ * classes.
  */
 @Retention(RUNTIME)
-@Target(FIELD)
+@Target({ TYPE, FIELD })
 public @interface TypeURI {
     String value();
 }

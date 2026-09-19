@@ -39,6 +39,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 
+import org.incenp.linkml.core.annotations.LinkURI;
+import org.incenp.linkml.core.annotations.TypeURI;
+
 /**
  * Represents the type of a LinkML object.
  */
@@ -73,21 +76,18 @@ public enum ObjectType {
      * @return The corresponding LinkML type.
      */
     public static ObjectType get(Class<?> type) {
-        // FIXME: We might have to deal with custom types as well at some point.
         if ( type.isPrimitive() || type == String.class || type == Boolean.class || type == Integer.class
                 || type == Float.class || type == Double.class || type == ZonedDateTime.class || type == LocalDate.class
                 || type == LocalTime.class || type == URI.class ) {
             return TYPE;
-        } else if ( type.isEnum() ) {
-            // FIXME: Not necessarily a *LinkML* enum
+        } else if ( type.isEnum() && type.isAnnotationPresent(LinkURI.class) ) {
             return ENUM;
-        } else if ( type.getSuperclass() == null ) {
-            // Could be Object, an interface, or void -- in any case, cannot be a LinkML
-            // object at all
-            return NONE;
-        } else {
-            // FIXME: Not necessarily a *LinkML* class
+        } else if ( type.isAnnotationPresent(TypeURI.class) ) {
+            return TYPE;
+        } else if ( type.isAnnotationPresent(LinkURI.class) ) {
             return CLASS;
+        } else {
+            return NONE;
         }
     }
 }

@@ -37,6 +37,8 @@ package org.incenp.linkml.core.types;
 import java.util.Arrays;
 import java.util.Base64;
 
+import org.incenp.linkml.core.annotations.TypeURI;
+
 /**
  * This class represents a type intended to store arbitrary blobs of binary
  * data.
@@ -45,6 +47,7 @@ import java.util.Base64;
  * wrapper makes it easier to provide the appropriate <code>equals()</code> and
  * <code>hashCode()</code> behaviours.
  */
+@TypeURI("http://www.w3.org/2001/XMLSchema#base64Binary")
 public class BinaryBlob {
 
     private byte[] value;
