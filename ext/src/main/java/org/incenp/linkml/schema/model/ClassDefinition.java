@@ -9,15 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.incenp.linkml.core.annotations.Converter;
-import org.incenp.linkml.core.annotations.ExtensionHolder;
-import org.incenp.linkml.core.annotations.Identifier;
-import org.incenp.linkml.core.annotations.Inlined;
-import org.incenp.linkml.core.annotations.LinkURI;
-import org.incenp.linkml.core.annotations.Required;
-import org.incenp.linkml.core.annotations.SlotName;
-import org.incenp.linkml.core.annotations.TypeDesignator;
-import org.incenp.linkml.core.CurieConverter;
+import org.incenp.linkml.core.annotations.*;
+import org.incenp.linkml.core.types.*;
 
 @LinkURI("https://w3id.org/linkml/ClassDefinition")
 public class ClassDefinition extends Definition {
@@ -35,12 +28,12 @@ public class ClassDefinition extends Definition {
     private List<SlotDefinition> attributes;
 
     @SlotName("class_uri")
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("https://w3id.org/linkml/class_uri")
     private String classUri;
 
     @SlotName("subclass_of")
-    @Converter(CurieConverter.class)
+    @TypeURI("https://w3id.org/linkml/Uriorcurie")
     @LinkURI("https://w3id.org/linkml/subclass_of")
     private String subclassOf;
 
