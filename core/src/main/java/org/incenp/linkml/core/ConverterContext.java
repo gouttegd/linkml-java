@@ -171,6 +171,8 @@ public class ConverterContext {
 
         // Converters that are looked up by type URIs.
         addConverter(new CurieConverter());
+        addConverter(new Base64BlobConverter());
+        addConverter(new Base16BlobConverter());
 
         objectConverterProvider = (t) -> new ObjectConverter(t);
         typeResolver = new DefaultTypeDesignatorResolver();
