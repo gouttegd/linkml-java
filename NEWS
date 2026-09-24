@@ -1,3 +1,12 @@
+Changes in LinkML-Java 0.3.0
+----------------------------
+
+    * All converter implementations have been moved to a distinct
+      `converters` sub-package.
+    * Added a generic mechanism to support custom types.
+    * Added support for xsd:base64Binary and xsd:hexBinary types.
+
+
 Changes in LinkML-Java 0.2.3
 ----------------------------
 

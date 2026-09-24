@@ -8,6 +8,7 @@
       <item name="Introduction" href="index.html" />
       <item name="Getting started" href="quickstart.html" />
       <item name="Code generation" href="codegen.html" />
+      <item name="Custom types" href="custom-types.html" />
     </menu>
   </body>
 </project>

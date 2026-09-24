@@ -34,7 +34,8 @@ the slot may not have a value (by setting the field to `null`).
 String object, rather than by a dedicated class, for convenience. To
 support automatic expansion/contraction of CURIEs, the String field
 representing a LinkML `uriorcurie` slot must be annotated with a
-`@Converter(CurieConverter.class)` annotation (more on that below).
+`@TypeURI("https://w3id.org/linkml/Uriorcurie")` annotation (more on
+that below).
 
 ### LinkML classes
 A LinkML class is represented by a Java class that must satisfy the
@@ -115,6 +116,7 @@ namespace. They are:
 | Inlined        | Mark a slot as being inlined (as list or as dictionary) |
 | SlotName       | Provide the original name of a slot |
 | Converter      | Indicate that the class or slot requires a custom converter |
+| TypeURI        | Provide the URI associated with the type of a slot |
 
 Refined inherited slots
 -----------------------
