@@ -35,7 +35,11 @@
 package org.incenp.linkml.ext;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +97,7 @@ public class ObjectLoader {
      *                                type.
      */
     public <T> T loadObject(File file, Class<T> type) throws IOException, LinkMLRuntimeException {
-        return loadObject(file, type, DataFormat.YAML);
+        return loadObject(new FileInputStream(file), type, DataFormat.YAML);
     }
 
     /**
@@ -111,7 +115,42 @@ public class ObjectLoader {
      *                                type.
      */
     public <T> T loadObject(File file, Class<T> type, DataFormat format) throws IOException, LinkMLRuntimeException {
-        Object raw = getReader(format, false).readValue(file);
+        return loadObject(new FileInputStream(file), type, format);
+    }
+
+    /**
+     * Loads an instance of the specified type from a YAML stream.
+     * 
+     * @param <T>    The type of objects to load.
+     * @param stream The stream to load the object from.
+     * @return The object that was loaded.
+     * @throws IOException            If any I/O error occurs while attempting to
+     *                                read from the stream.
+     * @throws LinkMLRuntimeException If the contents of the stream do not match
+     *                                what is expected for an instance of the
+     *                                specified type.
+     */
+    public <T> T loadObject(InputStream stream, Class<T> type) throws IOException, LinkMLRuntimeException {
+        return loadObject(stream, type, DataFormat.YAML);
+    }
+
+    /**
+     * Loads an instance of the specified type from a stream.
+     * 
+     * @param <T>    The type of objects to load.
+     * @param stream The stream to load the object from.
+     * @param type   The type of object to load.
+     * @param format The expected format of the stream.
+     * @return The object that was loaded.
+     * @throws IOException            If any I/O error occurs while attempting to
+     *                                read from the stream.
+     * @throws LinkMLRuntimeException If the contents of the stream do not match
+     *                                what is expected for an instance of the
+     *                                specified type.
+     */
+    public <T> T loadObject(InputStream stream, Class<T> type, DataFormat format)
+            throws IOException, LinkMLRuntimeException {
+        Object raw = getReader(format, false).readValue(stream);
 
         Object cooked = ctx.getConverter(type).convert(raw, ctx);
         ctx.finalizeAssignments();
@@ -133,7 +172,7 @@ public class ObjectLoader {
      *                                type.
      */
     public <T> List<T> loadObjects(File file, Class<T> type) throws IOException, LinkMLRuntimeException {
-        return loadObjects(file, type, DataFormat.YAML);
+        return loadObjects(new FileInputStream(file), type, DataFormat.YAML);
     }
 
     /**
@@ -152,7 +191,43 @@ public class ObjectLoader {
      */
     public <T> List<T> loadObjects(File file, Class<T> type, DataFormat format)
             throws IOException, LinkMLRuntimeException {
-        List<?> raw = getReader(format, true).readValue(file);
+        return loadObjects(new FileInputStream(file), type, format);
+    }
+
+    /**
+     * Loads a list of instances of the specified type from a YAML stream.
+     * 
+     * @param <T>    The type of objects to load.
+     * @param stream The stream to load the objects from.
+     * @param type   The type of objects to load.
+     * @return The objects that were loaded.
+     * @throws IOException            If any I/O error occurs when attempting to
+     *                                read from the stream.
+     * @throws LinkMLRuntimeException If the contents of the stream do not match
+     *                                what is expected for instances of the
+     *                                specified type.
+     */
+    public <T> List<T> loadObjects(InputStream stream, Class<T> type) throws IOException, LinkMLRuntimeException {
+        return loadObjects(stream, type, DataFormat.YAML);
+    }
+
+    /**
+     * Loads a list of instances of the specified type from a stream.
+     * 
+     * @param <T>    The type of objects to load.
+     * @param stream The stream to load the objects from.
+     * @param type   The type of objects to load.
+     * @param format The expected format of the stream.
+     * @return The objects that were loaded.
+     * @throws IOException            If any I/O error occurs when attempting to
+     *                                read from the stream.
+     * @throws LinkMLRuntimeException If the contents of the stream do not match
+     *                                what is expected for instances of the
+     *                                specified type.
+     */
+    public <T> List<T> loadObjects(InputStream stream, Class<T> type, DataFormat format)
+            throws IOException, LinkMLRuntimeException {
+        List<?> raw = getReader(format, true).readValue(stream);
 
         List<T> cooked = new ArrayList<>();
         for ( Object rawItem : raw ) {
@@ -172,13 +247,12 @@ public class ObjectLoader {
      * @throws IOException            If any I/O error occurs when attempting to
      *                                write to the file.
      * @throws LinkMLRuntimeException If any error occurs when serialising the
-     *                                object to a raw YAML tree (this should not
-     *                                happen if the object is a valid LinkML object
-     *                                in the first place).
+     *                                object to a raw tree (this should not happen
+     *                                if the object is a valid LinkML object in the
+     *                                first place).
      */
     public <T> void dumpObject(File file, T object) throws IOException, LinkMLRuntimeException {
-        Object raw = ctx.getConverter(object.getClass()).serialise(object, ctx);
-        getWriter(DataFormat.YAML, false).writeValue(file, raw);
+        dumpObject(new FileOutputStream(file), object, DataFormat.YAML);
     }
 
     /**
@@ -191,13 +265,49 @@ public class ObjectLoader {
      * @throws IOException            If any I/O error occurs when attempting to
      *                                write to the file.
      * @throws LinkMLRuntimeException If any error occurs when serialising the
-     *                                object to a raw YAML tree (this should not
-     *                                happen if the object is a valid LinkML object
-     *                                in the first place).
+     *                                object to a raw tree (this should not happen
+     *                                if the object is a valid LinkML object in the
+     *                                first place).
      */
     public <T> void dumpObject(File file, T object, DataFormat format) throws IOException, LinkMLRuntimeException {
+        dumpObject(new FileOutputStream(file), object, format);
+    }
+
+    /**
+     * Dumps a LinkML object into a YAML stream.
+     * 
+     * @param <T>    The type of the object to dump.
+     * @param stream The stream where to dump the object.
+     * @param object The object to dump.
+     * @throws IOException            If any I/O error occurs when attempting to
+     *                                write to the stream.
+     * @throws LinkMLRuntimeException If any error occurs when serialising the
+     *                                object to a raw tree (this should not happen
+     *                                if the object is a valid LinkML object in the
+     *                                first place).
+     */
+    public <T> void dumpObject(OutputStream stream, T object) throws IOException, LinkMLRuntimeException {
+        dumpObject(stream, object, DataFormat.YAML);
+    }
+
+    /**
+     * Dumps a LinkML object into a stream.
+     * 
+     * @param <T>    The type of the object to dump.
+     * @param stream The stream where to dump the object.
+     * @param object The object to dump.
+     * @param format The format to use to serialise the dumped object.
+     * @throws IOException            If any I/O error occurs when attempting to
+     *                                write to the stream.
+     * @throws LinkMLRuntimeException If any error occurs when serialising the
+     *                                object to a raw tree (this should not happen
+     *                                if the object is a valid LinkML object in the
+     *                                first place).
+     */
+    public <T> void dumpObject(OutputStream stream, T object, DataFormat format)
+            throws IOException, LinkMLRuntimeException {
         Object raw = ctx.getConverter(object.getClass()).serialise(object, ctx);
-        getWriter(format, false).writeValue(file, raw);
+        getWriter(format, false).writeValue(stream, raw);
     }
 
     /**
@@ -210,12 +320,12 @@ public class ObjectLoader {
      * @throws IOException            If any I/O error occurs when attempting to
      *                                write to the file.
      * @throws LinkMLRuntimeException If any error occurs when serialising the
-     *                                objects to a raw YAML tree (this should not
-     *                                happen if the object is a valid LinkML object
-     *                                in the first place).
+     *                                objects to a raw tree (this should not happen
+     *                                if the object is a valid LinkML object in the
+     *                                first place).
      */
     public <T> void dumpObjects(File file, List<T> objects) throws IOException, LinkMLRuntimeException {
-        dumpObjects(file, objects, DataFormat.YAML);
+        dumpObjects(new FileOutputStream(file), objects, DataFormat.YAML);
     }
 
     /**
@@ -229,17 +339,55 @@ public class ObjectLoader {
      * @throws IOException            If any I/O error occurs when attempting to
      *                                write to the file.
      * @throws LinkMLRuntimeException If any error occurs when serialising the
-     *                                objects to a raw YAML tree (this should not
-     *                                happen if the object is a valid LinkML object
-     *                                in the first place).
+     *                                objects to a raw tree (this should not happen
+     *                                if the object is a valid LinkML object in the
+     *                                first place).
      */
     public <T> void dumpObjects(File file, List<T> objects, DataFormat format)
+            throws IOException, LinkMLRuntimeException {
+        dumpObjects(new FileOutputStream(file), objects, format);
+    }
+
+    /**
+     * Dumps a list of LinkML objects into a YAML file.
+     * 
+     * @param <T>     The type of the objects to dump. Of note, each object may be
+     *                of a different subtype of that type.
+     * @param stream  The stream where to dump the objects.
+     * @param objects The objects to dump.
+     * @throws IOException            If any I/O error occurs when attempting to
+     *                                write to the file.
+     * @throws LinkMLRuntimeException If any error occurs when serialising the
+     *                                objects to a raw tree (this should not happen
+     *                                if the object is a valid LinkML object in the
+     *                                first place).
+     */
+    public <T> void dumpObjects(OutputStream stream, List<T> objects) throws IOException, LinkMLRuntimeException {
+        dumpObjects(stream, objects, DataFormat.YAML);
+    }
+
+    /**
+     * Dumps a list of LinkML objects into a file.
+     * 
+     * @param <T>     The type of the objects to dump. Of note, each object may be
+     *                of a different subtype of that type.
+     * @param stream  The stream where to dump the objects.
+     * @param objects The objects to dump.
+     * @param format  The format to use to serialise the dumped objects.
+     * @throws IOException            If any I/O error occurs when attempting to
+     *                                write to the file.
+     * @throws LinkMLRuntimeException If any error occurs when serialising the
+     *                                objects to a raw tree (this should not happen
+     *                                if the object is a valid LinkML object in the
+     *                                first place).
+     */
+    public <T> void dumpObjects(OutputStream stream, List<T> objects, DataFormat format)
             throws IOException, LinkMLRuntimeException {
         List<Object> raw = new ArrayList<>();
         for ( T object : objects ) {
             raw.add(ctx.getConverter(object.getClass()).serialise(object, ctx));
         }
-        getWriter(format, true).writeValue(file, raw);
+        getWriter(format, true).writeValue(stream, raw);
     }
 
     private ObjectReader getReader(DataFormat format, boolean list) {
