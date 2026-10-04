@@ -1,3 +1,9 @@
+Changes in LinkML-Java 0.3.1
+----------------------------
+
+    * The ObjectLoader supports operating on streams.
+
+
 Changes in LinkML-Java 0.3.0
 ----------------------------
 
