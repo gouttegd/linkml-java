@@ -49,9 +49,8 @@ import org.incenp.linkml.core.LinkMLRuntimeException;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 
 /**
  * Helper class to load or dump LinkML data instances from or to YAML or JSON
@@ -150,7 +149,7 @@ public class ObjectLoader {
      */
     public <T> T loadObject(InputStream stream, Class<T> type, DataFormat format)
             throws IOException, LinkMLRuntimeException {
-        Object raw = getReader(format, false).readValue(stream);
+        Object raw = mapper.readerFor(Map.class).with(getFactory(format)).readValue(stream);
 
         Object cooked = ctx.getConverter(type).convert(raw, ctx);
         ctx.finalizeAssignments();
@@ -227,7 +226,7 @@ public class ObjectLoader {
      */
     public <T> List<T> loadObjects(InputStream stream, Class<T> type, DataFormat format)
             throws IOException, LinkMLRuntimeException {
-        List<?> raw = getReader(format, true).readValue(stream);
+        List<?> raw = mapper.readerFor(List.class).with(getFactory(format)).readValue(stream);
 
         List<T> cooked = new ArrayList<>();
         for ( Object rawItem : raw ) {
@@ -307,7 +306,7 @@ public class ObjectLoader {
     public <T> void dumpObject(OutputStream stream, T object, DataFormat format)
             throws IOException, LinkMLRuntimeException {
         Object raw = ctx.getConverter(object.getClass()).serialise(object, ctx);
-        getWriter(format, false).writeValue(stream, raw);
+        mapper.writerFor(Map.class).with(getFactory(format)).writeValue(stream, raw);
     }
 
     /**
@@ -387,18 +386,16 @@ public class ObjectLoader {
         for ( T object : objects ) {
             raw.add(ctx.getConverter(object.getClass()).serialise(object, ctx));
         }
-        getWriter(format, true).writeValue(stream, raw);
+        mapper.writerFor(List.class).with(getFactory(format)).writeValue(stream, raw);
     }
 
-    private ObjectReader getReader(DataFormat format, boolean list) {
-        JsonFactory factory = format == DataFormat.JSON ? new JsonFactory() : new YAMLFactory();
-        Class<?> type = list ? List.class : Map.class;
-        return mapper.readerFor(type).with(factory);
-    }
-
-    private ObjectWriter getWriter(DataFormat format, boolean list) {
-        JsonFactory factory = format == DataFormat.JSON ? new JsonFactory() : new YAMLFactory();
-        Class<?> type = list ? List.class : Map.class;
-        return mapper.writerFor(type).with(factory);
+    private JsonFactory getFactory(DataFormat format) {
+        if ( format == DataFormat.JSON ) {
+            return new JsonFactory();
+        } else {
+            YAMLFactory factory = new YAMLFactory();
+            factory.configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true);
+            return factory;
+        }
     }
 }
