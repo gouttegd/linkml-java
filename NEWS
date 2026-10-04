@@ -1,3 +1,9 @@
+Changes in LinkML-Java 0.3.2
+----------------------------
+
+    * The ObjectLoader outputs YAML with minimized use of quoting.
+
+
 Changes in LinkML-Java 0.3.1
 ----------------------------
 
